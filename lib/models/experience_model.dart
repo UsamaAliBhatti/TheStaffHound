@@ -1,16 +1,16 @@
-class ExperienceModel {
-  double _id;
+class UserExperienceModel {
+  // double _id;
   String _startDate;
   String _endDate;
   String _companyName;
   String _userDesignation;
 
-  ExperienceModel(this._id, this._userDesignation, this._companyName,
+  UserExperienceModel(/* this._id, */ this._userDesignation, this._companyName,
       this._startDate, this._endDate);
 
-  get id => _id;
+/*   get id => _id;
 
-  set id(value) => _id = value;
+  set id(value) => _id = value; */
 
   get startDate => _startDate;
 
