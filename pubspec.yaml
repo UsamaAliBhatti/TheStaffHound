@@ -43,7 +43,14 @@ dependencies:
   intl: ^0.17.0
   toggle_switch: ^1.4.0
   fluttertoast: ^8.0.9
- 
+  pdf: ^3.7.3
+  path_provider: ^2.0.9
+  open_document: ^1.0.4
+  open_file: ^3.2.1
+  flutter_pdfview: ^1.2.2
+  google_fonts: ^2.3.1
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

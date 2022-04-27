@@ -1,17 +1,32 @@
 import 'package:get/get.dart';
+import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/models/general_jobs_model.dart';
 import 'package:the_staff_hound/models/job_categories_model.dart';
+import 'package:the_staff_hound/models/nav_model.dart';
 
 class DashBoardController extends GetxController {
   var jobCategoryList = <JobCategoriesModel>[].obs;
   var featuredJobsList = <GeneralJobModel>[].obs;
   var recentJobsList = <GeneralJobModel>[].obs;
+  var navModelList = <NavModel>[].obs;
+
+  var selectedIndex = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchJobCategories();
     fetchFeaturedJobs();
+    fetchDrawerMenu();
+  }
+
+  fetchDrawerMenu() {
+    navModelList.add(NavModel('Profile', Constants.navProfile));
+    navModelList
+        .add(NavModel('Searched Jobs', Constants.navSearchJobIcon));
+    navModelList
+        .add(NavModel('Change Password', Constants.passwordIcon));
+    navModelList.add(NavModel('My Jobs', Constants.navMyJobsIcon));
   }
 
   void fetchJobCategories() {

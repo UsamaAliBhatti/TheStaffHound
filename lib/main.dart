@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
-import 'package:the_staff_hound/views/create_resume_screen.dart';
+// import 'package:the_staff_hound/views/my_jobs_screen.dart';
+// import 'package:the_staff_hound/views/profile_screen.dart';
+// import 'package:the_staff_hound/views/notification_screen.dart';
 // import 'package:the_staff_hound/views/resume_view.dart';
 
 // import 'package:the_staff_hound/views/dashboard_screen.dart';
-// import 'package:the_staff_hound/views/splash_screen.dart';
+import 'package:the_staff_hound/views/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Constants.primaryColor,
           backgroundColor: Constants.backgroundColor,
           fontFamily: 'Lato'),
-      home: CreateResumeActivity(),
+      home: const SplashScreen(),
     );
   }
 }

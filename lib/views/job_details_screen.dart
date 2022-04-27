@@ -35,28 +35,14 @@ class JobDetailsActivity extends StatelessWidget {
                 bottom: BorderSide(color: Colors.black26, width: 0.2)),
             shadowColor: Colors.black38,
             toolbarHeight: 70,
-            leading: Container(
-              margin: const EdgeInsets.only(left: 10),
-              width: 20,
-              height: 20,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black38,
-                      offset: Offset(1.0, 1.5),
-                      blurRadius: 1,
-                      blurStyle: BlurStyle.outer)
-                ],
-              ),
-              child: IconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    Constants.backArrow,
-                    color: Constants.primaryColor,
-                  )),
-            ),
+            leading: IconButton(
+                onPressed: () {
+                  Get.back();
+                },
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Constants.primaryColor,
+                )),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

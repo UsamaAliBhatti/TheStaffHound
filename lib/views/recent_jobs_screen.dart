@@ -18,6 +18,34 @@ class RecentJobs extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        toolbarHeight: 70,
+        backgroundColor: Constants.backgroundColor,
+        elevation: 1,
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Constants.primaryColor,
+            )),
+        title: AppText(
+          text: 'Recent Jobs',
+          textSize: 20,
+          isBold: true,
+        ),
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Platform.isAndroid ? Icons.more_vert : Icons.more_horiz,
+                color: Constants.primaryColor,
+                size: 30,
+              ))
+        ],
+      ),
       backgroundColor: Constants.backgroundColor,
       body: SafeArea(
           child: SizedBox(
@@ -26,51 +54,6 @@ class RecentJobs extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            Container(
-              height: 70,
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              decoration: const BoxDecoration(
-                  color: Constants.backgroundColor,
-                  boxShadow: [
-                    BoxShadow(color: Colors.grey, offset: Offset(0, 0.9))
-                  ]),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(50),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.grey,
-                            offset: Offset(0.3, 0.3),
-                          )
-                        ]),
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Image.asset(
-                          Constants.backArrow,
-                          color: Constants.primaryColor,
-                        )),
-                  ),
-                  AppText(
-                    text: 'Recent Jobs',
-                    textSize: 20,
-                    isBold: true,
-                  ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Platform.isAndroid ? Icons.more_vert : Icons.more_horiz,
-                        color: Constants.primaryColor,
-                        size: 30,
-                      ))
-                ],
-              ),
-            ),
             const SizedBox(height: 30),
             Expanded(
                 child: SingleChildScrollView(

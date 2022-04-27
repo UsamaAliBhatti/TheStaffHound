@@ -16,6 +16,12 @@ class Constants {
   static const String facebookIcon = "assets/images/facebook_icon.png";
   static const String forgotPasswordImage = "assets/images/forgot_pass_img.png";
   static const String otpScreenImage = "assets/images/otp_screen_img.png";
+  static const String notificationImage =
+      "assets/images/ic_notification_img.png";
+  static const String applicationAcceptImage =
+      "assets/images/ic_application_accept_img.png";
+  static const String applicationRejectImage =
+      "assets/images/ic_application_reject_img.png";
   static const String resetPasswordImage =
       "assets/images/reset_password_img.png";
   static const String successPasswordImage =
@@ -23,4 +29,7 @@ class Constants {
 
   static const jobImg = "assets/images/job_img.png";
   static const backArrow = "assets/images/back_arrow.png";
+  static const navProfile = "assets/images/ic_nav_profile.png";
+  static const navMyJobsIcon = "assets/images/ic_nav_my_job.png";
+  static const navSearchJobIcon = "assets/images/ic_nav_search_job.png";
 }

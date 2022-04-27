@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/resume_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/views/resume_view.dart';
 
 // ignore: must_be_immutable
 class CreateResumeActivity extends StatelessWidget {
@@ -180,7 +179,7 @@ class CreateResumeActivity extends StatelessWidget {
                         IconButton(
                             splashRadius: 5,
                             onPressed: () {
-                              openDescriptionDialog(size);
+                              resumeController.openDescriptionDialog(size);
                             },
                             icon: const Icon(
                               Icons.add_circle_outline_rounded,
@@ -189,6 +188,16 @@ class CreateResumeActivity extends StatelessWidget {
                       ],
                     ),
                   ),
+
+                  Obx(() => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: AppText(
+                          text: resumeController.aboutMeText.value,
+                          textColor: Colors.black,
+                          textSize: 15,
+                          isStart: true,
+                        ),
+                      )),
                   Container(
                     width: size.width,
                     height: 1,
@@ -210,7 +219,7 @@ class CreateResumeActivity extends StatelessWidget {
                         IconButton(
                             splashRadius: 5,
                             onPressed: () {
-                              openEducationDialog(size);
+                              resumeController.openEducationDialog(size);
                             },
                             icon: const Icon(
                               Icons.add_circle_outline_rounded,
@@ -219,6 +228,9 @@ class CreateResumeActivity extends StatelessWidget {
                       ],
                     ),
                   ),
+                  Obx(() {
+                    return generateEducationListVIew();
+                  }),
                   Container(
                     width: size.width,
                     height: 1,
@@ -240,7 +252,7 @@ class CreateResumeActivity extends StatelessWidget {
                         IconButton(
                             splashRadius: 5,
                             onPressed: () {
-                              openExperireceDialog(size);
+                              resumeController.openExperienceDialog(size);
                             },
                             icon: const Icon(
                               Icons.add_circle_outline_rounded,
@@ -249,11 +261,9 @@ class CreateResumeActivity extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+
                   Obx(() {
-                    return generateLUserExperienceListView();
+                    return generateUserExperienceListView();
                   }), //Calling Experience Method
                   Container(
                     width: size.width,
@@ -340,11 +350,13 @@ class CreateResumeActivity extends StatelessWidget {
                 right: 1,
                 child: Container(
                   margin: const EdgeInsets.all(20),
-                  width: 120,
+                  /* width: 120, */
                   height: 60,
                   child: TextButton(
-                      onPressed: () {
-                        Get.to(() => ResumeViewActivity());
+                      onPressed: () async {
+                        final data =
+                            await resumeController.createResumePdf(size);
+                        resumeController.saveAndViewPdf(data);
                       },
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -358,7 +370,7 @@ class CreateResumeActivity extends StatelessWidget {
                               width: 5,
                             ),
                             AppText(
-                              text: 'Save',
+                              text: 'Save & View',
                               textSize: 20,
                               isBold: true,
                               textColor: Colors.white,
@@ -374,599 +386,6 @@ class CreateResumeActivity extends StatelessWidget {
         ),
       ),
     ));
-  }
-
-//About Me Dialog
-  void openDescriptionDialog(size) {
-    Get.defaultDialog(
-        backgroundColor: Constants.backgroundColor,
-        title: 'About',
-        titleStyle: const TextStyle(
-            color: Constants.primaryColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 25),
-        content: SizedBox(
-          width: size.width,
-          child: Column(
-            children: const <Widget>[
-              SizedBox(
-                height: 20,
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                textAlign: TextAlign.start,
-                maxLines: 5,
-                style: TextStyle(color: Colors.black, fontSize: 15),
-                decoration: InputDecoration(
-                  isDense: true,
-                  fillColor: Colors.white,
-                  filled: true,
-                  hintText: "Enter about you here",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide.none),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
-        ),
-        textCancel: 'Cancel',
-        textConfirm: 'Save',
-        contentPadding: const EdgeInsets.all(10));
-  }
-
-// Education Dialog
-  void openEducationDialog(Size size) {
-    Get.defaultDialog(
-        backgroundColor: Constants.backgroundColor,
-        radius: 10,
-        title: 'Education',
-        titleStyle: const TextStyle(
-            color: Constants.primaryColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 25),
-        content: SizedBox(
-          width: size.width,
-          child: Column(
-            children: <Widget>[
-              const TextField(
-                keyboardType: TextInputType.multiline,
-                textAlign: TextAlign.start,
-                style: TextStyle(color: Colors.black, fontSize: 15),
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: "Qualification",
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const TextField(
-                keyboardType: TextInputType.multiline,
-                textAlign: TextAlign.start,
-                style: TextStyle(color: Colors.black, fontSize: 15),
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: "Institute Name",
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  InkWell(
-                      onTap: () {
-                        resumeController.chooseEducationStartDate();
-                      },
-                      child: Obx(
-                        () => Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border:
-                                  Border.all(color: Constants.primaryColor)),
-                          child: AppText(
-                            text: resumeController.educationStartDate.value,
-                            isBold: true,
-                            textSize: 18,
-                          ),
-                        ),
-                      )),
-                  Obx(
-                    () => (!resumeController.isSelected[0] &&
-                            !resumeController.isSelected[1])
-                        ? Column(
-                            children: <Widget>[
-                              AppText(
-                                text: 'Still Studying?',
-                                textSize: 18,
-                                isBold: true,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Obx(
-                                () => SizedBox(
-                                  height: 30,
-                                  child: ToggleButtons(
-                                    children: <Widget>[
-                                      AppText(
-                                        text: 'Yes',
-                                        isBold: true,
-                                      ),
-                                      AppText(
-                                        text: 'No',
-                                        isBold: true,
-                                      ),
-                                    ],
-                                    onPressed: (int index) {
-                                      resumeController.selectYesOrNO(index);
-                                    },
-                                    isSelected: resumeController.isSelected,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : (resumeController.isSelected[0] &&
-                                !resumeController.isSelected[1])
-                            ? Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: Constants.primaryColor)),
-                                child: AppText(
-                                  text: resumeController.continueText.value,
-                                  isBold: true,
-                                  textSize: 18,
-                                ),
-                              )
-                            : (!resumeController.isSelected[0] &&
-                                    resumeController.isSelected[1])
-                                ? InkWell(
-                                    onTap: () {
-                                      resumeController.chooseEducationEndDate();
-                                    },
-                                    child: Obx(
-                                      () => Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                color: Constants.primaryColor)),
-                                        child: AppText(
-                                          text: resumeController
-                                              .educationEndDate.value,
-                                          isBold: true,
-                                          textSize: 18,
-                                        ),
-                                      ),
-                                    ))
-                                : const SizedBox(),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 40,
-              )
-            ],
-          ),
-        ),
-        onWillPop: () async => resumeController.updateEducationState(),
-        contentPadding: const EdgeInsets.all(10),
-        textCancel: 'Cancel',
-        textConfirm: 'Save',
-        onCancel: () async => resumeController.updateEducationState());
-  }
-
-//Experience Dialog
-  void openExperireceDialog(Size size) {
-    showDialog(
-        context: Get.overlayContext!,
-        builder: (_) => AlertDialog(
-              title: AppText(
-                text: 'Experience',
-                textSize: 25,
-                isBold: true,
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12.0),
-                ),
-              ),
-              content: SizedBox(
-                width: size.width,
-                child: Form(
-                  key: resumeController.experienceFormKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextFormField(
-                        keyboardType: TextInputType.multiline,
-                        textAlign: TextAlign.start,
-                        style:
-                            const TextStyle(color: Colors.black, fontSize: 15),
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          hintText: "Designation",
-                        ),
-                        controller: resumeController.designationController,
-                        onSaved: (value) {
-                          resumeController.designationText.value = value!;
-                        },
-                        validator: (value) {
-                          return resumeController
-                              .validateDesignationTextField(value!);
-                        },
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        keyboardType: TextInputType.multiline,
-                        textAlign: TextAlign.start,
-                        style:
-                            const TextStyle(color: Colors.black, fontSize: 15),
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          hintText: "Company Name",
-                        ),
-                        controller: resumeController.companyNameController,
-                        onSaved: (value) {
-                          resumeController.companyNameText.value = value!;
-                        },
-                        validator: (value) {
-                          return resumeController
-                              .validateCompanyNameTextField(value!);
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          InkWell(
-                              onTap: () {
-                                resumeController.chooseExperienceStartDate();
-                              },
-                              child: Obx(
-                                () => Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color: Constants.primaryColor)),
-                                  child: AppText(
-                                    text: resumeController
-                                        .experienceStartDate.value,
-                                    isBold: true,
-                                    textSize: 18,
-                                  ),
-                                ),
-                              )),
-                          Obx(
-                            () => (!resumeController.isExperienceContinue[0] &&
-                                    !resumeController.isExperienceContinue[1])
-                                ? Column(
-                                    children: <Widget>[
-                                      AppText(
-                                        text: 'Still Continue?',
-                                        textSize: 18,
-                                        isBold: true,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Obx(
-                                        () => SizedBox(
-                                          height: 30,
-                                          child: ToggleButtons(
-                                            children: <Widget>[
-                                              AppText(
-                                                text: 'Yes',
-                                                isBold: true,
-                                              ),
-                                              AppText(
-                                                text: 'No',
-                                                isBold: true,
-                                              ),
-                                            ],
-                                            onPressed: (int index) {
-                                              resumeController
-                                                  .selectYesOrNOForExperience(
-                                                      index);
-                                            },
-                                            isSelected: resumeController
-                                                .isExperienceContinue,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : (resumeController.isExperienceContinue[0] &&
-                                        !resumeController
-                                            .isExperienceContinue[1])
-                                    ? Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                color: Constants.primaryColor)),
-                                        child: AppText(
-                                          text: resumeController
-                                              .continueText.value,
-                                          isBold: true,
-                                          textSize: 18,
-                                        ),
-                                      )
-                                    : (!resumeController
-                                                .isExperienceContinue[0] &&
-                                            resumeController
-                                                .isExperienceContinue[1])
-                                        ? InkWell(
-                                            onTap: () {
-                                              resumeController
-                                                  .chooseExperienceEndDate();
-                                            },
-                                            child: Obx(
-                                              () => Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                        color: Constants
-                                                            .primaryColor)),
-                                                child: AppText(
-                                                  text: resumeController
-                                                      .experienceEndDate.value,
-                                                  isBold: true,
-                                                  textSize: 18,
-                                                ),
-                                              ),
-                                            ))
-                                        : const SizedBox(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 40,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextButton(
-                            child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5.0, right: 5.0),
-                                child: AppText(
-                                  text: 'Cancel',
-                                  isBold: true,
-                                  textSize: 15,
-                                )),
-                            style: TextButton.styleFrom(
-                              side: const BorderSide(
-                                  color: Constants.primaryColor, width: 2),
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(25))),
-                            ),
-                            onPressed: () {
-                              Get.back();
-                            },
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          TextButton(
-                            child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: AppText(
-                                  text: 'Save',
-                                  isBold: true,
-                                  textSize: 15,
-                                  textColor: Colors.white,
-                                )),
-                            style: TextButton.styleFrom(
-                              backgroundColor: Constants.primaryColor,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(25)),
-                              ),
-                            ),
-                            onPressed: () {
-                              resumeController.saveExperience();
-                              Get.back();
-                            },
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              insetPadding: const EdgeInsets.symmetric(horizontal: 10),
-            ));
-    /*  Get.defaultDialog(
-      backgroundColor: Constants.backgroundColor,
-      radius: 10,
-      title: 'Experience',
-      titleStyle: const TextStyle(
-          color: Constants.primaryColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 25),
-      content: SizedBox(
-        width: size.width,
-        child: Form(
-          key: resumeController.experienceFormKey,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.black, fontSize: 15),
-                decoration: const InputDecoration(
-                  isDense: true,
-                  hintText: "Designation",
-                ),
-                controller: resumeController.designationController,
-                onSaved: (value) {
-                  resumeController.designationText.value = value!;
-                },
-                validator: (value) {
-                  return resumeController.validateDesignationTextField(value!);
-                },
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.black, fontSize: 15),
-                decoration: const InputDecoration(
-                  isDense: true,
-                  hintText: "Company Name",
-                ),
-                controller: resumeController.companyNameController,
-                onSaved: (value) {
-                  resumeController.companyNameText.value = value!;
-                },
-                validator: (value) {
-                  return resumeController.validateCompanyNameTextField(value!);
-                },
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  InkWell(
-                      onTap: () {
-                        resumeController.chooseExperienceStartDate();
-                      },
-                      child: Obx(
-                        () => Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border:
-                                  Border.all(color: Constants.primaryColor)),
-                          child: AppText(
-                            text: resumeController.experienceStartDate.value,
-                            isBold: true,
-                            textSize: 18,
-                          ),
-                        ),
-                      )),
-                  Obx(
-                    () => (!resumeController.isExperienceContinue[0] &&
-                            !resumeController.isExperienceContinue[1])
-                        ? Column(
-                            children: <Widget>[
-                              AppText(
-                                text: 'Still Continue?',
-                                textSize: 18,
-                                isBold: true,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Obx(
-                                () => SizedBox(
-                                  height: 30,
-                                  child: ToggleButtons(
-                                    children: <Widget>[
-                                      AppText(
-                                        text: 'Yes',
-                                        isBold: true,
-                                      ),
-                                      AppText(
-                                        text: 'No',
-                                        isBold: true,
-                                      ),
-                                    ],
-                                    onPressed: (int index) {
-                                      resumeController
-                                          .selectYesOrNOForExperience(index);
-                                    },
-                                    isSelected:
-                                        resumeController.isExperienceContinue,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : (resumeController.isExperienceContinue[0] &&
-                                !resumeController.isExperienceContinue[1])
-                            ? Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: Constants.primaryColor)),
-                                child: AppText(
-                                  text: resumeController.continueText.value,
-                                  isBold: true,
-                                  textSize: 18,
-                                ),
-                              )
-                            : (!resumeController.isExperienceContinue[0] &&
-                                    resumeController.isExperienceContinue[1])
-                                ? InkWell(
-                                    onTap: () {
-                                      resumeController
-                                          .chooseExperienceEndDate();
-                                    },
-                                    child: Obx(
-                                      () => Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                color: Constants.primaryColor)),
-                                        child: AppText(
-                                          text: resumeController
-                                              .experienceEndDate.value,
-                                          isBold: true,
-                                          textSize: 18,
-                                        ),
-                                      ),
-                                    ))
-                                : const SizedBox(),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 40,
-              )
-            ],
-          ),
-        ),
-      ),
-      onWillPop: () async => resumeController.updateExperienceState(),
-      contentPadding: const EdgeInsets.all(10),
-      textCancel: 'Cancel',
-      textConfirm: 'Save',
-      onConfirm: () {
-        resumeController.saveExperience();
-      },
-      onCancel: () async => resumeController.updateExperienceState(),
-    ); */
   }
 
 //Skill Dialog
@@ -1239,14 +658,14 @@ class CreateResumeActivity extends StatelessWidget {
   }
 
   // ListView Generation Method for Experience
-  ListView generateLUserExperienceListView() {
+  ListView generateUserExperienceListView() {
     return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: resumeController.userExperienceList.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1256,14 +675,14 @@ class CreateResumeActivity extends StatelessWidget {
                         text: 'Designation: ',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18,
                             color: Colors.black),
                         children: [
                       TextSpan(
                         text: resumeController
                             .userExperienceList[index].userDesignation,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.normal,
                             fontSize: 16,
                             color: Colors.black),
                       )
@@ -1273,14 +692,16 @@ class CreateResumeActivity extends StatelessWidget {
                         text: 'Company Name: ',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18,
                             color: Colors.black),
                         children: [
                       TextSpan(
                           text: resumeController
                               .userExperienceList[index].companyName,
                           style: const TextStyle(
-                              fontSize: 16, color: Colors.black)),
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal)),
                     ])),
                 const SizedBox(
                   height: 10,
@@ -1293,28 +714,124 @@ class CreateResumeActivity extends StatelessWidget {
                             text: 'Start Date: ',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: Colors.black),
                             children: [
                           TextSpan(
                               text: resumeController
                                   .userExperienceList[index].startDate,
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.black)),
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal)),
                         ])),
                     RichText(
                         text: TextSpan(
                             text: 'End Date: ',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: Colors.black),
                             children: [
                           TextSpan(
                               text: resumeController
                                   .userExperienceList[index].endDate,
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.black)),
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal)),
+                        ])),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+//Listview for Educations List
+  ListView generateEducationListVIew() {
+    return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: resumeController.userEducationsList.length,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                    text: TextSpan(
+                        text: 'Qualification: ',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black),
+                        children: [
+                      TextSpan(
+                        text: resumeController
+                            .userEducationsList[index].qualification,
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal),
+                      )
+                    ])),
+                RichText(
+                    text: TextSpan(
+                        text: 'Institute Name: ',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black),
+                        children: [
+                      TextSpan(
+                          text: resumeController
+                              .userEducationsList[index].instituteName,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal)),
+                    ])),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    RichText(
+                        text: TextSpan(
+                            text: 'Start Date: ',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black),
+                            children: [
+                          TextSpan(
+                              text: resumeController
+                                  .userEducationsList[index].startDate,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal)),
+                        ])),
+                    RichText(
+                        text: TextSpan(
+                            text: 'End Date: ',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black),
+                            children: [
+                          TextSpan(
+                              text: resumeController
+                                  .userEducationsList[index].endDate,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal)),
                         ])),
                   ],
                 )
