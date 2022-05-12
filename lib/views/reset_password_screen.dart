@@ -84,7 +84,7 @@ class ResetPasswordActivity extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Get.to(() => const LoginActivity());
+                  Get.to(() => LoginActivity());
                 },
                 child: AppButton(
                   text: 'Update',

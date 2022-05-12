@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
@@ -369,9 +367,8 @@ class DashboardActivity extends StatelessWidget {
                                       margin: const EdgeInsets.symmetric(
                                           horizontal: 5),
                                       decoration: BoxDecoration(
-                                          color: Colors.primaries[Random()
-                                              .nextInt(
-                                                  Colors.primaries.length)],
+                                          color: Colors.primaries[
+                                              index % Colors.primaries.length],
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       child: Center(

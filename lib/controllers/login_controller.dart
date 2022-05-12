@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:the_staff_hound/services/rest_api_services.dart';
 
 class LoginController extends GetxController {
   final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
   late TextEditingController emailController, passwordController;
 
-  var email = '';
-  var password = '';
+  var email = ''.obs;
+  var password = ''.obs;
 
   @override
   void onInit() {
@@ -48,5 +49,6 @@ class LoginController extends GetxController {
       return;
     }
     loginFormKey.currentState!.save();
+    RestApiServices.userLogin(email.value, password.value);
   }
 }

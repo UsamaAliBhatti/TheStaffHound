@@ -276,7 +276,7 @@ class ResumeController extends GetxController
     if (value.isEmpty) {
       return "please provide your designation";
     }
-
+ 
     return null;
   }
 
