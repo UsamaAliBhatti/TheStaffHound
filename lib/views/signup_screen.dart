@@ -5,8 +5,11 @@ import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/views/dashboard_screen.dart';
 
+import '../controllers/signup_controller.dart';
+
 class SignUpActivity extends StatelessWidget {
-  const SignUpActivity({Key? key}) : super(key: key);
+  var controller = Get.put(SignUpController());
+  SignUpActivity({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

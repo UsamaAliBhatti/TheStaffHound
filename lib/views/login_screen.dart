@@ -169,7 +169,7 @@ class LoginActivity extends StatelessWidget {
                       const SizedBox(width: 5),
                       TextButton(
                           onPressed: () {
-                            Get.to(() => const SignUpActivity());
+                            Get.to(() => SignUpActivity());
                           },
                           child: AppText(
                             text: "Sign Up",
