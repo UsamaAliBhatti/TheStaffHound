@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/views/otp_screen.dart';
+import 'package:the_staff_hound/views/reset_password_screen.dart';
 
 class ForgotPasswordActivity extends StatelessWidget {
   const ForgotPasswordActivity({Key? key}) : super(key: key);
@@ -65,7 +65,7 @@ class ForgotPasswordActivity extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    Get.to(() => const OTPActivity());
+                    Get.to(() => const ResetPasswordActivity());
                   },
                   child: AppButton(
                     text: 'Continue',

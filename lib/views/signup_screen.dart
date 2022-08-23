@@ -1,136 +1,352 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:the_staff_hound/api_services/response_models/branches_model.dart';
 import 'package:the_staff_hound/constants.dart';
-import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/views/dashboard_screen.dart';
 
 import '../controllers/signup_controller.dart';
 
 class SignUpActivity extends StatelessWidget {
   var controller = Get.put(SignUpController());
+
   SignUpActivity({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    bool isChecked = false;
-    Size size = MediaQuery.of(context).size;
+    // Size size = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: SafeArea(
-          child: Container(
-        width: size.width,
-        height: size.height,
-        color: Constants.backgroundColor,
-        padding: const EdgeInsets.all(30),
-        child: SingleChildScrollView(
-          child: Form(
-              child: Column(
-            children: <Widget>[
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Icon(
-                  Icons.arrow_back_ios_new,
+        appBar: AppBar(
+          backgroundColor: Constants.backgroundColor,
+          elevation: 0,
+          leading: InkWell(
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Constants.primaryColor,
+            ),
+            onTap: () {
+              Get.back();
+            },
+          ),
+        ),
+        body: SafeArea(
+            child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverList(
+                      delegate: SliverChildListDelegate(<Widget>[
+                        AppText(
+                          text: 'Create Account',
+                          textSize: 20,
+                          isBold: true,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        AppText(
+                          text: 'Welcome',
+                          textSize: 25,
+                          isBold: true,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        AppText(
+                          text: 'its easier to sign up',
+                          textSize: 18,
+                        ),
+                      ]),
+                    ),
+                  ];
+                },
+                body: Obx(() => Stepper(
+                    currentStep: controller.currentStep.value,
+                    onStepTapped: (index) {
+                      controller.currentStep.value = index;
+                    },
+                    steps: [
+                      Step(
+                          isActive: controller.currentStep.value >= 0,
+                          title: AppText(
+                            text: 'Account',
+                            textSize: 20,
+                            isBold: true,
+                          ),
+                          content: getAccountDetails()),
+                      Step(
+                        title: AppText(
+                          text: 'Address',
+                          textSize: 20,
+                          isBold: true,
+                        ),
+                        content: getAddressForm(),
+                        isActive: controller.currentStep.value >= 1,
+                      ),
+                      Step(
+                        title: AppText(
+                          text: 'Add a Branch',
+                          textSize: 20,
+                          isBold: true,
+                        ),
+                        content: getBranches(),
+                        isActive: controller.currentStep.value >= 2,
+                      ),
+                    ],
+                    type: StepperType.vertical,
+                    controlsBuilder: (context, _) {
+                      return Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            (controller.currentStep.value != 0)
+                                ? SizedBox(
+                                    width: 100,
+                                    height: 50,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        controller.currentStep.value == 0
+                                            ? null
+                                            : controller.currentStep.value--;
+                                      },
+                                      style: TextButton.styleFrom(
+                                          // padding: const EdgeInsets.symmetric(horizontal: 30),
+                                          backgroundColor:
+                                              Constants.buttonBackgroundColor,
+                                          elevation: 2,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(25))),
+                                      child: AppText(
+                                        text: 'Back',
+                                        isBold: true,
+                                        textSize: 15,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: SizedBox(
+                                width: 100,
+                                height: 50,
+                                child: TextButton(
+                                  onPressed: () {
+                                    if (controller.currentStep.value < 2) {
+                                      if (controller
+                                          .formKeys[
+                                              controller.currentStep.value]
+                                          .currentState!
+                                          .validate()) {
+                                        controller.currentStep.value++;
+                                      }
+                                      // print(controller.currentStep.value);
+                                    } else {
+                                      controller.userSignUpMethod();
+                                      /*  if (controller.formKeys[0].currentState!
+                                              .validate() &&
+                                          controller.formKeys[1].currentState!
+                                              .validate()) {
+                                        controller.userSignUpMethod();
+                                        print(controller.currentStep.value);
+                                      } */
+                                      /* Get.to(
+                                          () => const ForgotPasswordActivity()); */
+                                    }
+                                  },
+                                  style: TextButton.styleFrom(
+                                      // padding: const EdgeInsets.symmetric(horizontal: 30),
+                                      backgroundColor:
+                                          Constants.buttonBackgroundColor,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25))),
+                                  child: AppText(
+                                    text: (controller.currentStep.value == 2)
+                                        ? 'Sign Up'
+                                        : 'Next',
+                                    isBold: true,
+                                    textSize: 18,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    })))));
+  }
+
+// Account Details Form
+  Widget getAccountDetails() {
+    return Form(
+        key: controller.formKeys[0],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextFormField(
+              controller: controller.nameController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
+                ),
+                labelText: "Full Name",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
+                prefixIcon: const Icon(
+                  Icons.person_rounded,
                   color: Constants.primaryColor,
                 ),
               ),
-              const SizedBox(height: 30),
-              AppText(
-                text: 'Create Account',
-                textSize: 20,
-                isBold: true,
-              ),
-              const SizedBox(height: 30),
-              AppText(
-                text: 'Welcome',
-                textSize: 25,
-                isBold: true,
-              ),
-              const SizedBox(height: 5),
-              AppText(
-                text: 'its easier to sign up',
-                textSize: 18,
-              ),
-              const SizedBox(
-                height: 60,
-              ),
-              TextFormField(
-                decoration: InputDecoration(
+              onSaved: (value) {
+                controller.nameController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateName(value);
+              },
+              keyboardType: TextInputType.emailAddress,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: controller.emailController,
+              decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                     borderSide: const BorderSide(
                         color: Constants.primaryColor, width: 2.0),
                   ),
-                  labelText: "Username",
+                  labelText: "Email",
                   labelStyle: const TextStyle(
                       color: Constants.primaryColor, fontSize: 17),
-                  prefixIcon: const Icon(
-                    Icons.person_rounded,
-                    color: Constants.primaryColor,
-                  ),
-                ),
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                    color: Constants.primaryColor, fontSize: 18),
+                  prefixIcon:
+                      const Icon(Icons.email, color: Constants.primaryColor)),
+              keyboardType: TextInputType.emailAddress,
+              style: const TextStyle(
+                color: Constants.primaryColor,
+                fontSize: 18,
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
-                      borderSide: const BorderSide(
-                          color: Constants.primaryColor, width: 2.0),
-                    ),
-                    labelText: "Email",
-                    labelStyle: const TextStyle(
-                        color: Constants.primaryColor, fontSize: 17),
-                    prefixIcon:
-                        const Icon(Icons.email, color: Constants.primaryColor)),
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                  color: Constants.primaryColor,
-                  fontSize: 18,
+              onSaved: (value) {
+                controller.emailController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateEmail(value);
+              },
+            ),
+            const SizedBox(height: 20),
+            InternationalPhoneNumberInput(
+              textFieldController: controller.phoneContoller,
+              onInputChanged: (phoneNumber) {
+                // controller.phoneContoller.text = phoneNumber.phoneNumber!;
+              },
+              onSaved: (value) {
+                controller.phoneContoller.text = value.phoneNumber!;
+              },
+              validator: (value) {
+                return controller.validatePhone(value);
+              },
+              selectorTextStyle: const TextStyle(color: Colors.black),
+              inputDecoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
                 ),
+                labelText: "Phone Number",
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
+              selectorConfig: const SelectorConfig(
+                  selectorType: PhoneInputSelectorType.DIALOG),
+            ),
+            /*  TextFormField(
+              onSaved: (value) {
+                controller.phoneContoller.text = value!;
+              },
+              validator: (value) {
+                return controller.validatePhone(value);
+              },
+              controller: controller.phoneContoller,
+              decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                     borderSide: const BorderSide(
                         color: Constants.primaryColor, width: 2.0),
                   ),
-                  labelText: "Password",
+                  labelText: "Phone Number",
                   labelStyle: const TextStyle(
                       color: Constants.primaryColor, fontSize: 17),
-                  prefixIcon: Image.asset(Constants.passwordIcon),
-                ),
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                    color: Constants.primaryColor, fontSize: 18),
+                  prefixIcon: Image.asset(Constants.ic_phone)),
+              keyboardType: TextInputType.emailAddress,
+              style: const TextStyle(
+                color: Constants.primaryColor,
+                fontSize: 18,
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
-                      borderSide: const BorderSide(
-                          color: Constants.primaryColor, width: 2.0),
-                    ),
-                    labelText: "Re-Enter Password",
-                    labelStyle: const TextStyle(
-                        color: Constants.primaryColor, fontSize: 17),
-                    prefixIcon: Image.asset(Constants.passwordIcon)),
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                  color: Constants.primaryColor,
-                  fontSize: 18,
+            ), */
+            const SizedBox(height: 20),
+            TextFormField(
+              onSaved: (value) {
+                controller.passwordController.text = value!;
+              },
+              validator: (value) {
+                return controller.validatePassword(value);
+              },
+              controller: controller.passwordController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
                 ),
+                labelText: "Password",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
+                prefixIcon: Image.asset(Constants.passwordIcon),
               ),
-              Padding(
+              keyboardType: TextInputType.emailAddress,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              onSaved: (value) {
+                controller.reEnterPasswordController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateReEnterPassword(value);
+              },
+              controller: controller.reEnterPasswordController,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: const BorderSide(
+                        color: Constants.primaryColor, width: 2.0),
+                  ),
+                  labelText: "Re-Enter Password",
+                  labelStyle: const TextStyle(
+                      color: Constants.primaryColor, fontSize: 17),
+                  prefixIcon: Image.asset(Constants.passwordIcon)),
+              keyboardType: TextInputType.emailAddress,
+              style: const TextStyle(
+                color: Constants.primaryColor,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Obx(() {
+              return Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: GestureDetector(
                   onTap: () {
-                    isChecked = !isChecked;
+                    controller.isPrivacyPolicyChecked.value =
+                        !controller.isPrivacyPolicyChecked.value;
                   },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -141,15 +357,15 @@ class SignUpActivity extends StatelessWidget {
                         decoration: BoxDecoration(
                             // color: /*isChecked ? primaryColor : */Colors.grey,
                             border: Border.all(
-                                color: isChecked
+                                color: controller.isPrivacyPolicyChecked.value
                                     ? Constants.primaryColor
                                     : Constants.textHintColor),
                             borderRadius: BorderRadius.circular(3.0)),
                         width: 20,
                         height: 20,
-                        child: isChecked
+                        child: controller.isPrivacyPolicyChecked.value
                             ? const Icon(Icons.check,
-                                color: Constants.primaryColor, size: 20)
+                                color: Constants.primaryColor, size: 18)
                             : null,
                       ),
                       const Padding(
@@ -177,24 +393,299 @@ class SignUpActivity extends StatelessWidget {
                     ],
                   ),
                 ),
+              );
+            }),
+            /* const SizedBox(
+              height: 20,
+            ),
+            InkWell(
+              child: AppButton(
+                text: "Sign Up",
+                textSize: 20,
+                buttonWidth: 250,
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              InkWell(
-                child: AppButton(
-                  text: "Sign Up",
-                  textSize: 20,
-                  buttonWidth: 250,
+              onTap: () {
+                // Get.to(() => DashboardActivity());
+                controller.userSignUpMethod();
+              },
+            ),
+            const SizedBox(
+              height: 20,
+            ),*/
+          ],
+        ));
+  }
+
+  // Address Form
+  Widget getAddressForm() {
+    return Form(
+        key: controller.formKeys[1],
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Current Location',
+                    style:
+                        TextStyle(color: Constants.primaryColor, fontSize: 20),
+                  ),
                 ),
-                onTap: () {
-                  Get.to(() => DashboardActivity());
-                },
+                /*  InkWell(
+                    onTap: () {
+                      controller.isCurrentLocationSelected.value =
+                          !controller.isCurrentLocationSelected.value;
+                    },
+                    child: */
+                IconButton(
+                    splashColor: Colors.transparent,
+                    padding: EdgeInsets.zero,
+                    onPressed: () async {
+                      controller.isCurrentLocationSelected.value =
+                          !controller.isCurrentLocationSelected.value;
+                      if (controller.isCurrentLocationSelected.value) {
+                        await controller.getCurrentLocation();
+                      } else {
+                        controller.clearAddress();
+                      }
+                    },
+                    icon: controller.isCurrentLocationSelected.isFalse
+                        ? Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 2,
+                                color:
+                                    controller.isCurrentLocationSelected.value
+                                        ? Constants.secondaryColor
+                                        : Constants.textHintColor,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ))
+                        : const Icon(
+                            Icons.adjust_sharp,
+                            color: Constants.secondaryColor,
+                            size: 30,
+                          ))
+              ],
+            ),
+            TextFormField(
+              controller: controller.streetTextController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
+                ),
+                labelText: "Street",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
               ),
-            ],
-          )),
-        ),
-      )),
+              onSaved: (value) {
+                controller.streetTextController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateStreet(value);
+              },
+              keyboardType: TextInputType.text,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              controller: controller.zipcodeTextController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
+                ),
+                labelText: "Zip Code",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
+              ),
+              onSaved: (value) {
+                controller.zipcodeTextController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateZipCode(value);
+              },
+              keyboardType: TextInputType.number,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              controller: controller.cityTextController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
+                ),
+                labelText: "City",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
+              ),
+              onSaved: (value) {
+                controller.cityTextController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateCity(value);
+              },
+              keyboardType: TextInputType.text,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              controller: controller.stateTextController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
+                ),
+                labelText: "State",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
+              ),
+              onSaved: (value) {
+                controller.stateTextController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateState(value);
+              },
+              keyboardType: TextInputType.text,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              controller: controller.countryTextController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: const BorderSide(
+                      color: Constants.primaryColor, width: 2.0),
+                ),
+                labelText: "Country",
+                labelStyle: const TextStyle(
+                    color: Constants.primaryColor, fontSize: 17),
+              ),
+              onSaved: (value) {
+                controller.countryTextController.text = value!;
+              },
+              validator: (value) {
+                return controller.validateCountry(value);
+              },
+              keyboardType: TextInputType.text,
+              style:
+                  const TextStyle(color: Constants.primaryColor, fontSize: 18),
+            ),
+          ],
+        ));
+  }
+
+  // Add a Branch Layout
+  getBranches() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        MultiSelectDialogField(
+            dialogHeight: controller.dropdownItemsList.length * 60,
+            items: controller.dropdownItemsList,
+            title: AppText(
+              text: 'Select Branch',
+              isBold: true,
+              textSize: 18,
+              textColor: Colors.black,
+            ),
+            selectedColor: Constants.primaryColor,
+            buttonText: const Text(
+              'Select Branch',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+              ),
+            ),
+            buttonIcon: const Icon(Icons.arrow_drop_down_sharp),
+            decoration: BoxDecoration(
+                border: Border.all(
+                  width: 1,
+                  color: Constants.primaryColor,
+                ),
+                borderRadius: BorderRadius.circular(30)),
+            onConfirm: (values) {
+              controller.selectedBranchesList.value = [];
+              for (int i = 0; i < values.length; i++) {
+                Datum datum = values[i] as Datum;
+                controller.selectedBranchesList.add(datum.id);
+                print(values);
+              }
+              print(controller.selectedBranchesList.toJson());
+            }),
+        /* Expanded(
+          child: ListView.builder(
+            itemCount: controller.selectedBranchesList.length,
+            itemBuilder: (context, index) {
+              return Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                  )
+                ],
+              );
+            },
+          ),
+        ) */
+      ],
     );
+
+    /* DropdownButtonFormField(
+      decoration: InputDecoration(
+        isDense: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(50),
+          borderSide:
+              const BorderSide(color: Constants.primaryColor, width: 2.0),
+        ),
+      ),
+      hint: AppText(
+        text: 'Select your branch',
+        textSize: 15,
+      ),
+      style: const TextStyle(height: 0.0),
+      iconSize: 30,
+      items: controller.branchModel.data?.map((item) {
+        return DropdownMenuItem(
+          value: item.id,
+          child: AppText(
+            text: item.name,
+            textColor: Colors.black,
+            textSize: 15,
+          ),
+        );
+      }).toList(),
+      onChanged: (int? newVal) {
+        controller.branchId.value = newVal!;
+        print(newVal);
+      },
+    ); */
   }
 }

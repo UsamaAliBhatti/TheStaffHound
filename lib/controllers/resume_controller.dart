@@ -1,21 +1,21 @@
+import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart ';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:the_staff_hound/views/resume_view.dart';
+import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/main.dart';
+import 'package:the_staff_hound/models/language_model.dart';
+import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 import '../constants.dart';
 import '../custom_widgets/app_text.dart';
 import '../models/education_model.dart';
 import '../models/experience_model.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 
 class ResumeController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -23,18 +23,21 @@ class ResumeController extends GetxController
   var selectedImageSize = ''.obs;
 
 // Skills Dialog Parameters
-  var skillsList = [
+/*   var skillsList = [
     'Programming',
     'Graphic designing',
     'Web Development',
     'Mobile App Development',
     'Backend Development'
-  ].obs;
-  var selectedSkill = 'Programming'.obs;
+  ].obs; */
+  // var selectedSkill = ''.obs;
+  final otherSkillController = TextEditingController();
+  var skillFormKey = GlobalKey<FormState>();
   var userSelectedSkillsList = [].obs;
+  var tempSkillsList = <String>[].obs;
 
 // Language Dialog Parameters
-  var languagesList = [
+/*   var languagesList = [
     'Urdu',
     'Punjabi',
     'Sindhi',
@@ -43,9 +46,13 @@ class ResumeController extends GetxController
     'English',
     'Spanish',
     'French'
-  ].obs;
-  var selectedLanguage = 'Urdu'.obs;
+  ].obs; */
+  // var selectedLanguage = 'Urdu'.obs;
+  var languagesList = <LanguageModel>[].obs;
+  var tempLanguagesList = <String>[].obs;
+  final otherLanguageController = TextEditingController();
   var userSelectedLanguagesList = [].obs;
+  var languageFormKey = GlobalKey<FormState>();
 
 //Experience Dialog Parameters
   final GlobalKey<FormState> experienceFormKey = GlobalKey<FormState>();
@@ -57,6 +64,13 @@ class ResumeController extends GetxController
   var experienceStartDate = ''.obs;
   var experienceEndDate = ''.obs;
   final _isExperienceContinue = 'toggle'.obs;
+
+  //header dialog parameters
+  /*  final introductionFormKey = GlobalKey<FormState>();
+  final addressController = TextEditingController();
+  final phoneNumberController = TextEditingController(); */
+  var phoneNumber = ''.obs;
+  var address = ''.obs;
 
 //Education Dialog Parameters
   final GlobalKey<FormState> educationFormKey = GlobalKey<FormState>();
@@ -74,6 +88,12 @@ class ResumeController extends GetxController
   final aboutMeTextController = TextEditingController();
   var aboutMeText = ''.obs;
 
+  var userName = ''.obs;
+  var userEmail = ''.obs;
+  var userToken = ''.obs;
+
+  // Custom Icons
+
   @override
   void onClose() {
     companyNameController.dispose();
@@ -87,25 +107,88 @@ class ResumeController extends GetxController
   }
 
   @override
-  void onInit() {
-    aboutMeTextController.text = aboutMeText.value;
+  void onInit() async {
+    userToken.value = SharedPrefsManager.getUserToken;
+
+    languagesList
+        .add(LanguageModel(languageName: 'English', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Spanish', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Polish', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Russian', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Hindi', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Urdu', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Arabic', isSelected: false.obs));
+    languagesList
+        .add(LanguageModel(languageName: 'Chinese', isSelected: false.obs));
+
+    // aboutMeTextController.text = aboutMeText.value;
+    /*  addressController.text = address.value;
+    phoneNumberController.text = phoneNumber.value; */
+    userName.value = SharedPrefsManager.getUserName;
+    userEmail.value = SharedPrefsManager.getUserEmail;
+    address.value = SharedPrefsManager.getUserAddress ?? '';
+    phoneNumber.value = SharedPrefsManager.getUserPhoneNumber ?? '';
+    // getUserPhoneAndAddress(userToken.value);
+    getResume(userToken.value);
     super.onInit();
   }
 
-// About Me Dialog Methods
-  void saveAboutMeDescription() {}
+  getUserPhoneAndAddress(String token) async {
+    var response = await RestApiServices.getMyProfile(token);
+    if (response != null) {
+      phoneNumber.value = response.profile!.phone!;
+      address.value = response.address!;
+    }
+  }
+
+  getResume(String token) async {
+    address.value = SharedPrefsManager.getUserAddress ?? '';
+    phoneNumber.value = SharedPrefsManager.getUserPhoneNumber ?? '';
+    var response = await RestApiServices.getUserResume(token);
+    if (response != null) {
+      aboutMeText.value = response.aboutMe!;
+      aboutMeTextController.text = aboutMeText.value;
+
+      userSelectedSkillsList.value =
+          jsonDecode(response.skills!).cast<String>();
+      userSelectedLanguagesList.value =
+          jsonDecode(response.languages!).cast<String>();
+
+      userExperienceList.value = List<UserExperienceModel>.from(
+          jsonDecode(response.experience!)
+              .map((element) => UserExperienceModel.fromJson(element)));
+      userEducationsList.value = List<UserEducation>.from(
+          jsonDecode(response.education!)
+              .map((element) => UserEducation.fromJson(element)));
+
+      // print(skillsList);
+      // print(experienceList);
+      // print(educationList);
+      // print(languagesList);
+    } else {
+      aboutMeTextController.text = '';
+      userSelectedSkillsList.value = [];
+      userEducationsList.value = [];
+      userExperienceList.value = [];
+      userSelectedLanguagesList.value = [];
+    }
+  }
 
 // method to get Image from gallery
   void getImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       selectedImagepath.value = pickedFile.path;
       selectedImageSize.value =
-          ((File(selectedImagepath.value)).lengthSync() / 1024 / 1024)
-                  .toStringAsFixed(2) +
-              'Mb';
+          '${((File(selectedImagepath.value)).lengthSync() / 1024 / 1024).toStringAsFixed(2)}Mb';
     } else {
       Get.snackbar('Error', 'No Image Selected',
           snackPosition: SnackPosition.BOTTOM,
@@ -150,7 +233,7 @@ class ResumeController extends GetxController
                             const TextStyle(color: Colors.black, fontSize: 15),
                         decoration: const InputDecoration(
                           isDense: true,
-                          hintText: "Qualification",
+                          hintText: "Degree / Certification",
                         ),
                         controller: qualificationController,
                         onSaved: (value) {
@@ -216,14 +299,6 @@ class ResumeController extends GetxController
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           TextButton(
-                            child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5.0, right: 5.0),
-                                child: AppText(
-                                  text: 'Cancel',
-                                  isBold: true,
-                                  textSize: 15,
-                                )),
                             style: TextButton.styleFrom(
                               side: const BorderSide(
                                   color: Constants.primaryColor, width: 2),
@@ -235,20 +310,19 @@ class ResumeController extends GetxController
                               updateEducationState();
                               Get.back();
                             },
+                            child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 5.0, right: 5.0),
+                                child: AppText(
+                                  text: 'Cancel',
+                                  isBold: true,
+                                  textSize: 15,
+                                )),
                           ),
                           const SizedBox(
                             width: 10,
                           ),
                           TextButton(
-                            child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: AppText(
-                                  text: 'Save',
-                                  isBold: true,
-                                  textSize: 15,
-                                  textColor: Colors.white,
-                                )),
                             style: TextButton.styleFrom(
                               backgroundColor: Constants.primaryColor,
                               shape: const RoundedRectangleBorder(
@@ -261,6 +335,15 @@ class ResumeController extends GetxController
                                 Get.back();
                               }
                             },
+                            child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10.0, right: 10.0),
+                                child: AppText(
+                                  text: 'Save',
+                                  isBold: true,
+                                  textSize: 15,
+                                  textColor: Colors.white,
+                                )),
                           ),
                         ],
                       )
@@ -276,7 +359,7 @@ class ResumeController extends GetxController
     if (value.isEmpty) {
       return "please provide your designation";
     }
- 
+
     return null;
   }
 
@@ -323,7 +406,7 @@ class ResumeController extends GetxController
         lastDate: DateTime(2030));
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      educationEndDate.value = DateFormat.MEd().format(pickedDate);
+      educationEndDate.value = DateFormat.yMMMMd().format(pickedDate);
       update();
     }
   }
@@ -337,7 +420,7 @@ class ResumeController extends GetxController
         lastDate: DateTime.now());
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      educationStartDate.value = DateFormat.MEd().format(pickedDate);
+      educationStartDate.value = DateFormat.yMMMMd().format(pickedDate);
       update();
     }
   }
@@ -358,15 +441,24 @@ class ResumeController extends GetxController
     switch (_isEducationContinue.value) {
       case 'true':
         educationEndDate.value = 'Present';
-        return Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Constants.primaryColor)),
-          child: AppText(
-            text: 'Present',
-            isBold: true,
-            textSize: 18,
+        return InkWell(
+          onTap: () {
+            chooseEducationEndDate();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Constants.primaryColor)),
+            child: Obx(
+              () => AppText(
+                text: (educationEndDate.value.isEmpty)
+                    ? 'Present'
+                    : educationEndDate.value,
+                isBold: true,
+                textSize: 18,
+              ),
+            ),
           ),
         );
       case 'false':
@@ -468,7 +560,7 @@ class ResumeController extends GetxController
                             const TextStyle(color: Colors.black, fontSize: 15),
                         decoration: const InputDecoration(
                           isDense: true,
-                          hintText: "Designation",
+                          hintText: "Title / Position",
                         ),
                         controller: designationController,
                         onSaved: (value) {
@@ -534,14 +626,6 @@ class ResumeController extends GetxController
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           TextButton(
-                            child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5.0, right: 5.0),
-                                child: AppText(
-                                  text: 'Cancel',
-                                  isBold: true,
-                                  textSize: 15,
-                                )),
                             style: TextButton.styleFrom(
                               side: const BorderSide(
                                   color: Constants.primaryColor, width: 2),
@@ -553,20 +637,19 @@ class ResumeController extends GetxController
                               updateExperienceState();
                               Get.back();
                             },
+                            child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 5.0, right: 5.0),
+                                child: AppText(
+                                  text: 'Cancel',
+                                  isBold: true,
+                                  textSize: 15,
+                                )),
                           ),
                           const SizedBox(
                             width: 10,
                           ),
                           TextButton(
-                            child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: AppText(
-                                  text: 'Save',
-                                  isBold: true,
-                                  textSize: 15,
-                                  textColor: Colors.white,
-                                )),
                             style: TextButton.styleFrom(
                               backgroundColor: Constants.primaryColor,
                               shape: const RoundedRectangleBorder(
@@ -579,6 +662,15 @@ class ResumeController extends GetxController
                                 Get.back();
                               }
                             },
+                            child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10.0, right: 10.0),
+                                child: AppText(
+                                  text: 'Save',
+                                  isBold: true,
+                                  textSize: 15,
+                                  textColor: Colors.white,
+                                )),
                           ),
                         ],
                       )
@@ -642,7 +734,7 @@ class ResumeController extends GetxController
         lastDate: DateTime.now());
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      experienceStartDate.value = DateFormat.MEd().format(pickedDate);
+      experienceStartDate.value = DateFormat.yMMMMd().format(pickedDate);
       update();
     }
   }
@@ -656,7 +748,7 @@ class ResumeController extends GetxController
         lastDate: DateTime(2030));
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      experienceEndDate.value = DateFormat.MEd().format(pickedDate);
+      experienceEndDate.value = DateFormat.yMMMMd().format(pickedDate);
       update();
     }
   }
@@ -678,15 +770,24 @@ class ResumeController extends GetxController
     switch (_isExperienceContinue.value) {
       case 'true':
         experienceEndDate.value = 'Present';
-        return Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Constants.primaryColor)),
-          child: AppText(
-            text: 'Present',
-            isBold: true,
-            textSize: 18,
+        return InkWell(
+          onTap: () {
+            chooseExperienceEndDate();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Constants.primaryColor)),
+            child: Obx(
+              () => AppText(
+                text: (experienceEndDate.value.isEmpty)
+                    ? 'Present'
+                    : experienceEndDate.value,
+                isBold: true,
+                textSize: 18,
+              ),
+            ),
           ),
         );
       case 'false':
@@ -714,7 +815,7 @@ class ResumeController extends GetxController
         return Column(
           children: <Widget>[
             AppText(
-              text: 'Still Studying?',
+              text: 'Still Continue?',
               textSize: 15,
               isBold: true,
             ),
@@ -773,7 +874,7 @@ class ResumeController extends GetxController
               backgroundColor: Constants.backgroundColor,
               insetPadding: const EdgeInsets.symmetric(horizontal: 20),
               title: AppText(
-                text: 'About',
+                text: 'About Yourself',
                 textSize: 25,
                 isBold: true,
               ),
@@ -800,7 +901,7 @@ class ResumeController extends GetxController
                           isDense: true,
                           fillColor: Colors.white,
                           filled: true,
-                          hintText: "Enter about you here",
+                          hintText: "Enter about yourself here",
                           border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
@@ -820,13 +921,6 @@ class ResumeController extends GetxController
               actionsAlignment: MainAxisAlignment.center,
               actions: [
                 TextButton(
-                  child: Padding(
-                      padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                      child: AppText(
-                        text: 'Cancel',
-                        isBold: true,
-                        textSize: 15,
-                      )),
                   style: TextButton.styleFrom(
                     side: const BorderSide(
                         color: Constants.primaryColor, width: 2),
@@ -837,19 +931,18 @@ class ResumeController extends GetxController
                     // updateExperienceState();
                     Get.back();
                   },
+                  child: Padding(
+                      padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                      child: AppText(
+                        text: 'Cancel',
+                        isBold: true,
+                        textSize: 15,
+                      )),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
                 TextButton(
-                  child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                      child: AppText(
-                        text: 'Save',
-                        isBold: true,
-                        textSize: 15,
-                        textColor: Colors.white,
-                      )),
                   style: TextButton.styleFrom(
                     backgroundColor: Constants.primaryColor,
                     shape: const RoundedRectangleBorder(
@@ -861,6 +954,14 @@ class ResumeController extends GetxController
                       Get.back();
                     }
                   },
+                  child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                      child: AppText(
+                        text: 'Save',
+                        isBold: true,
+                        textSize: 15,
+                        textColor: Colors.white,
+                      )),
                 ),
               ],
             ));
@@ -888,35 +989,270 @@ class ResumeController extends GetxController
         fontSize: 16.0);
   }
 
-  // select list method
-  void selectSkill(Object value) {
-    selectedSkill.value = value.toString();
+//////----------------------------------------Skill Dialog Methods Starts--------------------------------------------//////
+  // validate skill field
+  String? validateSkillTextField(String value) {
+    if (value.isEmpty) {
+      return "please add your skill";
+    }
+
+    return null;
   }
 
-  // select list language
-  void selectLanguage(Object value) {
-    selectedLanguage.value = value.toString();
+  addSkill() {
+    if (skillFormKey.currentState!.validate()) {
+      if (!tempSkillsList.contains(otherSkillController.text)) {
+        tempSkillsList.add(otherSkillController.text.capitalizeFirstofEach);
+        otherSkillController.clear();
+      } else {
+        return;
+      }
+    }
+  }
+
+  removeSkill(int index) {
+    if (tempSkillsList.isNotEmpty) {
+      tempSkillsList.removeAt(index);
+    } else {
+      showToast('Please add skills first');
+    }
   }
 
   //Save User Skills Method
   saveUserSkills() {
-    if (!userSelectedSkillsList.contains(selectedSkill.value)) {
-      userSelectedSkillsList.add(selectedSkill.value);
-      update();
-    } else {
-      return;
+    if (tempSkillsList.isNotEmpty) {
+      for (int i = 0; i < tempSkillsList.length; i++) {
+        if (userSelectedSkillsList
+            .every((element) => element != tempSkillsList[i])) {
+          userSelectedSkillsList.add(tempSkillsList[i]);
+        }
+      }
     }
+  }
+  //////-------------------------------------------Skill Dialog Methods Ends---------------------------------------//////
+
+  //////--------------------------------------Language Dialog Methods Starts--------------------------------------//////
+
+  addLanguage() {
+    if (languageFormKey.currentState!.validate()) {
+      if (!tempLanguagesList.contains(otherLanguageController.text)) {
+        tempLanguagesList
+            .add(otherLanguageController.text.capitalizeFirstofEach);
+        otherLanguageController.clear();
+      } else {
+        return;
+      }
+    }
+  }
+
+  addLanguageFromList(int index) {
+    tempLanguagesList.add(languagesList[index].getLanguageName!);
+  }
+
+  removeLanguageAlongList(int index) {
+    if (tempLanguagesList.isNotEmpty) {
+      tempLanguagesList.removeWhere((element) =>
+          languagesList[index].getLanguageName == element &&
+          languagesList[index].getIsSelected == false);
+    }
+  }
+
+  removeLanguage(int index) {
+    if (tempLanguagesList.isNotEmpty) {
+      // ignore: iterable_contains_unrelated_type
+      if (languagesList
+          .any((element) => element.languageName == tempLanguagesList[index])) {
+        languagesList[languagesList.indexWhere(
+                (element) => element.languageName == tempLanguagesList[index])]
+            .isSelected!
+            .value = false;
+        // tempLanguagesList.removeAt(index);
+      }
+
+      tempLanguagesList.removeAt(index);
+    }
+  }
+
+  // validate Language Text Field
+  String? validateLanguageTextField(String value) {
+    if (value.isEmpty) {
+      return "Please add language first";
+    }
+    return null;
   }
 
   //Save User Languages Method
   saveUserLanguages() {
-    if (!userSelectedLanguagesList.contains(selectedLanguage.value)) {
-      userSelectedLanguagesList.add(selectedLanguage.value);
-      update();
-    } else {
-      return;
+    if (tempLanguagesList.isNotEmpty) {
+      for (int i = 0; i < tempLanguagesList.length; i++) {
+        if (userSelectedLanguagesList
+            .every((element) => element != tempLanguagesList[i])) {
+          userSelectedLanguagesList.add(tempLanguagesList[i]);
+          // return;
+        }
+      }
     }
   }
+
+  //////----------------------------------------Language Dialog Methods End-------------------------------------------//////
+
+  /*  userDetailDialogMethod(Size size) {
+    showDialog(
+        context: Get.overlayContext!,
+        builder: (_) => AlertDialog(
+              title: AppText(
+                text: 'Contact Information',
+                textSize: 25,
+                isBold: true,
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12.0),
+                ),
+              ),
+              content: SizedBox(
+                width: size.width,
+                child: Form(
+                  key: introductionFormKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextFormField(
+                        keyboardType: TextInputType.phone,
+                        textAlign: TextAlign.start,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 15),
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          hintText: "Phone Number",
+                        ),
+                        controller: phoneNumberController,
+                        onSaved: (value) {
+                          phoneNumber.value = value!;
+                        },
+                        validator: (value) {
+                          return validatePhoneTextField(value!);
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        keyboardType: TextInputType.multiline,
+                        textAlign: TextAlign.start,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 15),
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          hintText: "Address",
+                        ),
+                        controller: addressController,
+                        onSaved: (value) {
+                          address.value = value!;
+                        },
+                        validator: (value) {
+                          return validateAddressTextField(value!);
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              side: const BorderSide(
+                                  color: Constants.primaryColor, width: 2),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(25))),
+                            ),
+                            onPressed: () {
+                              //updateExperienceState();
+                              Get.back();
+                            },
+                            child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 5.0, right: 5.0),
+                                child: AppText(
+                                  text: 'Cancel',
+                                  isBold: true,
+                                  textSize: 15,
+                                )),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Constants.primaryColor,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(25)),
+                              ),
+                            ),
+                            onPressed: () {
+                              if (saveContactInfo()) {
+                                Get.back();
+                              }
+                            },
+                            child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10.0, right: 10.0),
+                                child: AppText(
+                                  text: 'Save',
+                                  isBold: true,
+                                  textSize: 15,
+                                  textColor: Colors.white,
+                                )),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+            ));
+  }
+
+   bool saveContactInfo() {
+    final isValid = introductionFormKey.currentState!.validate();
+
+    if (!isValid) {
+      showToast("Please Fill The Credentials");
+      return false;
+    } else {
+      introductionFormKey.currentState!.save();
+      address.value = addressController.text;
+      phoneNumber.value = phoneNumberController.text;
+      showToast("Data Saved Successfully");
+      return true;
+    }
+  }
+ */
+//validate phone Text
+/*   String? validatePhoneTextField(String value) {
+    if (value.isEmpty) {
+      return "please provide your phone number";
+    }
+
+    return null;
+  }
+
+  //validate address Text
+  String? validateAddressTextField(String value) {
+    if (value.isEmpty) {
+      return "please provide your address";
+    }
+
+    return null;
+  } */
 
 // Test Method
   // ignore: non_constant_identifier_names
@@ -936,21 +1272,64 @@ class ResumeController extends GetxController
     experienceFormKey.currentState!.save();
   }
 
-//  create Resume PDF Method
-  Future<Uint8List> createResumePdf(Size size) async {
-    final pdfDocument = pw.Document();
+// Method to create resume
+  void createResume() async {
+    if (aboutMeText.isEmpty) {
+      showToast('Please Enter About Description');
+    } else if (phoneNumber.isEmpty && address.isEmpty) {
+      showToast('Please Enter your Contact Information');
+    } else if (userExperienceList.isEmpty) {
+      showToast('Please add some of your experience');
+    } else if (userEducationsList.isEmpty) {
+      showToast('Please add some of your education details');
+    } else if (userSelectedLanguagesList.isEmpty) {
+      showToast('Please add some languages that you know');
+    } else if (userSelectedSkillsList.isEmpty) {
+      showToast('Please add some of your skills');
+    } else {
+      print(userSelectedLanguagesList);
+      Map<String, String> data = {
+        'about_me': aboutMeText.value,
+        // 'phone': phoneNumber.value,
+        'education': jsonEncode(userEducationsList),
+        'skills': jsonEncode(userSelectedSkillsList),
+        'experience': jsonEncode(userExperienceList),
+        'language': jsonEncode(userSelectedLanguagesList),
+        // 'address': address.value
+      };
+      var isCreated = await RestApiServices.createResume(
+          SharedPrefsManager.getUserToken, data);
+      if (isCreated!) {
+        Get.back(result: 'refresh');
+        print('Resume Created Successfully');
+      } else {
+        print('Error in Creating Resume');
+      }
+    }
+  }
 
+/* //  create Resume PDF Method
+  Future<Uint8List> createResumePdf() async {
+    late Uint8List emailIconBytes, phoneIconBytes, addressIconBytes;
+    ByteData icHome = await rootBundle.load(Constants.ic_home_address);
+    ByteData icPhone = await rootBundle.load(Constants.ic_phone);
+    ByteData icEmail = await rootBundle.load(Constants.ic_email);
+    emailIconBytes = icEmail.buffer.asUint8List();
+    addressIconBytes = icHome.buffer.asUint8List();
+    phoneIconBytes = icPhone.buffer.asUint8List();
+
+    final pdfDocument = pw.Document();
     pdfDocument.addPage(pw.Page(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(20),
       build: (pw.Context context) {
         return pw.Column(children: [
           pw.Container(
+              width: double.infinity,
               padding: const pw.EdgeInsets.all(20),
               child: pw.Column(
                 children: [
                   pw.Container(
-                    width: size.width,
                     margin: const pw.EdgeInsets.symmetric(horizontal: 10),
                     child: pw.Row(children: [
                       pw.Container(
@@ -976,58 +1355,19 @@ class ResumeController extends GetxController
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           mainAxisSize: pw.MainAxisSize.max,
                           children: [
-                            resumeText('Usama Ali', 25),
+                            resumeText('Usama Ali', 28, '#12727f', true),
                             pw.SizedBox(
                               height: 10,
                             ),
-                            pw.Row(
-                                mainAxisAlignment: pw.MainAxisAlignment.start,
-                                children: [
-                                  pw.Icon(
-                                    const pw.IconData(0xe0cd),
-                                    color: PdfColor.fromHex("#12727f"),
-                                  ),
-                                  pw.SizedBox(
-                                    width: 5,
-                                  ),
-                                  resumeText('0310-4241301', 13),
-                                ]),
+                            headerRow(phoneIconBytes, '0310-4241301'),
                             pw.SizedBox(
                               height: 5,
                             ),
-                            pw.Row(
-                              children: [
-                                pw.Icon(
-                                  const pw.IconData(0xe0be),
-                                  color: PdfColor.fromHex("#12727f"),
-                                ),
-                                pw.SizedBox(
-                                  width: 5,
-                                ),
-                                pw.Expanded(
-                                  child: resumeText(
-                                      'usamaali185.ua@gmail.com', 13),
-                                ),
-                              ],
-                            ),
+                            headerRow(emailIconBytes, 'usamaali@gmail.com'),
                             pw.SizedBox(
                               height: 5,
                             ),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Icon(
-                                  const pw.IconData(0xe88a),
-                                  color: PdfColor.fromHex("#12727f"),
-                                ),
-                                pw.SizedBox(
-                                  width: 5,
-                                ),
-                                pw.Expanded(
-                                  child: resumeText('Lahore', 13),
-                                ),
-                              ],
-                            ),
+                            headerRow(addressIconBytes, 'Lahore'),
                           ],
                         ),
                       )
@@ -1036,44 +1376,261 @@ class ResumeController extends GetxController
                 ],
               ),
               decoration: const pw.BoxDecoration(
-                  color: PdfColors
-                      .grey300 /* , boxShadow: [
+                color: PdfColors
+                    .grey300, /*  boxShadow: [
                 pw.BoxShadow(
                   color: PdfColors.black,
                   offset: PdfPoint(0, 0.5),
                 )
               ] */
-                  )),
+              )),
+          pw.SizedBox(height: 15),
+          pw.Align(
+            alignment: pw.Alignment.centerLeft,
+            child: pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 10),
+                child: resumeText('About Me', 25, '#12727f', true)),
+          ),
+          pw.Align(
+            alignment: pw.Alignment.centerLeft,
+            child: pw.Padding(
+                padding: const pw.EdgeInsets.all(10),
+                child: resumeText(aboutMeText.value, 18, '#000000', false)),
+          ),
+          pw.Container(
+            width: double.infinity,
+            height: 1,
+            margin: const pw.EdgeInsets.symmetric(vertical: 10),
+            color: PdfColor.fromHex('#d3d8db'),
+          ),
+          pw.Align(
+            alignment: pw.Alignment.centerLeft,
+            child: pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 10),
+                child: resumeText('Education', 25, '#12727f', true)),
+          ),
+          generateEducationListVIew(),
+          pw.Container(
+            width: double.infinity,
+            height: 1,
+            margin: const pw.EdgeInsets.symmetric(vertical: 10),
+            color: PdfColor.fromHex('#d3d8db'),
+          ),
+          pw.Align(
+            alignment: pw.Alignment.centerLeft,
+            child: pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 10),
+                child: resumeText('Experience', 25, '#12727f', true)),
+          ),
+          generateEducationListVIew(),
         ]);
       },
     ));
     return pdfDocument.save();
   }
 
-  //method to save and view pdf
-  void saveAndViewPdf(Uint8List list) async {
-    final output = await getTemporaryDirectory();
-    var filePath = "${output.path}/ Resume.pdf";
-    final file = File(filePath);
-    await file.writeAsBytes(list);
-    print(filePath);
+// method for creating language and skill widget
 
-    if (filePath.isNotEmpty) {
-      Get.to(() => ResumeViewActivity(), arguments: [
-        filePath,
-      ]);
-    }
+// method for creating header rows
+  pw.Row headerRow(Uint8List emailIconBytes, String value) {
+    return pw.Row(
+      children: [
+        pw.Image(
+          pw.MemoryImage(emailIconBytes),
+          width: 24,
+          height: 24,
+        ),
+        pw.SizedBox(
+          width: 5,
+        ),
+        pw.Expanded(
+          child: resumeText(value, 18, '#12727f', false),
+        ),
+      ],
+    );
   }
 
+
+
   pw.Text resumeText(
-    String text,
-    double textSize,
-  ) {
+      String text, double textSize, String textColor, bool isBold) {
     return pw.Text(text,
         style: pw.TextStyle(
-            color: PdfColor.fromHex("#12727f"),
-            fontWeight: pw.FontWeight.bold,
+            color: PdfColor.fromHex(textColor),
+            fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
             fontSize: textSize),
         textAlign: pw.TextAlign.left);
   }
+
+// method to add education list in resume
+  pw.ListView generateEducationListVIew() {
+    return pw.ListView.builder(
+        itemCount: userEducationsList.length,
+        itemBuilder: (context, index) {
+          return pw.Container(
+            margin: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.RichText(
+                    text: pw.TextSpan(
+                        text: 'Qualification: ',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 18,
+                            color: PdfColor.fromHex('#000000')),
+                        children: [
+                      pw.TextSpan(
+                        text: userEducationsList[index].qualification,
+                        style: pw.TextStyle(
+                            fontSize: 16,
+                            color: PdfColor.fromHex('#000000'),
+                            fontWeight: pw.FontWeight.normal),
+                      )
+                    ])),
+                pw.RichText(
+                    text: pw.TextSpan(
+                        text: 'Institute Name: ',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 18,
+                            color: PdfColor.fromHex('#000000')),
+                        children: [
+                      pw.TextSpan(
+                          text: userEducationsList[index].instituteName,
+                          style: pw.TextStyle(
+                              fontSize: 16,
+                              color: PdfColor.fromHex('#000000'),
+                              fontWeight: pw.FontWeight.normal)),
+                    ])),
+                pw.SizedBox(
+                  height: 10,
+                ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+                  children: [
+                    pw.RichText(
+                        text: pw.TextSpan(
+                            text: 'Start Date: ',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 18,
+                                color: PdfColor.fromHex('#000000')),
+                            children: [
+                          pw.TextSpan(
+                              text: userEducationsList[index].startDate,
+                              style: pw.TextStyle(
+                                  fontSize: 16,
+                                  color: PdfColor.fromHex('#000000'),
+                                  fontWeight: pw.FontWeight.normal)),
+                        ])),
+                    pw.RichText(
+                        text: pw.TextSpan(
+                            text: 'End Date: ',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 18,
+                                color: PdfColor.fromHex('#000000')),
+                            children: [
+                          pw.TextSpan(
+                              text: userEducationsList[index].endDate,
+                              style: pw.TextStyle(
+                                  fontSize: 16,
+                                  color: PdfColor.fromHex('#000000'),
+                                  fontWeight: pw.FontWeight.normal)),
+                        ])),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+// method to add experience list in resume
+  pw.ListView generateUserExperienceListView() {
+    return pw.ListView.builder(
+        itemCount: userExperienceList.length,
+        itemBuilder: (context, index) {
+          return pw.Container(
+            margin: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.RichText(
+                    text: pw.TextSpan(
+                        text: 'Designation: ',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 18,
+                            color: PdfColor.fromHex('#000000')),
+                        children: [
+                      pw.TextSpan(
+                        text: userExperienceList[index].userDesignation,
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.normal,
+                            fontSize: 16,
+                            color: PdfColor.fromHex('#000000')),
+                      )
+                    ])),
+                pw.RichText(
+                    text: pw.TextSpan(
+                        text: 'Company Name: ',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 18,
+                            color: PdfColor.fromHex('#000000')),
+                        children: [
+                      pw.TextSpan(
+                          text: userExperienceList[index].companyName,
+                          style: pw.TextStyle(
+                              fontSize: 16,
+                              color: PdfColor.fromHex('#000000'),
+                              fontWeight: pw.FontWeight.normal)),
+                    ])),
+                pw.SizedBox(
+                  height: 10,
+                ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+                  children: [
+                    pw.RichText(
+                        text: pw.TextSpan(
+                            text: 'Start Date: ',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 18,
+                                color: PdfColor.fromHex('#000000')),
+                            children: [
+                          pw.TextSpan(
+                              text: userExperienceList[index].startDate,
+                              style: pw.TextStyle(
+                                  fontSize: 16,
+                                  color: PdfColor.fromHex('#000000'),
+                                  fontWeight: pw.FontWeight.normal)),
+                        ])),
+                    pw.RichText(
+                        text: pw.TextSpan(
+                            text: 'End Date: ',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 18,
+                                color: PdfColor.fromHex('#000000')),
+                            children: [
+                          pw.TextSpan(
+                              text: userExperienceList[index].endDate,
+                              style: pw.TextStyle(
+                                  fontSize: 16,
+                                  color: PdfColor.fromHex('#000000'),
+                                  fontWeight: pw.FontWeight.normal)),
+                        ])),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  } */
 }

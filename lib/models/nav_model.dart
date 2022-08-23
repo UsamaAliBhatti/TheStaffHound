@@ -1,18 +1,20 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class NavModel {
-  String _navName;
-  String _navIcon;
+  String? navName;
+  String? navIcon;
+  RxBool? isNavSelected;
 
-  NavModel(this._navName, this._navIcon);
+  NavModel({this.navName, this.navIcon, this.isNavSelected});
 
-  get getNavName => _navName;
+  get getNavName => navName;
 
-  set setNavName(navName) => _navName = navName;
+  set setNavName(navName) => navName = navName;
 
-  get getIcon => _navIcon;
+  get getIcon => navIcon;
 
-  set setIcon(icon) => _navIcon = icon;
+  set setIcon(icon) => navIcon = icon;
 
-  
+  get getIsSelected => isNavSelected!.value;
+  set setIsSelected(isSelected) => isNavSelected!.value = isSelected;
 }

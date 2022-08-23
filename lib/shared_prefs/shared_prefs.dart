@@ -1,33 +1,63 @@
-import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UserSharedPrefs {
-  static final _loginDataBox = GetStorage('TheStaffHoundPrefs');
+class SharedPrefsManager {
+  static var userNameKey = 'userName';
+  static var userIdKey = 'userId';
+  static var userEmailKey = 'userEmail';
+  static var userTokenKey = 'userToken';
+  static var userTypeKey = 'userType';
+  static var userPhoneNumberKey = 'userPhoneNumber';
+  static var userAddresskey = 'userAddressKey';
+  
+  static late SharedPreferences prefs;
 
-  static  saveUserData(String userToken, String userName, String userEmail,
-      String userPhoneNumber) {
-    _loginDataBox.write('userToken', userToken);
-    _loginDataBox.write('userName', userName);
-    _loginDataBox.write('userEmail', userEmail);
-    _loginDataBox.write('userPhoneNumber', userPhoneNumber);
+  static Future<SharedPreferences> init() async {
+    prefs = await SharedPreferences.getInstance();
+    return prefs;
   }
 
-  static getUserName() async {
-    return await _loginDataBox.read('userName');
+  static Future<bool> saveUserData(
+    String userToken,
+    int userId,
+    String userName,
+    String userEmail,
+    int userType,
+     String userPhoneNumber,
+      String userAddress
+  ) async {
+    prefs.setInt(userIdKey, userId);
+    prefs.setString(userNameKey, userName);
+    prefs.setString(userEmailKey, userEmail);
+    prefs.setInt(userTypeKey, userType);
+    prefs.setString(userPhoneNumberKey, userPhoneNumber);
+    prefs.setString(userAddresskey, userAddress);
+    return prefs.setString(userTokenKey, userToken);
   }
 
-  static getUserEmail() async {
-    return await _loginDataBox.read('userEmail');
+  static Future<bool> update(
+      String userName, String userPhoneNumber, String userAddress) {
+    prefs.setString(userNameKey, userName);
+    prefs.setString(userPhoneNumberKey, userPhoneNumber);
+    
+ 
+    return prefs.setString(userAddresskey, userAddress);
   }
 
-  static getUserPhoneNumber() async {
-    return await _loginDataBox.read('userPhoneNumber');
-  }
+  static get getUserToken => prefs.getString(userTokenKey);
+  static get getUserName => prefs.getString(userNameKey);
+  static get getUserId => prefs.getString(userIdKey);
+  static get getUserType => prefs.getInt(userTypeKey);
+  static get getUserEmail => prefs.getString(userEmailKey);
+  static get getUserPhoneNumber => prefs.getString(userPhoneNumberKey);
+  static get getUserAddress => prefs.getString(userAddresskey);
 
-  static getUserToken() async {
-    return await _loginDataBox.read('userToken');
-  }
-
-  static userLogout() async {
-    await _loginDataBox.erase();
+  static void userLogout() {
+    prefs.remove(userTokenKey);
+    prefs.remove(userEmailKey);
+    prefs.remove(userIdKey);
+    prefs.remove(userNameKey);
+    prefs.remove(userTypeKey);
+    prefs.remove(userPhoneNumberKey);
+    prefs.remove(userAddresskey);
   }
 }

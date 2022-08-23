@@ -1,18 +1,15 @@
-// ignore_for_file: must_be_immutable
-
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
-import 'package:the_staff_hound/controllers/dasboard_controller.dart';
+import 'package:the_staff_hound/controllers/recent_job_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/models/general_jobs_model.dart';
 import 'package:the_staff_hound/views/job_details_screen.dart';
 
 class RecentJobs extends StatelessWidget {
-  var dashboardController = Get.put(DashBoardController());
-  RecentJobs({Key? key}) : super(key: key);
+  final recentJobController = Get.put(RecentJobController());
+  RecentJobs({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +33,7 @@ class RecentJobs extends StatelessWidget {
           textSize: 20,
           isBold: true,
         ),
-        actions: [
+        /*   actions: [
           IconButton(
               onPressed: () {},
               icon: Icon(
@@ -44,7 +41,7 @@ class RecentJobs extends StatelessWidget {
                 color: Constants.primaryColor,
                 size: 30,
               ))
-        ],
+        ], */
       ),
       backgroundColor: Constants.backgroundColor,
       body: SafeArea(
@@ -61,40 +58,68 @@ class RecentJobs extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 children: <Widget>[
-                  Container(
-                    width: size.width,
-                    height: 60,
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        boxShadow: const [
-                          BoxShadow(
-                              color: Constants.textHintColor,
-                              offset: Offset(0.2, 0.2),
-                              blurRadius: 1)
-                        ]),
-                    child: Center(
-                      child: SizedBox(
-                        width: 550,
-                        child: TextField(
-                          textAlign: TextAlign.start,
-                          decoration: InputDecoration(
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide.none),
-                              hintText: 'search job here...',
-                              suffixIcon: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.search,
-                                  size: 30,
-                                  color: Colors.grey,
-                                ),
-                              )),
-                          keyboardType: TextInputType.text,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          width: size.width - 100,
+                          height: 50,
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Constants.textHintColor,
+                                    offset: Offset(0.2, 0.2),
+                                    blurRadius: 1)
+                              ]),
+                          child: Center(
+                            child: SizedBox(
+                              width: 500,
+                              child: TextField(
+                                textAlign: TextAlign.start,
+                                decoration: InputDecoration(
+                                    border: const OutlineInputBorder(
+                                        borderSide: BorderSide.none),
+                                    hintText: 'search job here...',
+                                    suffixIcon: IconButton(
+                                      splashColor: Colors.transparent,
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.search,
+                                        size: 24,
+                                        color: Colors.grey,
+                                      ),
+                                    )),
+                                keyboardType: TextInputType.text,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {
+                                recentJobController.openFiltersDialog(size);
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateColor.resolveWith((states) =>
+                                          Colors.amberAccent.shade100),
+                                  shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)))),
+                              child: AppText(text: 'Filters'),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                   const SizedBox(
@@ -104,101 +129,175 @@ class RecentJobs extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: SizedBox(
                       width: size.width,
-                      child: GetX<DashBoardController>(builder: (controller) {
-                        return ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: controller.recentJobsList.length,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            scrollDirection: Axis.vertical,
-                            separatorBuilder: (context, index) {
-                              return const Divider(
-                                height: 1,
-                              );
-                            },
-                            itemBuilder: (context, index) {
-                              return InkWell(
-                                onTap: () {
-                                  GeneralJobModel model =
-                                      controller.recentJobsList[index];
-
-                                  // debugPrint(model.getCompanyName);
-
-                                  Get.to(() => JobDetailsActivity(),
-                                      arguments: model,
-                                      transition: Transition.zoom);
+                      child: Obx(() {
+                        return Visibility(
+                            visible: recentJobController.isLoaded.value,
+                            replacement: const Center(
+                                child: CircularProgressIndicator()),
+                            child: ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: recentJobController.jobsList.length,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                scrollDirection: Axis.vertical,
+                                separatorBuilder: (context, index) {
+                                  return const Divider(
+                                    height: 1,
+                                  );
                                 },
-                                child: Container(
-                                  padding: const EdgeInsets.all(20),
-                                  width: size.width,
-                                  color: Colors.white,
-                                  child: Center(
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
+                                itemBuilder: (context, index) {
+                                  return InkWell(
+                                    onTap: () {
+                                      print(recentJobController
+                                          .jobsList[index].id);
+                                      Get.to(
+                                        () => JobDetailsActivity(),
+                                        arguments: [
+                                          {
+                                            'jobId': recentJobController
+                                                .jobsList[index].id,
+                                            'status': 'new'
+                                          }
+                                        ],
+                                      );
+                                    },
+                                    child: Stack(
+                                      children: [
                                         Container(
-                                          width: 60,
-                                          height: 60,
-                                          decoration: BoxDecoration(
-                                              color: Colors.red,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              image: DecorationImage(
-                                                  image: NetworkImage(
-                                                    controller
-                                                        .recentJobsList[index]
-                                                        .companyLogo,
-                                                  ),
-                                                  fit: BoxFit.fill)),
+                                          padding: const EdgeInsets.all(20),
+                                          width: size.width,
+                                          color: Colors.white,
+                                          child: Center(
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Container(
+                                                    width: 60,
+                                                    height: 60,
+                                                    padding: EdgeInsets.zero,
+                                                    decoration: BoxDecoration(
+                                                      color: Constants
+                                                          .secondaryColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: Center(
+                                                        child: AppText(
+                                                      text: 'J',
+                                                      textSize: 30,
+                                                      isBold: true,
+                                                      textColor: Colors.white,
+                                                    ))),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    AppText(
+                                                      text: recentJobController
+                                                          .jobsList[index]
+                                                          .jobTitle!,
+                                                      isBold: true,
+                                                      isStart: true,
+                                                      textColor: Colors.black,
+                                                      textSize: 20,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    AppText(
+                                                      text: recentJobController
+                                                          .jobsList[index]
+                                                          .location!,
+                                                      textColor: Constants
+                                                          .textHintColor,
+                                                      isStart: true,
+                                                      textSize: 13,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        AppText(
+                                                          text: 'Salary:',
+                                                          textSize: 15,
+                                                          isBold: true,
+                                                          isStart: true,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        AppText(
+                                                          text:
+                                                              recentJobController
+                                                                      .jobsList[
+                                                                          index]
+                                                                      .salary ??
+                                                                  'N/A',
+                                                          textSize: 15,
+                                                          isBold: true,
+                                                          isStart: true,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
                                         ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            AppText(
-                                              text: controller
-                                                  .recentJobsList[index]
-                                                  .jobTitle,
-                                              isBold: true,
-                                              isStart: true,
-                                              textColor: Colors.black,
-                                              textSize: 20,
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            AppText(
-                                              text: controller
-                                                  .recentJobsList[index]
-                                                  .jobLocation,
-                                              textColor:
-                                                  Constants.textHintColor,
-                                              isStart: true,
-                                              textSize: 13,
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            AppText(
-                                              text: controller
-                                                  .recentJobsList[index]
-                                                  .jobSalaryRange,
-                                              textSize: 18,
-                                              isBold: true,
-                                              isStart: true,
-                                            ),
-                                          ],
-                                        )
+                                        Positioned(
+                                            right: 0,
+                                            top: 0,
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                    onPressed: () {
+                                                      recentJobController
+                                                          .addToArchive(
+                                                              recentJobController
+                                                                  .jobsList[
+                                                                      index]
+                                                                  .id!);
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.favorite,
+                                                      color: Colors.red,
+                                                    )),
+                                                IconButton(
+                                                    onPressed: () {
+                                                      Get.to(
+                                                        () =>
+                                                            JobDetailsActivity(),
+                                                        arguments: [
+                                                          {
+                                                            'jobId':
+                                                                recentJobController
+                                                                    .jobsList[
+                                                                        index]
+                                                                    .id,
+                                                            'status': 'new'
+                                                          }
+                                                        ],
+                                                      );
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .remove_red_eye_rounded,
+                                                      color: Constants
+                                                          .primaryColor,
+                                                    )),
+                                              ],
+                                            ))
                                       ],
                                     ),
-                                  ),
-                                ),
-                              );
-                            });
+                                  );
+                                }));
                       }),
                     ),
                   ),
@@ -210,4 +309,18 @@ class RecentJobs extends StatelessWidget {
       )),
     );
   }
+
+  /*  Widget _getImage(String? s) {
+    if (s == null) {
+      return Image.asset(
+        Constants.placeholderImage,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Image.network(
+        s,
+        fit: BoxFit.cover,
+      );
+    }
+  } */
 }

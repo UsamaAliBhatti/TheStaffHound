@@ -6,10 +6,9 @@ class Constants {
   static const Color secondaryColor = Color(0xfff4bd05);
   static const Color primaryColor = Color(0xff12727f);
   static const Color buttonBackgroundColor = Color(0xffECF0F3);
-  static const Color textHintColor = Color(0xffA1A3A4);
+  static const Color textHintColor = Color(0xFFA1A3A4);
 
   // Images
-
   static const String splashLogo = "assets/images/staff_hound_logo.png";
   static const String passwordIcon = "assets/images/password_icon.png";
   static const String googleIcon = "assets/images/google_icon.png";
@@ -31,5 +30,16 @@ class Constants {
   static const backArrow = "assets/images/back_arrow.png";
   static const navProfile = "assets/images/ic_nav_profile.png";
   static const navMyJobsIcon = "assets/images/ic_nav_my_job.png";
+  static const navResume = "assets/images/ic_nav_resume_img.png";
   static const navSearchJobIcon = "assets/images/ic_nav_search_job.png";
+  static const placeholderImage = "assets/images/placeholder.jpg";
+  static const oopsImage = "assets/images/oops.png";
+
+  // Icons
+
+  static const icPhone = "assets/images/ic_phone.png";
+  static const icHomeAddress = "assets/images/ic_home_address.png";
+  static const icEmail = "assets/images/ic_email.png";
+  static const icArchived = "assets/images/ic_archived_img.png";
+  static const icBranch = "assets/images/ic_branch.png";
 }

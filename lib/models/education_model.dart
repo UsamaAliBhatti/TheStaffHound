@@ -12,6 +12,18 @@ class UserEducation {
 
   set id(value) => _id = value; */
 
+
+  factory UserEducation.fromJson(Map<String, dynamic> json) =>
+      UserEducation(json['instituteName'], json['qualification'],
+          json['startDate'], json['endDate']);
+
+  Map toJson() => {
+        'instituteName': _instituteName,
+        'startDate': _startDate,
+        'endDate': _endDate,
+        'qualification': _qualification,
+      };
+
   get instituteName => _instituteName;
 
   set instituteName(value) => _instituteName = value;
@@ -28,3 +40,4 @@ class UserEducation {
 
   set qualification(value) => _qualification = value;
 }
+

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/views/dashboard_screen.dart';
+
+import '../network_manager/network_state_manager.dart';
 
 class LoginController extends GetxController {
-  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+  final loginFormKey = GlobalKey<FormState>();
   late TextEditingController emailController, passwordController;
+
+  final _networkManager = Get.put(NetworkManager());
 
   var email = ''.obs;
   var password = ''.obs;
@@ -42,13 +47,28 @@ class LoginController extends GetxController {
     return null;
   }
 
-  void checkLogin() {
-    final isValid = loginFormKey.currentState!.validate();
+  void checkLogin() async {
+    var isConnected = await _networkManager.checkInternetConnection();
+    if (isConnected) {
+      final isValid = loginFormKey.currentState!.validate();
 
-    if (!isValid) {
-      return;
+      if (!isValid) {
+        return;
+      } else {
+        loginFormKey.currentState!.save();
+        var isLoggedIn =
+            await RestApiServices.userLogin(email.value, password.value);
+        if (isLoggedIn!) {
+          loginFormKey.currentState!.reset();
+          email.value = '';
+          password.value = '';
+          emailController.clear();
+          passwordController.clear();
+          Get.off(() => DashboardActivity());
+        }
+      }
+    } else {
+      Get.snackbar('Connection Error', 'Please Check Your Internet Connection');
     }
-    loginFormKey.currentState!.save();
-    RestApiServices.userLogin(email.value, password.value);
   }
 }

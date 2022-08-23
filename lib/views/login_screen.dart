@@ -4,12 +4,14 @@ import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/login_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/views/forgot_password_screen.dart';
+// import 'package:the_staff_hound/network_manager/network_state_manager.dart';
+import 'package:the_staff_hound/views/phone_otp_screen.dart';
 import 'package:the_staff_hound/views/signup_screen.dart';
 
 class LoginActivity extends StatelessWidget {
   LoginActivity({Key? key}) : super(key: key);
-  var controller = Get.put(LoginController());
+  final controller = Get.put(LoginController());
+  // var _networkManager = Get.find<NetworkManager>();
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +71,7 @@ class LoginActivity extends StatelessWidget {
                     validator: (value) {
                       return controller.validatePassword(value);
                     },
+                    obscureText: true,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(50),
@@ -92,7 +95,9 @@ class LoginActivity extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20.0),
                     child: InkWell(
                         onTap: () {
-                          Get.to(() => const ForgotPasswordActivity());
+                          Get.to(() => PhoneOTPActivity(), arguments: [{
+                            'status': 'forgotpassword'
+                          }]);
                         },
                         child: Align(
                           alignment: Alignment.centerLeft,
@@ -174,7 +179,7 @@ class LoginActivity extends StatelessWidget {
                           child: AppText(
                             text: "Sign Up",
                             isBold: true,
-                            textColor: Constants.textHintColor,
+                            textColor: Constants.primaryColor,
                             textSize: 20,
                           ))
                     ],
