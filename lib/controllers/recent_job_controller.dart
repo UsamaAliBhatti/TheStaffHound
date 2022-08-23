@@ -130,6 +130,9 @@ class RecentJobController extends GetxController {
                   textSize: 15,
                 ),
               ),
+              const SizedBox(
+                height: 10,
+              ),
             ],
           ),
         ),
