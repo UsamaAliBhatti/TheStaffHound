@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
@@ -29,7 +30,11 @@ class RecentJobController extends GetxController {
     'Branch 6',
     'Branch 7',
     'Branch 8',
+    'Branch 9',
   ];
+
+  var isCitySearchSelected = false.obs;
+  var isSkillSearchSelected = false.obs;
 
   @override
   void onInit() {
@@ -72,7 +77,232 @@ class RecentJobController extends GetxController {
   }
 
   openFiltersDialog(Size size) {
-    showDialog(
+    Get.bottomSheet(
+      Obx(() {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            color: Constants.backgroundColor,
+          ),
+          width: size.width,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: AppText(
+                  text: 'Filters',
+                  isBold: true,
+                  textColor: Colors.black,
+                  textSize: 24,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppText(
+                    text: 'Search by city and  branch',
+                    isBold: true,
+                    textColor: Colors.black,
+                    textSize: 18,
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        isCitySearchSelected.value =
+                            !isCitySearchSelected.value;
+                      },
+                      icon: Icon(
+                        isCitySearchSelected.value
+                            ? Icons.radio_button_checked_sharp
+                            : Icons.radio_button_off_sharp,
+                        color: isCitySearchSelected.value
+                            ? Constants.secondaryColor
+                            : Colors.grey,
+                        size: 20,
+                      ))
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              isCitySearchSelected.isTrue
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          text: 'Select City',
+                          isBold: true,
+                          textColor: Colors.black,
+                          textSize: 15,
+                        ),
+                        SizedBox(
+                          height: 40,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: listOfCities.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (_, index) {
+                                return Container(
+                                  height: 30,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: /*  resumeController
+                                                     .languagesList[index]
+                                                     .isSelected!
+                                                     .value
+                                                 ? Colors.green.shade300
+                                                 :  */
+                                          Colors.grey.shade200),
+                                  child: AppText(
+                                    text: /*  resumeController
+                                               .languagesList[index].getLanguageName! */
+                                        listOfCities[index],
+                                    textColor: Colors.black,
+                                  ),
+                                );
+                              }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        AppText(
+                          text: 'Select Branch',
+                          isBold: true,
+                          textColor: Colors.black,
+                          textSize: 15,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        GridView.builder(
+                          itemCount: listOfBranches.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 10,
+                                  mainAxisExtent: 40),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: 30,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              margin: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: /*  resumeController
+                                                     .languagesList[index]
+                                                     .isSelected!
+                                                     .value
+                                                 ? Colors.green.shade300
+                                                 :  */
+                                      Colors.grey.shade200),
+                              child: AppText(
+                                text: /*  resumeController
+                                               .languagesList[index].getLanguageName! */
+                                    listOfBranches[index],
+                                textColor: Colors.black,
+                              ),
+                            );
+                          },
+                        )
+                      ],
+                    )
+                  : const SizedBox(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppText(
+                    text: 'Search by skill',
+                    isBold: true,
+                    textColor: Colors.black,
+                    textSize: 18,
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        isSkillSearchSelected.value =
+                            !isSkillSearchSelected.value;
+                      },
+                      icon: Icon(
+                        isSkillSearchSelected.value
+                            ? Icons.radio_button_checked_sharp
+                            : Icons.radio_button_off_sharp,
+                        color: isSkillSearchSelected.value
+                            ? Constants.secondaryColor
+                            : Colors.grey,
+                        size: 20,
+                      ))
+                ],
+              ),
+
+              /* SizedBox(
+                   height: 40,
+                   child: ListView.builder(
+                       shrinkWrap: true,
+                       itemCount: listOfCities.length,
+                       scrollDirection: Axis.horizontal,
+                       itemBuilder: (_, index) {
+                         return 
+                       }),
+                 ),
+                 const SizedBox(
+                   height: 10,
+                 ),
+                 Align(
+                   alignment: Alignment.centerLeft,
+                   child: 
+                 ),
+                 const SizedBox(
+                   height: 10,
+                 ),
+                 SizedBox(
+                   height: 40,
+                   child: ListView.builder(
+                       shrinkWrap: true,
+                       itemCount: listOfBranches.length,
+                       scrollDirection: Axis.horizontal,
+                       itemBuilder: (_, index) {
+                         return Container(
+                           height: 30,
+                           padding: const EdgeInsets.symmetric(
+                               horizontal: 10, vertical: 5),
+                           margin: const EdgeInsets.all(5),
+                           decoration: BoxDecoration(
+                               borderRadius: BorderRadius.circular(15),
+                               color: /*  resumeController
+                                                     .languagesList[index]
+                                                     .isSelected!
+                                                     .value
+                                                 ? Colors.green.shade300
+                                                 :  */
+                                   Colors.grey.shade200),
+                           child: AppText(
+                             text: /*  resumeController
+                                               .languagesList[index].getLanguageName! */
+                                 listOfBranches[index],
+                             textColor: Colors.black,
+                           ),
+                         );
+                       }),
+                 ), */
+            ],
+          ),
+        );
+      }),
+      backgroundColor: Colors.transparent,
+    );
+    /*   showDialog(
       context: Get.overlayContext!,
       builder: (_) => AlertDialog(
         contentPadding: const EdgeInsets.all(10),
@@ -242,7 +472,11 @@ class RecentJobController extends GetxController {
           ),
         ),
         actions: [
-          TextButton(
+          
+        ],
+      ),
+    ); */
+    /*  TextButton(
               style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all(Colors.green.shade100),
@@ -259,9 +493,6 @@ class RecentJobController extends GetxController {
                 text: 'Apply',
                 textSize: 20,
                 isBold: true,
-              ))
-        ],
-      ),
-    );
+              )) */
   }
 }
