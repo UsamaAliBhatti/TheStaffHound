@@ -96,7 +96,7 @@ class RecentJobController extends GetxController {
               Align(
                 alignment: Alignment.centerLeft,
                 child: AppText(
-                  text: 'Select City',
+                  text: 'Search by city',
                   isBold: true,
                   textColor: Colors.black,
                   textSize: 15,
