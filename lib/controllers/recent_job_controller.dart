@@ -20,6 +20,17 @@ class RecentJobController extends GetxController {
     'Quetta'
   ];
 
+  var listOfBranches = <String>[
+    'Branch 1',
+    'Branch 2',
+    'Branch 3',
+    'Branch 4',
+    'Branch 5',
+    'Branch 6',
+    'Branch 7',
+    'Branch 8',
+  ];
+
   @override
   void onInit() {
     super.onInit();
@@ -66,6 +77,11 @@ class RecentJobController extends GetxController {
       builder: (_) => AlertDialog(
         contentPadding: const EdgeInsets.all(10),
         insetPadding: const EdgeInsets.all(10),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(15.0),
+          ),
+        ),
         title: AppText(
           text: 'Filters',
           textSize: 20,
@@ -80,7 +96,7 @@ class RecentJobController extends GetxController {
               Align(
                 alignment: Alignment.centerLeft,
                 child: AppText(
-                  text: 'Cities',
+                  text: 'Select City',
                   isBold: true,
                   textColor: Colors.black,
                   textSize: 15,
@@ -89,6 +105,64 @@ class RecentJobController extends GetxController {
               const SizedBox(
                 height: 10,
               ),
+              /*   MultipleSearchSelection(
+                  items: listOfCities,
+                  maximumShowItemsHeight: 100,
+                  onPickedChange: (items) {},
+                  itemsVisibility: ShowedItemsVisibility.alwaysOn,
+                  fuzzySearch: FuzzySearch.jaro,
+                  pickedItemBuilder: (String pickedItem) {
+                    return AppText(text: pickedItem);
+                  },
+                  fieldToCheck: (String check) {
+                    return check;
+                  },
+                  itemBuilder: (String item) {
+                    return AppText(text: item);
+                  }), */
+              /*   MultipleSearchSelection(
+    items: listOfCities, // List<String>
+    fuzzySearch: FuzzySearch.jaro,
+    title: Text(
+        'Countries',
+        style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        ),
+    ),
+    
+   
+    showedItemsBackgroundColor: Colors.grey.withOpacity(0.1),
+    showShowedItemsScrollbar: false,
+   
+    onTapShowedItem: () {},
+    onPickedChange: (items) {},
+    onItemAdded: (item) {
+        print('$item added to picked items');
+    },
+    onItemRemoved: (item) {
+        print('$item removed from picked items');
+    },
+) */
+              /* Wrap(
+                  children: listOfCities
+                      .map((city) => Container(
+                            margin: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey.shade200,
+                                border:
+                                    Border.all(color: Colors.grey.shade200)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: size.width * 0.030,
+                                vertical: size.height * 0.0045),
+                            child: AppText(
+                              text: city,
+                              textColor: Colors.black,
+                            ),
+                          ))
+                      .toList()), */
+
               SizedBox(
                 height: 40,
                 child: ListView.builder(
@@ -98,7 +172,8 @@ class RecentJobController extends GetxController {
                     itemBuilder: (_, index) {
                       return Container(
                         height: 30,
-                        padding: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
                         margin: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
@@ -124,7 +199,7 @@ class RecentJobController extends GetxController {
               Align(
                 alignment: Alignment.centerLeft,
                 child: AppText(
-                  text: 'Branches',
+                  text: 'Select Branch',
                   isBold: true,
                   textColor: Colors.black,
                   textSize: 15,
@@ -133,9 +208,59 @@ class RecentJobController extends GetxController {
               const SizedBox(
                 height: 10,
               ),
+              SizedBox(
+                height: 40,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: listOfBranches.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (_, index) {
+                      return Container(
+                        height: 30,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        margin: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: /*  resumeController
+                                                .languagesList[index]
+                                                .isSelected!
+                                                .value
+                                            ? Colors.green.shade300
+                                            :  */
+                                Colors.grey.shade200),
+                        child: AppText(
+                          text: /*  resumeController
+                                          .languagesList[index].getLanguageName! */
+                              listOfBranches[index],
+                          textColor: Colors.black,
+                        ),
+                      );
+                    }),
+              ),
             ],
           ),
         ),
+        actions: [
+          TextButton(
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(Colors.green.shade100),
+              ),
+              onPressed: () {},
+              child: AppText(
+                text: 'Cancel',
+                textSize: 20,
+                isBold: true,
+              )),
+          TextButton(
+              onPressed: () {},
+              child: AppText(
+                text: 'Apply',
+                textSize: 20,
+                isBold: true,
+              ))
+        ],
       ),
     );
   }
