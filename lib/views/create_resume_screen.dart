@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/resume_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
+import 'package:the_staff_hound/main.dart';
+
+import '../shared_prefs/shared_prefs.dart';
 
 // ignore: must_be_immutable
 class CreateResumeActivity extends StatelessWidget {
@@ -32,383 +34,664 @@ class CreateResumeActivity extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios_new_sharp,
                 color: Colors.white, size: 25)),
       ),
-      body: SafeArea(
-        child: SizedBox(
+      body: Obx(() {
+        return SizedBox(
           width: size.width,
           height: size.height,
-          child: Stack(
+          child: Column(
             children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  children: [
-                    Container(
+              Expanded(
+                  child: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Center(
+                      child: Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(200),
+                            color: Colors.amber,
+                            image: const DecorationImage(
+                                image:
+                                    AssetImage(Constants.placeholderUserImage),
+                                fit: BoxFit.cover)),
+                      ),
+                    ),
+                  ),
+                  AppText(
+                    text: SharedPrefsManager.getUserName
+                        .toString()
+                        .capitalizeFirstofEach,
+                    textColor: Constants.primaryColor,
+                    isBold: true,
+                    textSize: 25,
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 30),
                       width: size.width,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(children: <Widget>[
-                        Stack(
-                          children: [
-                            Container(
-                              width: 130,
-                              height: 130,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(200),
-                                color: Colors.amber,
-                                /* image: DecorationImage(
-                                  image: FileImage(
-                                    File(
-                                      resumeController.selectedImagepath.value,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          /*     boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.shade400,
+                                  offset: const Offset(0, -5),
+                                  blurRadius: 20,
+                                  blurStyle: BlurStyle.outer),
+                            ], */
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(60),
+                              topRight: Radius.circular(60))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /* Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 30.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                /* Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    const Icon(
+                                      Icons.phone_outlined,
+                                      color: Colors.grey,
                                     ),
-                                  ),
-                                  fit: BoxFit.fill) */
-                              ),
-                            ),
-                            Positioned(
-                                bottom: 2,
-                                right: 1,
-                                child: InkWell(
-                                  onTap: () {
-                                    resumeController.getImage();
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30)),
-                                        color: Colors.red),
-                                    child: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 25,
+                                    const SizedBox(
+                                      width: 5,
                                     ),
-                                  ),
-                                )),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              AppText(
-                                text: SharedPrefsManager.getUserName,
-                                textColor: Constants.primaryColor,
-                                isBold: true,
-                                isStart: true,
-                                textSize: 23,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  const Icon(
-                                    Icons.phone,
-                                    color: Constants.primaryColor,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Obx(
-                                    () => AppText(
-                                      text: resumeController.phoneNumber.value,
-                                      textSize: 13,
-                                      textColor: Colors.black,
-                                      isBold: true,
-                                      isStart: true,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  const Icon(
-                                    Icons.email,
-                                    color: Constants.primaryColor,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Expanded(
-                                    child: AppText(
-                                      text: SharedPrefsManager.getUserEmail,
-                                      textSize: 13,
-                                      textColor: Colors.black,
-                                      isBold: true,
-                                      isStart: true,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  const Icon(
-                                    Icons.home,
-                                    color: Constants.primaryColor,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Obx(
-                                    () => Expanded(
-                                      child: AppText(
-                                        text: resumeController.address.value,
+                                    Obx(
+                                      () => AppText(
+                                        text:
+                                            resumeController.phoneNumber.value,
                                         textSize: 13,
-                                        textColor: Colors.black,
+                                        textColor: Colors.grey.shade800,
                                         isBold: true,
                                         isStart: true,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                      ]),
-                    ),
-                    Container(
-                      width: size.width,
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      color: Constants.textHintColor.withOpacity(0.5),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        children: [
-                          AppText(
-                            text: 'Summary',
-                            textColor: Constants.primaryColor,
-                            textSize: 20,
-                            isBold: true,
-                            isStart: true,
-                          ),
-                          const Expanded(child: SizedBox()),
-                          IconButton(
-                              splashRadius: 5,
-                              onPressed: () {
-                                resumeController.openDescriptionDialog(size);
-                              },
-                              icon: const Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: Constants.secondaryColor,
-                              ))
-                        ],
-                      ),
-                    ),
-
-                    Obx(() => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: AppText(
-                            text: resumeController.aboutMeText.value,
-                            textColor: Colors.black,
-                            textSize: 15,
-                            isStart: true,
-                          ),
-                        )),
-                    Container(
-                      width: size.width,
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      color: Constants.textHintColor.withOpacity(0.5),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          AppText(
-                            text: 'Education',
-                            textColor: Constants.primaryColor,
-                            textSize: 20,
-                            isBold: true,
-                            isStart: true,
-                          ),
-                          IconButton(
-                              splashRadius: 5,
-                              onPressed: () {
-                                resumeController.openEducationDialog(size);
-                              },
-                              icon: const Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: Constants.secondaryColor,
-                              ))
-                        ],
-                      ),
-                    ),
-                    Obx(() {
-                      return generateEducationListVIew();
-                    }),
-                    Container(
-                      width: size.width,
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      color: Constants.textHintColor.withOpacity(0.5),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          AppText(
-                            text: 'Experience',
-                            textColor: Constants.primaryColor,
-                            textSize: 20,
-                            isBold: true,
-                            isStart: true,
-                          ),
-                          IconButton(
-                              splashRadius: 5,
-                              onPressed: () {
-                                resumeController.openExperienceDialog(size);
-                              },
-                              icon: const Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: Constants.secondaryColor,
-                              ))
-                        ],
-                      ),
-                    ),
-
-                    Obx(() {
-                      return generateUserExperienceListView();
-                    }), //Calling Experience Method
-                    Container(
-                      width: size.width,
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      color: Constants.textHintColor.withOpacity(0.5),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      text: 'Skills',
-                                      textColor: Constants.primaryColor,
-                                      textSize: 20,
-                                      isBold: true,
-                                      isStart: true,
-                                    ),
-                                    IconButton(
-                                        splashRadius: 5,
-                                        onPressed: () {
-                                          openSkillDialog(size);
-                                        },
-                                        icon: const Icon(
-                                          Icons.add_circle_outline_rounded,
-                                          color: Constants.secondaryColor,
-                                        ))
                                   ],
                                 ),
-                                Obx(() => generateSkillsListView())
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    const Icon(
+                                      Icons.email_outlined,
+                                      color: Colors.grey,
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Expanded(
+                                      child: AppText(
+                                        text: SharedPrefsManager.getUserEmail,
+                                        textSize: 13,
+                                        textColor: Colors.grey.shade800,
+                                        isBold: true,
+                                        isStart: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                */
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              ],
+                            ),
+                          ), */
+
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      const Icon(
+                                        Icons.phone_outlined,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Obx(
+                                        () => AppText(
+                                          text: resumeController
+                                              .phoneNumber.value,
+                                          textSize: 13,
+                                          textColor: Colors.grey.shade800,
+                                          isBold: true,
+                                          isStart: true,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      const Icon(
+                                        Icons.email_outlined,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Expanded(
+                                        child: AppText(
+                                          text: SharedPrefsManager.getUserEmail,
+                                          textSize: 13,
+                                          textColor: Colors.grey.shade800,
+                                          isBold: true,
+                                          isStart: true,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           const SizedBox(
-                            width: 10,
+                            height: 10,
                           ),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      text: 'Languages',
-                                      textColor: Constants.primaryColor,
-                                      textSize: 20,
-                                      isBold: true,
-                                      isStart: true,
-                                    ),
-                                    IconButton(
-                                        splashRadius: 5,
-                                        onPressed: () {
-                                          openLanguageDialog(size);
-                                        },
-                                        icon: const Icon(
-                                          Icons.add_circle_outline_rounded,
-                                          color: Constants.secondaryColor,
-                                        ))
-                                  ],
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                const Icon(
+                                  Icons.home_outlined,
+                                  color: Colors.grey,
                                 ),
-                                Obx(() => generateLanguagesListView())
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Expanded(
+                                  child: AppText(
+                                    text: resumeController.address.value,
+                                    textSize: 13,
+                                    textColor: Colors.grey.shade800,
+                                    isBold: true,
+                                    isStart: true,
+                                  ),
+                                ),
                               ],
                             ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: [
+                                AppText(
+                                  text: 'Summary',
+                                  textColor: Constants.primaryColor,
+                                  textSize: 23,
+                                  isBold: true,
+                                  isStart: true,
+                                ),
+                                const Expanded(child: SizedBox()),
+                                IconButton(
+                                    splashRadius: 1.0,
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      resumeController
+                                          .openDescriptionDialog(size);
+                                    },
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Constants.secondaryColor,
+                                    ))
+                              ],
+                            ),
+                          ),
+                          resumeController.aboutMeText.isNotEmpty
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: AppText(
+                                    text: resumeController.aboutMeText.value,
+                                    textColor: Colors.black,
+                                    textSize: 15,
+                                    isStart: true,
+                                  ),
+                                )
+                              : const SizedBox(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: [
+                                AppText(
+                                  text: 'Skills',
+                                  textColor: Constants.primaryColor,
+                                  textSize: 23,
+                                  isBold: true,
+                                  isStart: true,
+                                ),
+                                const Expanded(child: SizedBox()),
+                                IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      openSkillDialog(size);
+                                    },
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Constants.secondaryColor,
+                                    ))
+                              ],
+                            ),
+                          ),
+                          resumeController.userSelectedSkillsList.isNotEmpty
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30.0),
+                                  child: generateSkillsListView(),
+                                )
+                              : const SizedBox(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: [
+                                AppText(
+                                  text: 'Experience',
+                                  textColor: Constants.primaryColor,
+                                  textSize: 23,
+                                  isBold: true,
+                                  isStart: true,
+                                ),
+                                const Expanded(child: SizedBox()),
+                                IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      resumeController
+                                          .openExperienceDialog(size);
+                                    },
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Constants.secondaryColor,
+                                    ))
+                              ],
+                            ),
+                          ),
+                          generateUserExperienceListView(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: [
+                                AppText(
+                                  text: 'Education',
+                                  textColor: Constants.primaryColor,
+                                  textSize: 23,
+                                  isBold: true,
+                                  isStart: true,
+                                ),
+                                const Expanded(child: SizedBox()),
+                                IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      resumeController
+                                          .openEducationDialog(size);
+                                    },
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Constants.secondaryColor,
+                                    ))
+                              ],
+                            ),
+                          ),
+                          generateEducationListVIew(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: [
+                                AppText(
+                                  text: 'Languages',
+                                  textColor: Constants.primaryColor,
+                                  textSize: 23,
+                                  isBold: true,
+                                  isStart: true,
+                                ),
+                                const Expanded(child: SizedBox()),
+                                IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      openLanguageDialog(size);
+                                    },
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Constants.secondaryColor,
+                                    ))
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: generateLanguagesListView(),
                           )
                         ],
-                      ),
-                    )
-                  ],
-                ),
+                      )),
+                ],
+              )),
+              Container(
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 10.0),
+                /* width: 120, */
+                height: 60,
+                child: TextButton(
+                    onPressed: () {
+                      // resumeController.createResume();
+                    },
+                    style: TextButton.styleFrom(
+                        backgroundColor: Constants.secondaryColor,
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40))),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.save,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          AppText(
+                            text: 'Save',
+                            textSize: 20,
+                            isBold: true,
+                            textColor: Colors.white,
+                          )
+                        ])),
               ),
-              Positioned(
-                  bottom: 10,
-                  right: 1,
-                  child: Container(
-                    margin: const EdgeInsets.all(20),
-                    /* width: 120, */
-                    height: 60,
-                    child: TextButton(
-                        onPressed: () async {
-                          /* final data = await resumeController.createResumePdf();
-                      resumeController.saveAndViewPdf(data);
-                      print(Icons.home.codePoint); */
-                          resumeController.createResume();
-                        },
-                        style: TextButton.styleFrom(
-                            backgroundColor: Constants.secondaryColor,
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40))),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.save,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              AppText(
-                                text: 'Save',
-                                textSize: 20,
-                                isBold: true,
-                                textColor: Colors.white,
-                              )
-                            ])),
-                  ))
             ],
           ),
-        ),
-      ),
+          /* child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: ListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      children: [
+                        Container(
+                          width: size.width,
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(children: <Widget>[
+                            Stack(
+                              children: [
+                                Container(
+                                  width: 130,
+                                  height: 130,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(200),
+                                    color: Colors.amber,
+                                    /* image: DecorationImage(
+                                      image: FileImage(
+                                        File(
+                                          resumeController.selectedImagepath.value,
+                                        ),
+                                      ),
+                                      fit: BoxFit.fill) */
+                                  ),
+                                ),
+                                Positioned(
+                                    bottom: 2,
+                                    right: 1,
+                                    child: InkWell(
+                                      onTap: () {
+                                        resumeController.getImage();
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: const BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(30)),
+                                            color: Colors.red),
+                                        child: const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                      ),
+                                    )),
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            
+                          ]),
+                        ),
+                        Container(
+                          width: size.width,
+                          height: 1,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          color: Constants.textHintColor.withOpacity(0.5),
+                        ),
+                        
+                        Container(
+                          width: size.width,
+                          height: 1,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          color: Constants.textHintColor.withOpacity(0.5),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              AppText(
+                                text: 'Education',
+                                textColor: Constants.primaryColor,
+                                textSize: 20,
+                                isBold: true,
+                                isStart: true,
+                              ),
+                              IconButton(
+                                  splashRadius: 5,
+                                  onPressed: () {
+                                    resumeController.openEducationDialog(size);
+                                  },
+                                  icon: const Icon(
+                                    Icons.add_circle_outline_rounded,
+                                    color: Constants.secondaryColor,
+                                  ))
+                            ],
+                          ),
+                        ),
+                        Obx(() {
+                          return generateEducationListVIew();
+                        }),
+                        Container(
+                          width: size.width,
+                          height: 1,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          color: Constants.textHintColor.withOpacity(0.5),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              AppText(
+                                text: 'Experience',
+                                textColor: Constants.primaryColor,
+                                textSize: 20,
+                                isBold: true,
+                                isStart: true,
+                              ),
+                              IconButton(
+                                  splashRadius: 5,
+                                  onPressed: () {
+                                    resumeController.openExperienceDialog(size);
+                                  },
+                                  icon: const Icon(
+                                    Icons.add_circle_outline_rounded,
+                                    color: Constants.secondaryColor,
+                                  ))
+                            ],
+                          ),
+                        ),
+      
+                        Obx(() {
+                          
+                        }), //Calling Experience Method
+                        Container(
+                          width: size.width,
+                          height: 1,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          color: Constants.textHintColor.withOpacity(0.5),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        AppText(
+                                          text: 'Skills',
+                                          textColor: Constants.primaryColor,
+                                          textSize: 20,
+                                          isBold: true,
+                                          isStart: true,
+                                        ),
+                                        IconButton(
+                                            splashRadius: 5,
+                                            onPressed: () {
+                                              openSkillDialog(size);
+                                            },
+                                            icon: const Icon(
+                                              Icons.add_circle_outline_rounded,
+                                              color: Constants.secondaryColor,
+                                            ))
+                                      ],
+                                    ),
+                                    Obx(() => )
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        AppText(
+                                          text: 'Languages',
+                                          textColor: Constants.primaryColor,
+                                          textSize: 20,
+                                          isBold: true,
+                                          isStart: true,
+                                        ),
+                                        IconButton(
+                                            splashRadius: 5,
+                                            onPressed: () {
+                                              openLanguageDialog(size);
+                                            },
+                                            icon: const Icon(
+                                              Icons.add_circle_outline_rounded,
+                                              color: Constants.secondaryColor,
+                                            ))
+                                      ],
+                                    ),
+                                    Obx(() => generateLanguagesListView())
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                      bottom: 10,
+                      right: 1,
+                      child: Container(
+                        margin: const EdgeInsets.all(20),
+                        /* width: 120, */
+                        height: 60,
+                        child: TextButton(
+                            onPressed: () async {
+                              /* final data = await resumeController.createResumePdf();
+                          resumeController.saveAndViewPdf(data);
+                          print(Icons.home.codePoint); */
+                              resumeController.createResume();
+                            },
+                            style: TextButton.styleFrom(
+                                backgroundColor: Constants.secondaryColor,
+                                elevation: 5,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(40))),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.save,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  AppText(
+                                    text: 'Save',
+                                    textSize: 20,
+                                    isBold: true,
+                                    textColor: Colors.white,
+                                  )
+                                ])),
+                      ))
+                ],
+              ), */
+        );
+      }),
     );
   }
 
@@ -886,8 +1169,13 @@ class CreateResumeActivity extends StatelessWidget {
   }
 
 // user skills list method
-  ListView generateSkillsListView() {
-    return ListView.builder(
+  GridView generateSkillsListView() {
+    return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            mainAxisExtent: 40,
+            maxCrossAxisExtent: 200,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 5),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: resumeController.userSelectedSkillsList.length,
@@ -906,41 +1194,43 @@ class CreateResumeActivity extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: resumeController.userSelectedLanguagesList.length,
         itemBuilder: (context, index) {
-          return Align(
-            alignment: Alignment.centerLeft,
-            child:
-                createChip(resumeController.userSelectedLanguagesList[index]),
+          return Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child:
+                  createChip(resumeController.userSelectedLanguagesList[index]),
+            ),
           );
         });
   }
 
 // Method For Creating Chips
   Widget createChip(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Constants.secondaryColor),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            border: Border.all(color: Constants.secondaryColor, width: 1),
+            borderRadius: BorderRadius.circular(5),
           ),
-          const SizedBox(
-            width: 5,
-          ),
-          Text(
-            text,
-            style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-                fontSize: 15),
-            textAlign: TextAlign.start,
-            overflow: TextOverflow.ellipsis,
-          )
-        ],
-      ),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        Text(
+          text,
+          style: TextStyle(
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.normal,
+              fontSize: 16),
+          textAlign: TextAlign.start,
+          overflow: TextOverflow.ellipsis,
+        )
+      ],
     );
 
     /* Chip(
@@ -973,113 +1263,68 @@ class CreateResumeActivity extends StatelessWidget {
         itemCount: resumeController.userExperienceList.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Constants.primaryColor),
-                  ),
-                  child: Center(
-                    child: AppText(
-                      text: (index + 1).toString(),
-                      isBold: true,
-                      textColor: Constants.secondaryColor,
-                      textSize: 15,
+                Column(
+                  children: [
+                    const SizedBox(
+                      height: 3,
                     ),
-                  ),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(5)),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    (index != (resumeController.userExperienceList.length - 1))
+                        ? Container(
+                            height: 80,
+                            width: 0.8,
+                            color: Colors.grey,
+                          )
+                        : const SizedBox(),
+                  ],
+                ),
+                const SizedBox(
+                  width: 10,
                 ),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                          text: TextSpan(
-                              text: 'Position: ',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Colors.black),
-                              children: [
-                            TextSpan(
-                              text: resumeController
-                                  .userExperienceList[index].userDesignation,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 15,
-                                  color: Colors.black),
-                            )
-                          ])),
-                      RichText(
-                          text: TextSpan(
-                              text: 'Company Name: ',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Colors.black),
-                              children: [
-                            TextSpan(
-                                text: resumeController
-                                    .userExperienceList[index].companyName,
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.normal)),
-                          ])),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          RichText(
-                              text: TextSpan(
-                                  text: 'Start Date: ',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black),
-                                  children: [
-                                TextSpan(
-                                    text: resumeController
-                                        .userExperienceList[index].startDate,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal)),
-                              ])),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          RichText(
-                              text: TextSpan(
-                                  text: 'End Date: ',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black),
-                                  children: [
-                                TextSpan(
-                                    text: resumeController
-                                        .userExperienceList[index].endDate,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal)),
-                              ])),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText(
+                      text: resumeController
+                          .userExperienceList[index].userDesignation,
+                      textColor: Colors.grey.shade600,
+                      textSize: 16,
+                      isBold: true,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    AppText(
+                      text: resumeController
+                          .userExperienceList[index].companyName,
+                      textColor: Colors.grey.shade600,
+                      textSize: 14,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    AppText(
+                      text:
+                          '${resumeController.userExperienceList[index].startDate} - ${resumeController.userExperienceList[index].endDate}',
+                      textColor: Colors.grey,
+                      textSize: 12,
+                    ),
+                  ],
+                ))
               ],
             ),
           );
@@ -1094,113 +1339,113 @@ class CreateResumeActivity extends StatelessWidget {
         itemCount: resumeController.userEducationsList.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Constants.primaryColor),
-                  ),
-                  child: Center(
-                    child: AppText(
-                      text: (index + 1).toString(),
-                      isBold: true,
-                      textColor: Constants.secondaryColor,
-                      textSize: 15,
+                Column(
+                  children: [
+                    const SizedBox(
+                      height: 3,
                     ),
-                  ),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 1),
+                          borderRadius: BorderRadius.circular(5)),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    (index != (resumeController.userEducationsList.length - 1))
+                        ? Container(
+                            height: 80,
+                            width: 0.8,
+                            color: Colors.grey,
+                          )
+                        : const SizedBox(),
+                  ],
+                ),
+                const SizedBox(
+                  width: 10,
                 ),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                          text: TextSpan(
-                              text: 'Degree: ',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Colors.black),
-                              children: [
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                          text: 'Degree: ',
+                          style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                          children: [
                             TextSpan(
-                              text: resumeController
-                                  .userEducationsList[index].qualification,
-                              style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal),
-                            )
-                          ])),
-                      RichText(
-                          text: TextSpan(
-                              text: 'Institute Name: ',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Colors.black),
-                              children: [
-                            TextSpan(
-                                text: resumeController
-                                    .userEducationsList[index].instituteName,
+                                text:
+                                    '${resumeController.userEducationsList[index].qualification}',
                                 style: const TextStyle(
+                                    color: Colors.grey,
                                     fontSize: 15,
-                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal))
+                          ]),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                          text: 'Institute Name: ',
+                          style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(
+                                text:
+                                    '${resumeController.userEducationsList[index].instituteName}',
+                                style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal))
+                          ]),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                          text: 'Start Date: ',
+                          style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(
+                                text:
+                                    '${resumeController.userEducationsList[index].startDate}  ',
+                                style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.normal)),
-                          ])),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          RichText(
-                              text: TextSpan(
-                                  text: 'Start Date: ',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black),
-                                  children: [
-                                TextSpan(
-                                    text: resumeController
-                                        .userEducationsList[index].startDate,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal)),
-                              ])),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          RichText(
-                              text: TextSpan(
-                                  text: 'End Date: ',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black),
-                                  children: [
-                                TextSpan(
-                                    text: resumeController
-                                        .userEducationsList[index].endDate,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal)),
-                              ])),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+                            TextSpan(
+                                text: 'End Date: ',
+                                style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text:
+                                    '${resumeController.userEducationsList[index].endDate}',
+                                style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.normal))
+                          ]),
+                    ),
+                  ],
+                ))
               ],
             ),
           );

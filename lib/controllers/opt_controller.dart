@@ -23,11 +23,15 @@ class OTPController extends GetxController {
     super.onInit();
     // status.value = Get.arguments[0]['status'];
 
-    otpText.value = Get.arguments[0]['token'].toString();
-    print(otpText.value);
-    verIdText.value = Get.arguments[0]['verId'];
-    print(verIdText.value);
-    phone.value = Get.arguments[0]['phone'];
+    /*   if (Get.arguments[0]['token'] != null) {
+      otpText.value = Get.arguments[0]['token'].toString();
+      print(otpText.value);
+
+      verIdText.value = Get.arguments[0]['verId'];
+      print(verIdText.value);
+      phone.value = Get.arguments[0]['phone'];
+    } */
+    verifyPhone();
 
     timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (seconds.value != 0) {
@@ -42,6 +46,7 @@ class OTPController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    timer.cancel();
     otpTextController.clear();
   }
 
@@ -49,33 +54,37 @@ class OTPController extends GetxController {
     if (enableResend.isTrue) {
       enableResend.value = false;
       seconds.value = 30;
-      verifyPhone(phone.value);
+      verifyPhone();
     }
   }
 
-  Future<void> verifyPhone(String phone) async {
+  Future<void> verifyPhone() async {
     await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: phone,
-        timeout: const Duration(seconds: 10),
-        verificationCompleted: (credential) {},
-        verificationFailed: (e) {},
-        codeSent: (verId, code) {
-          verIdText.value = verId;
-          otpText.value = code.toString();
-          print(otpText.value);
-          print(verIdText.value);
-        },
-        codeAutoRetrievalTimeout: (verificationId) {
-          // showToast('Request Timeout!. Try Again Later');
-        });
+      phoneNumber: '+923104241301',
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: (credential) {},
+      verificationFailed: (e) {
+        if (e.code == 'invalid-phone-number') {
+          print('The provided phone number is not valid.');
+        }
+      },
+      codeSent: (verId, code) {
+        // Get.to(() => PhoneOTPActivity(), arguments: [{'verId', verId}]);
+        /*    print(otpText.value);
+        print(verIdText.value); */
+      },
+      codeAutoRetrievalTimeout: (e) {
+        // showToast('Request Timeout!. Try Again Later');
+      },
+    );
   }
 
-  Future<void> verifyOTP(String verId, String code) async {
-    // PhoneAuthCredential credential =
-        PhoneAuthProvider.credential(verificationId: verId, smsCode: code);
-        
-    // credential.
-  }
+  // Future<void> verifyOTP(String verId, String code) async {
+  //   // PhoneAuthCredential credential =
+  //   PhoneAuthProvider.credential(verificationId: verId, smsCode: code);
+
+  //   // credential.
+  // }
 
   void showToast(String msg) {
     Fluttertoast.showToast(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/api_services/response_models/job_detail_response.dart';
@@ -7,6 +9,9 @@ import '../shared_prefs/shared_prefs.dart';
 
 class JobDetailController extends GetxController
     with GetTickerProviderStateMixin {
+  var isDescriptionPressed = false.obs;
+  var isDutiesPressed = false.obs;
+  var isWorkSchedulePressed = false.obs;
   var jobDetail = JobDetail().obs;
   var jobId = 0.obs;
   var isLoaded = false.obs;
@@ -16,15 +21,18 @@ class JobDetailController extends GetxController
   late TabController tabController;
   late ScrollController scrollController;
   var isApplied = false.obs;
+  late Timer _timer;
 
+  var seconds = 5.obs;
   @override
   void onInit() {
     super.onInit();
+
     tabController = TabController(length: 2, vsync: this);
     scrollController = ScrollController();
     userToken.value = SharedPrefsManager.getUserToken;
-    jobId.value = Get.arguments[0]['jobId'];
-    status.value = Get.arguments[0]['status'];
+    // jobId.value = Get.arguments[0]['jobId'];
+    // status.value = Get.arguments[0]['status'];
     print(jobId.value);
     fetchJobDetails(jobId.value, SharedPrefsManager.getUserToken);
   }
@@ -36,6 +44,7 @@ class JobDetailController extends GetxController
     super.dispose();
     tabController.dispose();
     scrollController.dispose();
+    _timer.cancel();
   }
 
   fetchJobDetails(int id, String token) async {
@@ -67,34 +76,63 @@ class JobDetailController extends GetxController
     RestApiServices.addNotInterested(userToken.value, jobId.value);
   }
 
-  applyForJob() async {
+  startTimer() {
     isApplied.value = true;
-    var response =
-        await RestApiServices.applyForJob(userToken.value, jobId.value);
-    print(response);
-    switch (response) {
-      case 'success':
-        Get.snackbar('Job', 'You applied to this job successfully',
-            snackPosition: SnackPosition.BOTTOM,
-            duration: const Duration(seconds: 3));
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (seconds.value != 0) {
+        seconds.value--;
         isApplied.value = true;
-        break;
-      case 'already exist':
-        Get.snackbar('Job', 'You already applied to this job',
-            snackPosition: SnackPosition.BOTTOM);
+      } else {
         isApplied.value = false;
+        timer.cancel();
+      }
+    });
+  }
 
-        break;
-      case 'resume not exist':
-        Get.snackbar('Resume', 'Please create your resume first',
-            snackPosition: SnackPosition.BOTTOM);
-        isApplied.value = false;
+  applyForJob() async {
+    // startTimer();
 
-        break;
-      default:
-        Get.snackbar('Error', 'Internal Server Error. Please try again later',
-            snackPosition: SnackPosition.BOTTOM);
-        isApplied.value = false;
-    }
+    isApplied.value = true;
+
+    /*  var response =
+          await RestApiServices.applyForJob(userToken.value, jobId.value);
+      print(response);
+      switch (response) {
+        case 'success':
+          Get.snackbar('Job', 'You applied to this job successfully',
+              snackPosition: SnackPosition.BOTTOM,
+              duration: const Duration(seconds: 3));
+          isApplied.value = true;
+          break;
+        case 'already exist':
+          Get.snackbar('Job', 'You already applied to this job',
+              snackPosition: SnackPosition.BOTTOM);
+          isApplied.value = false;
+
+          break;
+        case 'resume not exist':
+          Get.snackbar('Resume', 'Please create your resume first',
+              snackPosition: SnackPosition.BOTTOM);
+          isApplied.value = false;
+
+          break;
+        default:
+          Get.snackbar('Error', 'Internal Server Error. Please try again later',
+              snackPosition: SnackPosition.BOTTOM);
+          isApplied.value = false;
+      } */
+  }
+
+  undoForJob() {
+    // if (isApplied.isTrue) {
+    //   isApplied.value = false;
+    //   seconds.value = 5;
+    //
+    // }
+    isApplied.value = false;
+  }
+
+  addToArchive(int jobId) {
+    RestApiServices.addToArchive(userToken.value, jobId);
   }
 }

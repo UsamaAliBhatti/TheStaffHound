@@ -1,19 +1,18 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:the_staff_hound/api_services/response_models/branches_model.dart';
+import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
+import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
+import 'package:the_staff_hound/api_services/response_models/user_login_signup_response.dart';
 import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/network_manager/network_state_manager.dart';
 import 'package:the_staff_hound/views/phone_otp_screen.dart';
 
-
 class SignUpController extends GetxController {
-
-  late BranchesModel branchModel = BranchesModel();
-
+ var branches = BranchesResponse().obs;
   var dropdownItemsList = <MultiSelectItem>[].obs;
   var selectedBranchesList = <int>[].obs;
 
@@ -52,6 +51,7 @@ class SignUpController extends GetxController {
   var countryText = ''.obs;
 
   var isCurrentLocationSelected = false.obs;
+  final NetworkManager _networkManager = NetworkManager();
   @override
   void onInit() {
     emailController = TextEditingController();
@@ -132,11 +132,10 @@ class SignUpController extends GetxController {
 
 //method to get branches
   getBranchesList() async {
-    branchModel = (await RestApiServices.getAllBranches())!;
-    dropdownItemsList.value = branchModel.data!.map((branch) {
-      return MultiSelectItem(branch, branch.name);
+    branches.value = (await AuthApis.getAllBranches())!;
+    dropdownItemsList.value = branches.value.data!.map((branch) {
+      return MultiSelectItem(branch, branch.name!);
     }).toList();
-    update();
   }
 
   @override
@@ -244,7 +243,7 @@ class SignUpController extends GetxController {
     // if (!isValid) {
     //   return;
     // }
-    /*   var isConnected = await _networkManager.checkInternetConnection();
+    var isConnected = await _networkManager.checkInternetConnection();
 
     if (isConnected) {
       if (!formKeys[0].currentState!.validate() &&
@@ -299,10 +298,10 @@ class SignUpController extends GetxController {
           streetTextController.clear();
 
           var userResponse = userResponseFromJson(response);
-          verifyPhone(userResponse.phone!);
-          /* Get.off(() => PhoneOTPActivity(), arguments: [
-            {'status': 'signup'}
-          ]); */
+          // verifyPhone(userResponse.phone!);
+          Get.off(() => PhoneOTPActivity(), arguments: [
+            {'phone': userResponse.phone}
+          ]);
           // Get.to(() => const ForgotPasswordActivity());
         }
       }
@@ -311,11 +310,11 @@ class SignUpController extends GetxController {
           msg: 'Please Check Your Internet Connection',
           backgroundColor: Colors.red,
           textColor: Colors.white);
-    } */
-    verifyPhone('+923104241301');
+    }
+    // verifyPhone('+923104241301');
   }
 
-//
+/* //
   Future<void> verifyPhone(String phone) async {
     print('called');
     await FirebaseAuth.instance.verifyPhoneNumber(
@@ -333,7 +332,7 @@ class SignUpController extends GetxController {
         codeAutoRetrievalTimeout: (verificationId) {
           //showToast('Request Timeout!. Try Again Later');
         });
-  }
+  } */
 
   void showToast(String msg) {
     Fluttertoast.showToast(

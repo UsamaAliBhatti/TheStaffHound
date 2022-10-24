@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:animate_icons/animate_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
@@ -21,102 +20,428 @@ class JobDetailsActivity extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 //
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
+        backgroundColor: Constants.backgroundColor,
+        appBar: AppBar(
           backgroundColor: Constants.backgroundColor,
-          appBar: AppBar(
-            backgroundColor: Constants.backgroundColor,
-            elevation: 1,
-            titleSpacing: 0,
-            centerTitle: true,
-            shape: const Border(
-                bottom: BorderSide(color: Colors.black26, width: 0.2)),
-            shadowColor: Colors.black38,
-            toolbarHeight: 70,
-            leading: IconButton(
-                onPressed: () {
-                  Get.back(result: 'refresh');
-                },
+          elevation: 1,
+          titleSpacing: 0,
+          centerTitle: true,
+          shape: const Border(
+              bottom: BorderSide(color: Colors.black26, width: 0.2)),
+          shadowColor: Colors.black38,
+          toolbarHeight: 70,
+          leading: IconButton(
+              onPressed: () {
+                Get.back(result: 'refresh');
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Constants.primaryColor,
+              )),
+          title: AppText(
+            text: 'Job Details',
+            textSize: 22,
+            isBold: true,
+          ),
+          actions: [
+            IconButton(
+                onPressed: () {},
                 icon: const Icon(
-                  Icons.arrow_back_ios_new,
+                  Icons.share_sharp,
                   color: Constants.primaryColor,
                 )),
-            title: AppText(
-              text: 'Job Details',
-              textSize: 22,
-              isBold: true,
-            ),
-            /* Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                      width: 60,
-                      height: 60,
-                      padding: EdgeInsets.zero,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Obx(() {
-                        return _getImage(
-                            jobDetailController.jobDetail.value.jobs!.imageUrl!);
-                      })),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  AppText(
-                    text: jobDetailController.jobDetail.value.jobs!.companyName ??
-                        'Name is empty',
-                    textSize: 20,
+            IconButton(
+                onPressed: () {
+                  jobDetailController
+                      .addToArchive(jobDetailController.jobId.value);
+                },
+                icon: const Icon(
+                  Icons.favorite_border_sharp,
+                  color: Constants.primaryColor,
+                )),
+          ],
+        ),
+        body: Obx(() {
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: size.width,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  color: Constants.secondaryColor,
+                  child: AppText(
+                    text: 'Congratulation! You have been offered this job',
+                    textColor: Colors.white,
                     isBold: true,
                   ),
-                ],
-              ), */
-            actions: [
-              /*  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Platform.isAndroid ? Icons.more_vert : Icons.more_horiz,
-                      color: Constants.primaryColor,
-                      size: 30,
-                    )) */
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.phone,
-                    color: Constants.primaryColor,
-                  )),
-              PopupMenuButton(
-                  icon: Icon(
-                    Platform.isAndroid ? Icons.more_vert : Icons.more_horiz,
-                    color: Constants.primaryColor,
-                    size: 30,
-                  ),
-                  itemBuilder: (context) => [
-                        PopupMenuItem(
-                            child: AppText(
-                          text: 'Interested',
-                        )),
-                        PopupMenuItem(
-                            child: AppText(
-                          text: 'Respond Later',
-                        ))
-                      ])
-            ],
-          ),
-          body: Obx(() {
-            return Visibility(
-                visible: jobDetailController.isLoaded.value,
-                replacement: const Center(
-                  child: CircularProgressIndicator(),
                 ),
-                child: Obx(() {
-                  return jobDetailController.status.value == 'approved'
-                      ? appliedJobDetailFunction(size, context)
-                      : simpleJobDetailsMethod(size, context);
-                }));
-          })),
-    );
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: AppText(
+                    text: 'NEW',
+                    textColor: Colors.grey.shade400,
+                    textSize: 12,
+                    isStart: true,
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.only(
+                        left: 20.0, right: 20, bottom: 10),
+                    shrinkWrap: true,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      AppText(
+                        text: 'Packaging Associate',
+                        textColor: Colors.black,
+                        isBold: true,
+                        textSize: 20,
+                        isStart: true,
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      AppText(
+                        text: 'Ashland Company',
+                        textColor: Colors.black,
+                        textSize: 15,
+                        isStart: true,
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      AppText(
+                        text: 'Contract / Temporary',
+                        textColor: Colors.grey.shade600,
+                        textSize: 12,
+                        isStart: true,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 20),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.folder_copy,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                AppText(
+                                  text: 'Hotel - Hospitality',
+                                  textSize: 13,
+                                  textColor: Colors.black,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                AppText(
+                                  text: 'Los Angeles, CA 90036',
+                                  textSize: 13,
+                                  textColor: Colors.black,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.attach_money_sharp,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                AppText(
+                                  text: '\$13 - \$15 per hour',
+                                  textSize: 13,
+                                  textColor: Colors.black,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_month_sharp,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                AppText(
+                                  text: 'Sep 24 - 23 Oct',
+                                  textSize: 13,
+                                  textColor: Colors.black,
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        color: Colors.grey,
+                        height: 2,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AppText(
+                            text: 'Job Description',
+                            textColor: Colors.black,
+                            textSize: 15,
+                            isBold: true,
+                          ),
+                          AnimateIcons(
+                              endIconColor: Colors.black,
+                              startIconColor: Colors.black,
+                              size: 25,
+                              startIcon: Icons.keyboard_arrow_up_sharp,
+                              endIcon: Icons.keyboard_arrow_down_sharp,
+                              onStartIconPress: () {
+                                jobDetailController.isDescriptionPressed.value =
+                                    true;
+                                return true;
+                              },
+                              onEndIconPress: () {
+                                jobDetailController.isDescriptionPressed.value =
+                                    false;
+                                return true;
+                              },
+                              duration: const Duration(milliseconds: 500),
+                              controller: AnimateIconController()),
+                        ],
+                      ),
+                      jobDetailController.isDescriptionPressed.isFalse
+                          ? const Text(
+                              'This is Packaging Associate Job Dscription fdsadfvsjlkgmnsb gnb flwdshldsa nvdsqng/z dfhbvqs godg lg ge kxgb ',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                  height: 1.5,
+                                  wordSpacing: 1.5),
+                            )
+                          : const SizedBox(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AppText(
+                            text: 'Responsibilities / Duties',
+                            textColor: Colors.black,
+                            textSize: 15,
+                            isBold: true,
+                          ),
+                          AnimateIcons(
+                              endIconColor: Colors.black,
+                              startIconColor: Colors.black,
+                              size: 25,
+                              startIcon: Icons.keyboard_arrow_up_sharp,
+                              endIcon: Icons.keyboard_arrow_down_sharp,
+                              onStartIconPress: () {
+                                jobDetailController.isDutiesPressed.value =
+                                    true;
+                                return true;
+                              },
+                              onEndIconPress: () {
+                                jobDetailController.isDutiesPressed.value =
+                                    false;
+                                return true;
+                              },
+                              duration: const Duration(milliseconds: 500),
+                              controller: AnimateIconController()),
+                        ],
+                      ),
+                      /*    const SizedBox(
+                                      height: 10,
+                                    ), */
+                      jobDetailController.isDutiesPressed.isFalse
+                          ? ListView.builder(
+                              itemCount: 3,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (_, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 5.0),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 5,
+                                        height: 5,
+                                        color: Colors.black,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: AppText(
+                                          text: index == 0
+                                              ? 'responsibility of package detailing'
+                                              : index == 2
+                                                  ? 'responsibility of package in and out'
+                                                  : 'responsibility of handling packages accounts',
+                                          textColor: Colors.black,
+                                          textSize: 12,
+                                          isStart: true,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              })
+                          : const SizedBox(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      AppText(
+                        text: 'Work Schedule',
+                        textColor: Colors.black,
+                        textSize: 16,
+                        isStart: true,
+                        isBold: true,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text(
+                        'Our shift starts from 9 : 00 AM and ends at 5 : 00 PM including break time from 1 : 00 PM to 2 : 00 PM',
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                            height: 1.5,
+                            wordSpacing: 1.5),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                /* Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    height: 60,
+                    width: size.width / 1.5,
+                    child: TextButton(
+                        style: ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(35))),
+                            backgroundColor: const MaterialStatePropertyAll(
+                                Constants.primaryColor)),
+                        onPressed: () {},
+                        child: AppText(
+                          textSize: 18,
+                          text: 'Apply',
+                          isBold: true,
+                          textColor: Colors.white,
+                        )),
+                  ),
+                ), */
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        height: 60,
+                        width: size.width / 2.8,
+                        child: TextButton(
+                            style: ButtonStyle(
+                                shape: MaterialStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                      color: Constants.primaryColor),
+                                  borderRadius: BorderRadius.circular(35),
+                                )),
+                                backgroundColor: const MaterialStatePropertyAll(
+                                    Constants.buttonBackgroundColor)),
+                            onPressed: () {},
+                            child: AppText(
+                              textSize: 18,
+                              text: 'Decline',
+                              isBold: true,
+                            )),
+                      ),
+                      SizedBox(
+                        height: 60,
+                        width: size.width / 2.8,
+                        child: TextButton(
+                            style: ButtonStyle(
+                                shape: MaterialStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(35))),
+                                backgroundColor: const MaterialStatePropertyAll(
+                                    Constants.primaryColor)),
+                            onPressed: () {},
+                            child: AppText(
+                              textSize: 18,
+                              text: 'Accept',
+                              isBold: true,
+                              textColor: Colors.white,
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                )
+                /* Container(
+                  width: size.width,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 70, vertical: 15),
+                  decoration: const BoxDecoration(
+                      color: Constants.backgroundColor,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            offset: Offset(0.0, -0.01),
+                            blurRadius: 10.0)
+                      ]),
+                  child: 
+                ) */
+              ]);
+
+          /* Visibility(
+              visible: jobDetailController.isLoaded.value,
+              replacement: const Center(
+                child: CircularProgressIndicator(),
+              ),
+              child: Obx(() {
+                return jobDetailController.status.value == 'approved'
+                    ? appliedJobDetailFunction(size, context)
+                    : simpleJobDetailsMethod(size, context);
+              })); */
+        }));
   }
 
   appliedJobDetailFunction(size, context) {
@@ -965,34 +1290,58 @@ class JobDetailsActivity extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              width: size.width / 3,
-                              height: 60,
-                              child: TextButton(
-                                onPressed: jobDetailController.isApplied.value
-                                    ? null
-                                    : () async {
+                            jobDetailController.isApplied.isFalse
+                                ? SizedBox(
+                                    width: size.width / 3,
+                                    height: 60,
+                                    child: TextButton(
+                                      onPressed: () async {
                                         await jobDetailController.checkResume()
                                             ? jobDetailController.applyForJob()
                                             : openBottomSheetDialog(
                                                 size, context);
                                       },
-                                style: TextButton.styleFrom(
+                                      style: TextButton.styleFrom(
 
-                                    // padding: const EdgeInsets.symmetric(horizontal: 30),
-                                    backgroundColor:
-                                        Constants.buttonBackgroundColor,
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30))),
-                                child: AppText(
-                                  text: 'Apply Now',
-                                  isBold: true,
-                                  textSize: 18,
-                                ),
-                              ),
-                            )
+                                          // padding: const EdgeInsets.symmetric(horizontal: 30),
+                                          backgroundColor:
+                                              Constants.primaryColor,
+                                          elevation: 2,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30))),
+                                      child: AppText(
+                                        text: 'Apply Now',
+                                        isBold: true,
+                                        textSize: 18,
+                                        textColor: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(
+                                    width: size.width / 3,
+                                    height: 60,
+                                    child: TextButton(
+                                      onPressed: () async {
+                                        jobDetailController.undoForJob();
+                                      },
+                                      style: TextButton.styleFrom(
+
+                                          // padding: const EdgeInsets.symmetric(horizontal: 30),
+                                          backgroundColor:
+                                              Constants.buttonBackgroundColor,
+                                          elevation: 2,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30))),
+                                      child: AppText(
+                                        text: 'Undo',
+                                        isBold: true,
+                                        textSize: 18,
+                                        textColor: Constants.primaryColor,
+                                      ),
+                                    ),
+                                  )
                           ],
                         )))
                 : const SizedBox();
@@ -1144,7 +1493,7 @@ class JobDetailsActivity extends StatelessWidget {
     );
   }
 
- /*  Widget _getImage(String? s) {
+  /*  Widget _getImage(String? s) {
     if (s == null) {
       return Image.asset(
         Constants.placeholderImage,

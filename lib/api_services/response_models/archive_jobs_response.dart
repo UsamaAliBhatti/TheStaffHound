@@ -21,7 +21,7 @@ class ArchivedJobsResponse {
     int? id;
     String? imageUrl;
     String? jobTitle;
-    int? companyId;
+    dynamic companyId;
     String? salary;
     String? location;
 

@@ -5,12 +5,13 @@
     "version": "0.2.0",
     "configurations": [
   
-        "configurations"
+        
         
         {
             "name": "the_staff_hound",
             "request": "launch",
             "type": "dart"
+            
         },
         {
             "name": "the_staff_hound (profile mode)",

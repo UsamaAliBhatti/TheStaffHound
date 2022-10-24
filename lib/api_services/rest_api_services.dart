@@ -7,8 +7,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:the_staff_hound/api_services/response_models/archive_jobs_response.dart';
+import 'package:the_staff_hound/api_services/response_models/forgot_password_email_response.dart';
 import 'package:the_staff_hound/api_services/response_models/my_jobs_response.dart';
-import 'package:the_staff_hound/api_services/response_models/branches_model.dart';
+import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
 import 'package:the_staff_hound/api_services/response_models/job_detail_response.dart';
 import 'package:the_staff_hound/api_services/response_models/jobs_response.dart';
 import 'package:the_staff_hound/api_services/response_models/notifications_response.dart';
@@ -16,7 +17,8 @@ import 'package:the_staff_hound/api_services/response_models/profile_response.da
 import 'package:the_staff_hound/api_services/response_models/resume_response.dart';
 import 'package:the_staff_hound/api_services/response_models/user_login_signup_response.dart';
 import 'package:the_staff_hound/constants.dart';
-import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
+import 'package:the_staff_hound/views/email_otp_screen.dart';
+import 'package:the_staff_hound/views/reset_password_screen.dart';
 
 class RestApiServices {
   static const _baseUrl = 'https://api.thestaffhound.com/api/';
@@ -61,7 +63,7 @@ class RestApiServices {
             var json = response.body;
             print('Login Successful');
             var userModel = userResponseFromJson(json);
-            saveUserMethod(userModel, 'Login', 'Login Successfull');
+            // saveUserMethod(userModel, 'Login', 'Login Successfull');
             return true;
           case 202:
             print('Error: Password Mismatch');
@@ -129,7 +131,7 @@ class RestApiServices {
     }
   }
 
-  //Method to get deahboad Data from Server
+  
   //----------------------------------------------------------------------------------------------------------//
   ////-------------------------------------Method to get dashboard data-------------------------------------////
   //----------------------------------------------------------------------------------------------------------//
@@ -294,7 +296,7 @@ class RestApiServices {
     }
   }
 
-  //---------------------------------------------------------------------------------------------------------//
+/*   //---------------------------------------------------------------------------------------------------------//
   ////-------------------------------------Method to get all Branches--------------------------------------////
   //---------------------------------------------------------------------------------------------------------//
   static Future<BranchesModel?> getAllBranches() async {
@@ -314,7 +316,7 @@ class RestApiServices {
       showToast('Request timeout. Please try again later.');
       return null;
     }
-  }
+  } */
 
   //----------------------------------------------------------------------------------------------------------------------------------//
   ////-------------------------------------Method to check if user CV\Resume is avaible or not--------------------------------------////
@@ -539,27 +541,101 @@ class RestApiServices {
   }
 
   //-------------------------------------------------------------------------------------------------------//
-  ////-------------------------------------Method to Save User Data--------------------------------------////
+  ////-------------------------------------Method to Undo Apply Job--------------------------------------////
   //-------------------------------------------------------------------------------------------------------//
-  static void saveUserMethod(
-      UserResponse userModel, String message, String title) async {
-    var isDataSaved = await SharedPrefsManager.saveUserData(
-        userModel.token!,
-        userModel.data!.id!,
-        userModel.data!.name!,
-        userModel.data!.email!,
-        userModel.data!.type!,
-        userModel.phone!,
-        userModel.address!);
-    if (isDataSaved) {
-      print('Email:   ${SharedPrefsManager.getUserEmail.toString()}');
-      Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM);
+  static undoApplyJob(String token, String jobId) async {
+    try {
+      var client = http.Client();
+      var uri = Uri.parse('${_baseUrl}remove_applicant');
+      http.Response response = await client.post(uri,
+          headers: {'Authorization': 'Bearer $token'},
+          body: {'job_Id': jobId}).timeout(const Duration(seconds: 15));
 
-      print('data saved');
-    } else {
-      print('data not saved');
+      var msgResponse = jsonDecode(response.body);
+      if (msgResponse == 'success') {
+        showToast('Undo successfully');
+      }
+    } on TimeoutException {
+      showToast('Request timeout. Please try again later.');
     }
   }
+
+  //----------------------------------------------------------------------------------------------------------------------------------//
+  ////-------------------------------------Method To Send Email To Get OTP For Forgot Password--------------------------------------////
+  //----------------------------------------------------------------------------------------------------------------------------------//
+  static sendEmailForOTP(String email) async {
+    try {
+      var client = http.Client();
+      var uri = Uri.parse('${_baseUrl}forget_password');
+      http.Response response = await client.post(uri,
+          body: {'email': email}).timeout(const Duration(seconds: 15));
+
+      var data = forgotPasswordEmailResponseFromJson(response.body);
+      if (data.status == 'True') {
+        Get.off(() => EmailOTPActivity(), arguments: {'email': data.data});
+      } else {
+        showToast('Email Not Matched');
+      }
+    } on TimeoutException {
+      showToast('Request timeout. Please try again later.');
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------//
+  ////-------------------------------------Method To Verify OTP From Email--------------------------------------////
+  //--------------------------------------------------------------------------------------------------------------//
+  static verifyEmailOTP(String email, String code) async {
+    try {
+      var client = http.Client();
+      var uri = Uri.parse('${_baseUrl}check_code');
+      http.Response response = await client.post(uri, body: {
+        'email': email,
+        'code': code
+      }).timeout(const Duration(seconds: 15));
+
+      var data = forgotPasswordEmailResponseFromJson(response.body);
+      if (data.status == 'True') {
+        Get.off(() => const ResetPasswordActivity(), arguments: {
+          'email': email
+        });
+      } else {
+        showToast('Code Not Matched');
+      }
+    } on TimeoutException {
+      showToast('Request timeout. Please try again later.');
+    }
+  }
+
+ //-------------------------------------------------------------------------------------------------------------//
+  ////-------------------------------------Method To Reset User Password--------------------------------------////
+  //------------------------------------------------------------------------------------------------------------//
+  static resetUserPassword(String email, String code) async {
+    try {
+      var client = http.Client();
+      var uri = Uri.parse('${_baseUrl}change_forget_password');
+      http.Response response = await client.post(uri, body: {
+        'email': email,
+        'code': code
+      }).timeout(const Duration(seconds: 15));
+
+      var data = forgotPasswordEmailResponseFromJson(response.body);
+      if (data.status == 'True') {
+        Get.off(() => const ResetPasswordActivity(), arguments: {
+          'email': email
+        });
+      } else {
+        showToast('Code Not Matched');
+      }
+    } on TimeoutException {
+      showToast('Request timeout. Please try again later.');
+    }
+  }
+
+
+  //-------------------------------------------------------------------------------------------------------//
+  ////-------------------------------------Method to Save User Data--------------------------------------////
+  //-------------------------------------------------------------------------------------------------------//
+  
 
   // Toast Method
   static showToast(String message) {

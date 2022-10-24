@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
+import 'package:the_staff_hound/network_manager/network_state_manager.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
-import 'package:the_staff_hound/views/dashboard_screen.dart';
-import 'package:the_staff_hound/views/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -17,31 +18,41 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  // final _networkManager = Get.put(NetworkManager());
+  final _networkManager = Get.put(NetworkManager());
+  // final NetworkManager _networkManager = Get.find<NetworkManager>();
+
   @override
   void initState() {
     super.initState();
 
-    // if (_networkManager.isConnected.value) {
-    Timer(const Duration(seconds: 3), () {
+    initTimer();
+  }
+
+  initTimer() async {
+    if (await _networkManager.checkInternetConnection()) {
       if (!SharedPrefsManager.prefs
           .containsKey(SharedPrefsManager.userTokenKey)) {
-        Get.off(() => LoginActivity());
+        Future.delayed(const Duration(milliseconds: 3000), () {
+          Get.offAllNamed(Routes.LOGIN);
+        });
       } else {
-        Get.off(() => DashboardActivity());
+        Future.delayed(const Duration(milliseconds: 3000), () {
+          Get.offAllNamed(Routes.DASHBOARD);
+        });
       }
-      //Get.off(() => LoginActivity());
-    });
-    /*   } else {
-      showDialog(
+    
+    } else {
+      showExitDialog();
+      // DialogHelper.showDialog();
+      /* showDialog(
           context: context,
           builder: (_) {
             return AlertDialog(
               title: AppText(text:  'Network Problem', textColor: Colors.black, textSize: 18, isBold: true,),
 
             );
-          });
-    } */
+          }); */
+    }
   }
 
   @override
@@ -68,5 +79,37 @@ class _SplashScreenState extends State<SplashScreen> {
         ],
       ),
     )));
+  }
+
+  showExitDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: ((context) => Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  const Text('Network Error',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text(
+                      'Seems Like you aren\'t connected to internet. Please connect to internet before try again.',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      )),
+                  ElevatedButton(
+                      onPressed: () {
+                        SystemNavigator.pop();
+                      },
+                      child: const Text('Okay'))
+                ]),
+              ),
+            )));
   }
 }

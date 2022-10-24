@@ -43,10 +43,9 @@ dependencies:
   intl: ^0.17.0
   toggle_switch: ^2.0.1
   fluttertoast: ^8.0.9
-  pdf: ^3.7.3
+ 
   path_provider: ^2.0.9
   open_file: ^3.2.1
-  flutter_pdfview: ^1.2.2
   google_fonts: ^3.0.1
   
  
@@ -66,6 +65,8 @@ dependencies:
   intl_phone_number_input: ^0.7.0+2
   dropdown_search: ^5.0.2
   multiple_search_selection: ^2.2.1
+  animate_icons: ^2.0.0
+  table_calendar: ^3.0.7
 
 dev_dependencies:
   flutter_test:

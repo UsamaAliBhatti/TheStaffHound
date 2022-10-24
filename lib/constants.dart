@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Constants {
+  //base url for api's
+  static const baseUrl = 'https://api.thestaffhound.com/api/';
   // Custom Colors
   static const Color backgroundColor = Color(0xffF9F9F9);
   static const Color secondaryColor = Color(0xfff4bd05);
@@ -15,6 +17,7 @@ class Constants {
   static const String facebookIcon = "assets/images/facebook_icon.png";
   static const String forgotPasswordImage = "assets/images/forgot_pass_img.png";
   static const String otpScreenImage = "assets/images/otp_screen_img.png";
+  static const String placeholderUserImage = "assets/images/placeholder.png";
   static const String notificationImage =
       "assets/images/ic_notification_img.png";
   static const String applicationAcceptImage =
@@ -42,4 +45,6 @@ class Constants {
   static const icEmail = "assets/images/ic_email.png";
   static const icArchived = "assets/images/ic_archived_img.png";
   static const icBranch = "assets/images/ic_branch.png";
+  static const icFavorite = "assets/images/ic_favorite.png";
+  static const icFilter = "assets/images/ic_filter.png";
 }

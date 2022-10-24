@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:the_staff_hound/api_services/rest_api_services.dart';
-import 'package:the_staff_hound/views/dashboard_screen.dart';
+import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
+import 'package:the_staff_hound/api_services/auth_service/responses/user_model.dart';
+import 'package:the_staff_hound/api_services/controllers/base_controller.dart';
+import 'package:the_staff_hound/constants.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
+import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
 import '../network_manager/network_state_manager.dart';
 
-class LoginController extends GetxController {
+class LoginController extends GetxController with BaseControler {
   final loginFormKey = GlobalKey<FormState>();
   late TextEditingController emailController, passwordController;
 
@@ -41,14 +46,39 @@ class LoginController extends GetxController {
   }
 
   String? validatePassword(String? password) {
-    if (password!.length < 8) {
-      return 'Password must be of 8 characters';
+    if (password!.length < 6) {
+      return 'Password must be of 6 characters';
     }
     return null;
   }
 
   void checkLogin() async {
-    var isConnected = await _networkManager.checkInternetConnection();
+    final isValid = loginFormKey.currentState!.validate();
+
+    if (!isValid) {
+      return;
+    } else {
+      loginFormKey.currentState!.save();
+      var userData = await AuthApis.loginUser(email.value, password.value);
+      if (userData != null) {
+        saveUserMethod(userData, 'Logged in successfully...');
+        loginFormKey.currentState!.reset();
+
+        email.value = '';
+        password.value = '';
+        emailController.clear();
+        passwordController.clear();
+        Get.offNamed(Routes.DASHBOARD);
+        print(SharedPrefsManager.getUserName);
+      }
+      /*        var isLoggedIn =
+            await RestApiServices.userLogin(email.value, password.value);
+        if (isLoggedIn!) {
+          
+        } */
+    }
+
+    /*   var isConnected = await _networkManager.checkInternetConnection();
     if (isConnected) {
       final isValid = loginFormKey.currentState!.validate();
 
@@ -69,6 +99,27 @@ class LoginController extends GetxController {
       }
     } else {
       Get.snackbar('Connection Error', 'Please Check Your Internet Connection');
+    }
+  } */
+  }
+
+  void saveUserMethod(User userModel, String message) async {
+    var isDataSaved = await SharedPrefsManager.saveUserData(
+        userModel.token!,
+        userModel.data!.id!,
+        userModel.data!.name!,
+        userModel.data!.email!,
+        userModel.data!.type!,
+        userModel.phone!,
+        userModel.address!);
+    if (isDataSaved) {
+      Fluttertoast.showToast(
+          msg: message,
+          textColor: Colors.white,
+          backgroundColor: Constants.secondaryColor);
+      print('data saved');
+    } else {
+      print('data not saved');
     }
   }
 }

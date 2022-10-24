@@ -6,7 +6,7 @@ import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/views/job_details_screen.dart';
 
 class ArchivedJobsActivity extends StatelessWidget {
-  final  controller = Get.put(ArchivedJobsController());
+  final controller = Get.put(ArchivedJobsController());
   ArchivedJobsActivity({Key? key}) : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class ArchivedJobsActivity extends StatelessWidget {
         ),
         elevation: 1,
       ),
-      body: SafeArea(child: Obx(() {
+      body: Obx(() {
         return Visibility(
           visible: controller.isLoaded.value,
           replacement: const Center(
@@ -57,76 +57,104 @@ class ArchivedJobsActivity extends StatelessWidget {
                       }
                     ]);
                   }),
-                  child: Card(
-                    elevation: 1,
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      width: size.width,
-                      color: Colors.white,
-                      child: Center(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                                alignment: Alignment.center,
-                                width: 40,
-                                height: 40,
-                                padding: EdgeInsets.zero,
-                                decoration: BoxDecoration(
-                                  color: Constants.secondaryColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: AppText(
-                                  text: 'J',
-                                  textSize: 20,
-                                  isBold: true,
-                                  textColor: Colors.white,
-                                ) /* Obx(() {
-                                  return _getImage(controller
-                                      .archivedJobsList[index].imageUrl);
-                                }) */
-                                ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Column(
+                  child: Stack(
+                    children: [
+                      Card(
+                        elevation: 1,
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          width: size.width,
+                          color: Colors.white,
+                          child: Center(
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                AppText(
-                                  text: controller
-                                      .archivedJobsList[index].jobTitle!,
-                                  isBold: true,
-                                  isStart: true,
-                                  textColor: Colors.black,
-                                  textSize: 20,
-                                ),
+                                Container(
+                                    alignment: Alignment.center,
+                                    width: 40,
+                                    height: 40,
+                                    padding: EdgeInsets.zero,
+                                    decoration: BoxDecoration(
+                                      color: Constants.secondaryColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: AppText(
+                                      text: 'J',
+                                      textSize: 20,
+                                      isBold: true,
+                                      textColor: Colors.white,
+                                    ) /* Obx(() {
+                                      return _getImage(controller
+                                          .archivedJobsList[index].imageUrl);
+                                    }) */
+                                    ),
                                 const SizedBox(
-                                  height: 5,
+                                  width: 20,
                                 ),
-                                AppText(
-                                  text: controller
-                                      .archivedJobsList[index].location!,
-                                  textColor: Constants.textHintColor,
-                                  isStart: true,
-                                  textSize: 13,
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                AppText(
-                                  text: controller
-                                          .archivedJobsList[index].salary ??
-                                      'Empty',
-                                  textSize: 18,
-                                  isBold: true,
-                                  isStart: true,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    AppText(
+                                      text: controller
+                                          .archivedJobsList[index].jobTitle!,
+                                      isBold: true,
+                                      isStart: true,
+                                      textColor: Colors.black,
+                                      textSize: 20,
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    AppText(
+                                      text: controller
+                                          .archivedJobsList[index].location!,
+                                      textColor: Constants.textHintColor,
+                                      isStart: true,
+                                      textSize: 13,
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    AppText(
+                                      text: controller
+                                              .archivedJobsList[index].salary ??
+                                          'Empty',
+                                      textSize: 18,
+                                      isBold: true,
+                                      isStart: true,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    Get.to(
+                                      () => JobDetailsActivity(),
+                                      arguments: [
+                                        {
+                                          'jobId': controller
+                                              .archivedJobsList[index].id,
+                                          'status': 'new'
+                                        }
+                                      ],
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.remove_red_eye_rounded,
+                                    color: Constants.primaryColor,
+                                  )),
+                            ],
+                          ))
+                    ],
                   ),
                 );
               },
@@ -134,11 +162,11 @@ class ArchivedJobsActivity extends StatelessWidget {
             ),
           ),
         );
-      })),
+      }),
     );
   }
 
- /*  Widget _getImage(String? s) {
+  /*  Widget _getImage(String? s) {
     if (s == null) {
       return Image.asset(
         Constants.placeholderImage,

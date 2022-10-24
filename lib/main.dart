@@ -2,13 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/network_manager/network_binding.dart';
 import 'package:the_staff_hound/notification_handler/notification_manager.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 import 'package:the_staff_hound/views/job_details_screen.dart';
-import 'package:the_staff_hound/views/splash_screen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
@@ -27,11 +26,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 extension CapExtension on String {
   String get inCaps => '${this[0].toUpperCase()}${substring(1)}';
   String get allInCaps => toUpperCase();
-  String get capitalizeFirstofEach => split(" ").map((str) => str.capitalize).join(" ");
+  String get capitalizeFirstofEach =>
+      split(" ").map((str) => str.capitalize).join(" ");
 }
 
 void main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   NotificationManager.initialize();
   await Firebase.initializeApp();
@@ -70,16 +69,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport(
-      child: GetMaterialApp(
-          initialBinding: NetworkBinding(),
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-              primarySwatch: createMaterialColor(Constants.primaryColor),
-              primaryColor: Constants.primaryColor,
-              backgroundColor: Constants.backgroundColor,
-              fontFamily: 'Lato'),
-          home: const SplashScreen()),
+    return GetMaterialApp(
+      initialBinding: NetworkBinding(),
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppPages.INITIAL,
+      getPages: AppPages.routes,
+      theme: ThemeData(
+          primarySwatch: createMaterialColor(Constants.primaryColor),
+          primaryColor: Constants.primaryColor,
+          backgroundColor: Constants.backgroundColor,
+          fontFamily: 'Lato'),
     );
   }
 }

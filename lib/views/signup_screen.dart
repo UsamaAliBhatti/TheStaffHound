@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'package:the_staff_hound/api_services/response_models/branches_model.dart';
+import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 
 import '../controllers/signup_controller.dart';
 
-class SignUpActivity extends StatelessWidget {
+class SignUpActivity extends StatelessWidget  {
   var controller = Get.put(SignUpController());
 
   SignUpActivity({Key? key}) : super(key: key);
@@ -69,34 +69,7 @@ class SignUpActivity extends StatelessWidget {
                     onStepTapped: (index) {
                       controller.currentStep.value = index;
                     },
-                    steps: [
-                      Step(
-                          isActive: controller.currentStep.value >= 0,
-                          title: AppText(
-                            text: 'Account',
-                            textSize: 20,
-                            isBold: true,
-                          ),
-                          content: getAccountDetails()),
-                      Step(
-                        title: AppText(
-                          text: 'Address',
-                          textSize: 20,
-                          isBold: true,
-                        ),
-                        content: getAddressForm(),
-                        isActive: controller.currentStep.value >= 1,
-                      ),
-                      Step(
-                        title: AppText(
-                          text: 'Add a Branch',
-                          textSize: 20,
-                          isBold: true,
-                        ),
-                        content: getBranches(),
-                        isActive: controller.currentStep.value >= 2,
-                      ),
-                    ],
+                    steps: accountRegisterFormSteps(),
                     type: StepperType.vertical,
                     controlsBuilder: (context, _) {
                       return Container(
@@ -181,6 +154,37 @@ class SignUpActivity extends StatelessWidget {
                         ),
                       );
                     })))));
+  }
+
+  List<Step> accountRegisterFormSteps(){
+    return [
+                      Step(
+                          isActive: controller.currentStep.value >= 0,
+                          title: AppText(
+                            text: 'Account',
+                            textSize: 20,
+                            isBold: true,
+                          ),
+                          content: getAccountDetails()),
+                      Step(
+                        title: AppText(
+                          text: 'Address',
+                          textSize: 20,
+                          isBold: true,
+                        ),
+                        content: getAddressForm(),
+                        isActive: controller.currentStep.value >= 1,
+                      ),
+                      Step(
+                        title: AppText(
+                          text: 'Add a Branch',
+                          textSize: 20,
+                          isBold: true,
+                        ),
+                        content: getBranches(),
+                        isActive: controller.currentStep.value >= 2,
+                      ),
+                    ];
   }
 
 // Account Details Form
@@ -632,7 +636,7 @@ class SignUpActivity extends StatelessWidget {
               controller.selectedBranchesList.value = [];
               for (int i = 0; i < values.length; i++) {
                 Datum datum = values[i] as Datum;
-                controller.selectedBranchesList.add(datum.id);
+                controller.selectedBranchesList.add(datum.id!);
                 print(values);
               }
               print(controller.selectedBranchesList.toJson());

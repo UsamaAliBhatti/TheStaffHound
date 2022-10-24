@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
+import 'package:the_staff_hound/controllers/forgot_password_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/views/reset_password_screen.dart';
 
 class ForgotPasswordActivity extends StatelessWidget {
-  const ForgotPasswordActivity({Key? key}) : super(key: key);
+  final controller = Get.put(ForgotPasswordController());
+  ForgotPasswordActivity({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +22,7 @@ class ForgotPasswordActivity extends StatelessWidget {
         color: Constants.backgroundColor,
         child: SingleChildScrollView(
           child: Form(
+            key: controller.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -44,17 +47,24 @@ class ForgotPasswordActivity extends StatelessWidget {
                   height: 40,
                 ),
                 TextFormField(
+                  focusNode: controller.emailFieldFocus,
+                  controller: controller.emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(50),
                       borderSide: const BorderSide(
                           color: Constants.primaryColor, width: 2.0),
                     ),
-                    labelText: "Enter Email Address",
+                    labelText: "Email",
+                    hintText: 'Enter Email Address',
                     labelStyle: const TextStyle(
                         color: Constants.primaryColor, fontSize: 17),
                   ),
                   keyboardType: TextInputType.emailAddress,
+                  validator: (email) {
+                    controller.validateEmail(email);
+                    return null;
+                  },
                   style: const TextStyle(
                     color: Constants.primaryColor,
                     fontSize: 18,
@@ -65,7 +75,7 @@ class ForgotPasswordActivity extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    Get.to(() => const ResetPasswordActivity());
+                    controller.sendEmailToGetOTP();
                   },
                   child: AppButton(
                     text: 'Continue',

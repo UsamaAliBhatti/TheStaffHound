@@ -4,9 +4,8 @@ import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/login_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-// import 'package:the_staff_hound/network_manager/network_state_manager.dart';
-import 'package:the_staff_hound/views/phone_otp_screen.dart';
-import 'package:the_staff_hound/views/signup_screen.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
+
 
 class LoginActivity extends StatelessWidget {
   LoginActivity({Key? key}) : super(key: key);
@@ -95,9 +94,7 @@ class LoginActivity extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20.0),
                     child: InkWell(
                         onTap: () {
-                          Get.to(() => PhoneOTPActivity(), arguments: [{
-                            'status': 'forgotpassword'
-                          }]);
+                          Get.toNamed(Routes.FORGOT_PASSWORD);
                         },
                         child: Align(
                           alignment: Alignment.centerLeft,
@@ -117,7 +114,7 @@ class LoginActivity extends StatelessWidget {
                       buttonWidth: 250,
                     ),
                     onTap: () {
-                      // Get.to(() => DashboardActivity());
+                    
                       controller.checkLogin();
                     },
                   ),
@@ -174,7 +171,8 @@ class LoginActivity extends StatelessWidget {
                       const SizedBox(width: 5),
                       TextButton(
                           onPressed: () {
-                            Get.to(() => SignUpActivity());
+
+                            Get.toNamed(Routes.SIGN_UP);
                           },
                           child: AppText(
                             text: "Sign Up",

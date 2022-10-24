@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:the_staff_hound/api_services/response_models/dashboard_response.dart';
 import 'package:the_staff_hound/api_services/rest_api_services.dart';
 import 'package:the_staff_hound/constants.dart';
@@ -14,6 +15,7 @@ class DashBoardController extends GetxController {
   var testJobsList = <GeneralJobModel>[].obs;
 
   var selectedIndex = 0.obs;
+  var isAvailable = false.obs;
 
   var savedJobs = 0.obs;
   var approvedJobs = 0.obs;
@@ -24,6 +26,12 @@ class DashBoardController extends GetxController {
   var token = ''.obs;
 
   var isLoaded = false.obs;
+
+  var focusedDay = DateTime.now().obs;
+  var selectedDay = Rxn<DateTime>();
+  var rangeStart = Rxn<DateTime>();
+  var rangeEnd = Rxn<DateTime>();
+  final rangeSelectionMode = RangeSelectionMode.toggledOn.obs;
   @override
   void onInit() {
     super.onInit();
@@ -38,7 +46,7 @@ class DashBoardController extends GetxController {
   fetchDashboardData(String token) async {
     userName.value = SharedPrefsManager.getUserName;
     userEmail.value = SharedPrefsManager.getUserEmail;
-    var json = await RestApiServices.getDashboardData(token);
+    /* var json = await RestApiServices.getDashboardData(token);
     if (json != null) {
       isLoaded.value = true;
       dashboardModel = dashboardResponseFromJson(json);
@@ -50,7 +58,7 @@ class DashBoardController extends GetxController {
       recentJobsList.value = dashboardModel.recentJobs!;
     } else {
       isLoaded.value = false;
-    }
+    } */
   }
 
   fetchDrawerMenu() {
@@ -70,7 +78,7 @@ class DashBoardController extends GetxController {
 
     navModelList.add(NavModel(
         navName: 'Saved Jobs',
-        navIcon: Constants.icArchived,
+        navIcon: Constants.icFavorite,
         isNavSelected: false.obs));
 
     navModelList.add(NavModel(
@@ -99,7 +107,7 @@ class DashBoardController extends GetxController {
     RestApiServices.addToArchive(token.value, jobId);
   }
 
- /*  notInterestedInJob(int jobId) {
+  /*  notInterestedInJob(int jobId) {
     RestApiServices.addNotInterested(token.value, jobId);
   } */
 }

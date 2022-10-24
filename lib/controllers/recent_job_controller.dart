@@ -12,25 +12,16 @@ class RecentJobController extends GetxController {
   var jobsList = <Job>[].obs;
   var isLoaded = false.obs;
   var isEmpty = false;
-  var listOfCities = <String>[
-    'Lahore',
-    'Karachi',
-    'Islamabad',
-    'Sargodha',
-    'Peshawar',
-    'Quetta'
-  ];
+  var listOfCities = <String>['Miami', 'Chicago', 'Florida'];
 
-  var listOfBranches = <String>[
-    'Branch 1',
-    'Branch 2',
-    'Branch 3',
-    'Branch 4',
-    'Branch 5',
-    'Branch 6',
-    'Branch 7',
-    'Branch 8',
-    'Branch 9',
+  var listOfBranches = <String>['Branch 1', 'Branch 2', 'Branch 3'];
+  var skillsList = <String>[
+    'Carpenter',
+    'Android Developer',
+    'Plumber',
+    'Flutter Developer',
+    'Doctor',
+    'Software Developer'
   ];
 
   var isCitySearchSelected = false.obs;
@@ -77,232 +68,7 @@ class RecentJobController extends GetxController {
   }
 
   openFiltersDialog(Size size) {
-    Get.bottomSheet(
-      Obx(() {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            color: Constants.backgroundColor,
-          ),
-          width: size.width,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: AppText(
-                  text: 'Filters',
-                  isBold: true,
-                  textColor: Colors.black,
-                  textSize: 24,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppText(
-                    text: 'Search by city and  branch',
-                    isBold: true,
-                    textColor: Colors.black,
-                    textSize: 18,
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        isCitySearchSelected.value =
-                            !isCitySearchSelected.value;
-                      },
-                      icon: Icon(
-                        isCitySearchSelected.value
-                            ? Icons.radio_button_checked_sharp
-                            : Icons.radio_button_off_sharp,
-                        color: isCitySearchSelected.value
-                            ? Constants.secondaryColor
-                            : Colors.grey,
-                        size: 20,
-                      ))
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              isCitySearchSelected.isTrue
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppText(
-                          text: 'Select City',
-                          isBold: true,
-                          textColor: Colors.black,
-                          textSize: 15,
-                        ),
-                        SizedBox(
-                          height: 40,
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: listOfCities.length,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (_, index) {
-                                return Container(
-                                  height: 30,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  margin: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      color: /*  resumeController
-                                                     .languagesList[index]
-                                                     .isSelected!
-                                                     .value
-                                                 ? Colors.green.shade300
-                                                 :  */
-                                          Colors.grey.shade200),
-                                  child: AppText(
-                                    text: /*  resumeController
-                                               .languagesList[index].getLanguageName! */
-                                        listOfCities[index],
-                                    textColor: Colors.black,
-                                  ),
-                                );
-                              }),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        AppText(
-                          text: 'Select Branch',
-                          isBold: true,
-                          textColor: Colors.black,
-                          textSize: 15,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        GridView.builder(
-                          itemCount: listOfBranches.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 10,
-                                  mainAxisExtent: 40),
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              height: 30,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              margin: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: /*  resumeController
-                                                     .languagesList[index]
-                                                     .isSelected!
-                                                     .value
-                                                 ? Colors.green.shade300
-                                                 :  */
-                                      Colors.grey.shade200),
-                              child: AppText(
-                                text: /*  resumeController
-                                               .languagesList[index].getLanguageName! */
-                                    listOfBranches[index],
-                                textColor: Colors.black,
-                              ),
-                            );
-                          },
-                        )
-                      ],
-                    )
-                  : const SizedBox(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppText(
-                    text: 'Search by skill',
-                    isBold: true,
-                    textColor: Colors.black,
-                    textSize: 18,
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        isSkillSearchSelected.value =
-                            !isSkillSearchSelected.value;
-                      },
-                      icon: Icon(
-                        isSkillSearchSelected.value
-                            ? Icons.radio_button_checked_sharp
-                            : Icons.radio_button_off_sharp,
-                        color: isSkillSearchSelected.value
-                            ? Constants.secondaryColor
-                            : Colors.grey,
-                        size: 20,
-                      ))
-                ],
-              ),
-
-              /* SizedBox(
-                   height: 40,
-                   child: ListView.builder(
-                       shrinkWrap: true,
-                       itemCount: listOfCities.length,
-                       scrollDirection: Axis.horizontal,
-                       itemBuilder: (_, index) {
-                         return 
-                       }),
-                 ),
-                 const SizedBox(
-                   height: 10,
-                 ),
-                 Align(
-                   alignment: Alignment.centerLeft,
-                   child: 
-                 ),
-                 const SizedBox(
-                   height: 10,
-                 ),
-                 SizedBox(
-                   height: 40,
-                   child: ListView.builder(
-                       shrinkWrap: true,
-                       itemCount: listOfBranches.length,
-                       scrollDirection: Axis.horizontal,
-                       itemBuilder: (_, index) {
-                         return Container(
-                           height: 30,
-                           padding: const EdgeInsets.symmetric(
-                               horizontal: 10, vertical: 5),
-                           margin: const EdgeInsets.all(5),
-                           decoration: BoxDecoration(
-                               borderRadius: BorderRadius.circular(15),
-                               color: /*  resumeController
-                                                     .languagesList[index]
-                                                     .isSelected!
-                                                     .value
-                                                 ? Colors.green.shade300
-                                                 :  */
-                                   Colors.grey.shade200),
-                           child: AppText(
-                             text: /*  resumeController
-                                               .languagesList[index].getLanguageName! */
-                                 listOfBranches[index],
-                             textColor: Colors.black,
-                           ),
-                         );
-                       }),
-                 ), */
-            ],
-          ),
-        );
-      }),
-      backgroundColor: Colors.transparent,
-    );
-    /*   showDialog(
+    showDialog(
       context: Get.overlayContext!,
       builder: (_) => AlertDialog(
         contentPadding: const EdgeInsets.all(10),
@@ -313,186 +79,247 @@ class RecentJobController extends GetxController {
           ),
         ),
         title: AppText(
-          text: 'Filters',
-          textSize: 20,
+          text: 'Filter Your Search',
           isBold: true,
+          textColor: Colors.black,
+          textSize: 24,
         ),
         titlePadding: const EdgeInsets.symmetric(vertical: 10),
-        content: SizedBox(
-          width: size.width,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: AppText(
-                  text: 'Search by city',
-                  isBold: true,
-                  textColor: Colors.black,
-                  textSize: 15,
+        content: Obx(() {
+          return SizedBox(
+            width: size.width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText(
+                      text: 'Search by city and  branch',
+                      isBold: true,
+                      textColor: Colors.black,
+                      textSize: 18,
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          isCitySearchSelected.value =
+                              !isCitySearchSelected.value;
+                        },
+                        icon: Icon(
+                          isCitySearchSelected.value
+                              ? Icons.radio_button_checked_sharp
+                              : Icons.radio_button_off_sharp,
+                          color: isCitySearchSelected.value
+                              ? Constants.secondaryColor
+                              : Colors.grey,
+                          size: 20,
+                        ))
+                  ],
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              /*   MultipleSearchSelection(
-                  items: listOfCities,
-                  maximumShowItemsHeight: 100,
-                  onPickedChange: (items) {},
-                  itemsVisibility: ShowedItemsVisibility.alwaysOn,
-                  fuzzySearch: FuzzySearch.jaro,
-                  pickedItemBuilder: (String pickedItem) {
-                    return AppText(text: pickedItem);
-                  },
-                  fieldToCheck: (String check) {
-                    return check;
-                  },
-                  itemBuilder: (String item) {
-                    return AppText(text: item);
-                  }), */
-              /*   MultipleSearchSelection(
-    items: listOfCities, // List<String>
-    fuzzySearch: FuzzySearch.jaro,
-    title: Text(
-        'Countries',
-        style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        ),
-    ),
-    
-   
-    showedItemsBackgroundColor: Colors.grey.withOpacity(0.1),
-    showShowedItemsScrollbar: false,
-   
-    onTapShowedItem: () {},
-    onPickedChange: (items) {},
-    onItemAdded: (item) {
-        print('$item added to picked items');
-    },
-    onItemRemoved: (item) {
-        print('$item removed from picked items');
-    },
-) */
-              /* Wrap(
-                  children: listOfCities
-                      .map((city) => Container(
+                const SizedBox(
+                  height: 10,
+                ),
+                isCitySearchSelected.isTrue
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: AppText(
+                              text: 'Select City',
+                              isBold: true,
+                              textColor: Colors.black,
+                              textSize: 15,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 40,
+                            child: ListView.builder(
+                                itemCount: listOfCities.length,
+                                physics: const NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (_, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 10),
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                            highlightColor: Colors.transparent,
+                                            padding: EdgeInsets.zero,
+                                            hoverColor: Colors.transparent,
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            onPressed: () {},
+                                            icon: const Icon(
+                                              Icons.radio_button_checked,
+                                              color: Constants.secondaryColor,
+                                            )),
+                                        AppText(
+                                          text: listOfCities[index],
+                                          textColor: Colors.black,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: AppText(
+                              text: 'Select Branch',
+                              isBold: true,
+                              textColor: Colors.black,
+                              textSize: 15,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          SizedBox(
+                            height: 180,
+                            child: ListView.builder(
+                              itemCount: listOfBranches.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: Colors.grey.shade200),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.location_pin,
+                                            color: Colors.black,
+                                          ),
+                                          AppText(
+                                            text: listOfBranches[index],
+                                            textColor: Colors.black,
+                                          ),
+                                        ],
+                                      ),
+                                      IconButton(
+                                          focusColor: Colors.transparent,
+                                          splashColor: Colors.transparent,
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.check_circle_outline_rounded,
+                                            color: Constants.secondaryColor,
+                                          ))
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        ],
+                      )
+                    : const SizedBox(),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText(
+                      text: 'Search by skill',
+                      isBold: true,
+                      textColor: Colors.black,
+                      textSize: 18,
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          isSkillSearchSelected.value =
+                              !isSkillSearchSelected.value;
+                        },
+                        icon: Icon(
+                          isSkillSearchSelected.value
+                              ? Icons.radio_button_checked_sharp
+                              : Icons.radio_button_off_sharp,
+                          color: isSkillSearchSelected.value
+                              ? Constants.secondaryColor
+                              : Colors.grey,
+                          size: 20,
+                        ))
+                  ],
+                ),
+                isSkillSearchSelected.isTrue
+                    ? GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: skillsList.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                                mainAxisExtent: 40),
+                        itemBuilder: (_, index) {
+                          return Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
                             margin: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.grey.shade200,
-                                border:
-                                    Border.all(color: Colors.grey.shade200)),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: size.width * 0.030,
-                                vertical: size.height * 0.0045),
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.grey.shade200),
                             child: AppText(
-                              text: city,
-                              textColor: Colors.black,
-                            ),
-                          ))
-                      .toList()), */
-
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: listOfCities.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (_, index) {
-                      return Container(
-                        height: 30,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: /*  resumeController
-                                                .languagesList[index]
-                                                .isSelected!
-                                                .value
-                                            ? Colors.green.shade300
-                                            :  */
-                                Colors.grey.shade200),
-                        child: AppText(
-                          text: /*  resumeController
-                                          .languagesList[index].getLanguageName! */
-                              listOfCities[index],
-                          textColor: Colors.black,
-                        ),
-                      );
-                    }),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: AppText(
-                  text: 'Select Branch',
-                  isBold: true,
-                  textColor: Colors.black,
-                  textSize: 15,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: listOfBranches.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (_, index) {
-                      return Container(
-                        height: 30,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: /*  resumeController
-                                                .languagesList[index]
-                                                .isSelected!
-                                                .value
-                                            ? Colors.green.shade300
-                                            :  */
-                                Colors.grey.shade200),
-                        child: AppText(
-                          text: /*  resumeController
-                                          .languagesList[index].getLanguageName! */
-                              listOfBranches[index],
-                          textColor: Colors.black,
-                        ),
-                      );
-                    }),
-              ),
-            ],
-          ),
-        ),
+                                text: skillsList[index],
+                                textColor: Colors.black),
+                          );
+                        })
+                    : const SizedBox(),
+              ],
+            ),
+          );
+        }),
+        actionsPadding: const EdgeInsets.only(bottom: 10),
         actions: [
-          
-        ],
-      ),
-    ); */
-    /*  TextButton(
+          TextButton(
               style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(Colors.green.shade100),
-              ),
-              onPressed: () {},
+                  // elevation: MaterialStateProperty.all(2),
+                  padding: MaterialStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                  backgroundColor: MaterialStateProperty.all(
+                      Constants.buttonBackgroundColor),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)))),
+              onPressed: () {
+                Get.back();
+              },
               child: AppText(
                 text: 'Cancel',
-                textSize: 20,
+                textSize: 18,
                 isBold: true,
               )),
           TextButton(
+              style: ButtonStyle(
+                  // elevation: MaterialStateProperty.all(2),
+                  padding: MaterialStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                  backgroundColor:
+                      MaterialStateProperty.all(Constants.primaryColor),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)))),
               onPressed: () {},
               child: AppText(
                 text: 'Apply',
-                textSize: 20,
+                textSize: 18,
                 isBold: true,
-              )) */
+                textColor: Colors.white,
+              ))
+        ],
+      ),
+    );
+    /*   */
   }
 }

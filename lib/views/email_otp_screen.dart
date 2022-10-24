@@ -82,10 +82,11 @@ class EmailOTPActivity extends StatelessWidget {
                         style: const TextStyle(fontSize: 17),
                         fieldWidth: 40,
                         onChanged: (pin) {
-                          // print("Changed: " + pin);
+                          print("Changed: $pin");
                         },
                         onCompleted: (pin) {
-                          // print("Completed: " + pin);
+                          controller.otpText.value = pin;
+                          controller.verifyOTP(controller.otpText.value);
                         },
                       ),
                     ),
@@ -94,7 +95,7 @@ class EmailOTPActivity extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        Get.to(() => const ResetPasswordActivity());
+                        controller.verifyOTP(controller.otpText.value);
                       },
                       child: AppButton(
                         text: 'Continue',

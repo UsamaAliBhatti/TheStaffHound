@@ -173,6 +173,7 @@ class ResumeController extends GetxController
       // print(languagesList);
     } else {
       aboutMeTextController.text = '';
+      aboutMeText.value = '';
       userSelectedSkillsList.value = [];
       userEducationsList.value = [];
       userExperienceList.value = [];
