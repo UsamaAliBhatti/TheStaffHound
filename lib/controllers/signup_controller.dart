@@ -6,13 +6,10 @@ import 'package:get/get.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
 import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
-import 'package:the_staff_hound/api_services/response_models/user_login_signup_response.dart';
-import 'package:the_staff_hound/api_services/rest_api_services.dart';
 import 'package:the_staff_hound/network_manager/network_state_manager.dart';
-import 'package:the_staff_hound/views/phone_otp_screen.dart';
 
 class SignUpController extends GetxController {
- var branches = BranchesResponse().obs;
+  var branches = BranchesResponse().obs;
   var dropdownItemsList = <MultiSelectItem>[].obs;
   var selectedBranchesList = <int>[].obs;
 
@@ -31,8 +28,6 @@ class SignUpController extends GetxController {
   var phoneNumber = ''.obs;
   // var isLoaded = false.obs;
   // var selectedItem = ''.obs;
-
-  var branchId = 0.obs;
 
   var isPrivacyPolicyChecked = false.obs;
 
@@ -243,42 +238,41 @@ class SignUpController extends GetxController {
     // if (!isValid) {
     //   return;
     // }
-    var isConnected = await _networkManager.checkInternetConnection();
 
-    if (isConnected) {
-      if (!formKeys[0].currentState!.validate() &&
-          !formKeys[1].currentState!.validate()) {
-        print('Error:  Please Complete Both Forms');
-        Fluttertoast.showToast(
-            msg: 'Please Complete Both Forms',
-            backgroundColor: Colors.red,
-            textColor: Colors.white);
-        return;
-      } else {
-        formKeys[0].currentState!.save();
-        formKeys[1].currentState!.save();
+    if (!formKeys[0].currentState!.validate() &&
+        !formKeys[1].currentState!.validate()) {
+      print('Error:  Please Complete Both Forms');
+      Fluttertoast.showToast(
+          msg: 'Please Complete Both Forms',
+          backgroundColor: Colors.red,
+          textColor: Colors.white);
+      return;
+    } else {
+      formKeys[0].currentState!.save();
+      formKeys[1].currentState!.save();
 
-        Map<String, dynamic> data = {
-          'name': nameController.text,
-          'email': emailController.text,
-          'password': passwordController.text,
-          'password_confirmation': passwordController.text,
-          'type': '5',
-          'branch_id': selectedBranchesList.toString(),
-          'phone': phoneContoller.text,
-          'street1': stateTextController.text,
-          'country': countryTextController.text,
-          'zip_code': zipcodeTextController.text,
-          'state': stateTextController.text,
-          'city': cityTextController.text
-        };
-        print(data.toString());
-        var response = await RestApiServices.userSignUp(data);
-        if (response != null) {
-          // Get.back();
-          formKeys[0].currentState!.reset();
-          formKeys[1].currentState!.reset();
-          /*    emailText.value = '';
+      Map<String, dynamic> data = {
+        'name': nameController.text,
+        'email': emailController.text,
+        'password': passwordController.text,
+        'password_confirmation': passwordController.text,
+        'type': '5',
+        'branch_id': selectedBranchesList.toString(),
+        'phone': phoneContoller.text,
+        'street1': stateTextController.text,
+        'country': countryTextController.text,
+        'zip_code': zipcodeTextController.text,
+        'state': stateTextController.text,
+        'city': cityTextController.text
+      };
+      print(data.toString());
+      var response = await AuthApis.registerUser(data);
+      if (response != null) {
+        Fluttertoast.showToast(msg: 'Account Registered Successfully');
+        // Get.back();
+        formKeys[0].currentState!.reset();
+        formKeys[1].currentState!.reset();
+        /*    emailText.value = '';
           password.value = '';
           reEnterPassword.value = '';
           name.value = '';
@@ -286,31 +280,19 @@ class SignUpController extends GetxController {
           stateText.value = '';
           zipcodeText.value = '';
           countryText.value = ''; */
-          branchId.value = 0;
-          emailController.clear();
-          passwordController.clear();
-          nameController.clear();
-          phoneContoller.clear();
-          reEnterPasswordController.clear();
-          stateTextController.clear();
-          zipcodeTextController.clear();
-          countryTextController.clear();
-          streetTextController.clear();
-
-          var userResponse = userResponseFromJson(response);
-          // verifyPhone(userResponse.phone!);
-          Get.off(() => PhoneOTPActivity(), arguments: [
-            {'phone': userResponse.phone}
-          ]);
-          // Get.to(() => const ForgotPasswordActivity());
-        }
+        emailController.clear();
+        passwordController.clear();
+        nameController.clear();
+        phoneContoller.clear();
+        reEnterPasswordController.clear();
+        stateTextController.clear();
+        zipcodeTextController.clear();
+        countryTextController.clear();
+        streetTextController.clear();
+        Get.back();
       }
-    } else {
-      Fluttertoast.showToast(
-          msg: 'Please Check Your Internet Connection',
-          backgroundColor: Colors.red,
-          textColor: Colors.white);
     }
+
     // verifyPhone('+923104241301');
   }
 

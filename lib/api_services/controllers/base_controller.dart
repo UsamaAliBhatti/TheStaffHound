@@ -2,7 +2,7 @@ import 'package:the_staff_hound/helper/dialog_helper.dart';
 
 import '../exceptions/api_exceptions.dart';
 
-class BaseControler {
+class BaseController {
   void handleError(error) {
     if (error is BadRequestException) {
       var message = error.message;

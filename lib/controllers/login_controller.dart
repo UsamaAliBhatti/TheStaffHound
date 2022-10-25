@@ -10,9 +10,11 @@ import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
 import '../network_manager/network_state_manager.dart';
 
-class LoginController extends GetxController with BaseControler {
+class LoginController extends GetxController with BaseController {
   final loginFormKey = GlobalKey<FormState>();
   late TextEditingController emailController, passwordController;
+
+  var showPassword = false.obs;
 
   final _networkManager = Get.put(NetworkManager());
 
@@ -27,6 +29,7 @@ class LoginController extends GetxController with BaseControler {
 
     emailController = TextEditingController();
     passwordController = TextEditingController();
+    showPassword.value = true;
   }
 
   @override
@@ -59,7 +62,8 @@ class LoginController extends GetxController with BaseControler {
       return;
     } else {
       loginFormKey.currentState!.save();
-      var userData = await AuthApis.loginUser(email.value, password.value);
+      var userData = await AuthApis.loginUser(email.value, password.value)
+          .catchError(handleError);
       if (userData != null) {
         saveUserMethod(userData, 'Logged in successfully...');
         loginFormKey.currentState!.reset();

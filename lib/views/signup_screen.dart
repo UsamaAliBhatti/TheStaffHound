@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
@@ -10,7 +11,7 @@ import 'package:the_staff_hound/custom_widgets/app_text.dart';
 
 import '../controllers/signup_controller.dart';
 
-class SignUpActivity extends StatelessWidget  {
+class SignUpActivity extends StatelessWidget {
   var controller = Get.put(SignUpController());
 
   SignUpActivity({Key? key}) : super(key: key);
@@ -33,104 +34,86 @@ class SignUpActivity extends StatelessWidget  {
             },
           ),
         ),
-        body: SafeArea(
-            child: NestedScrollView(
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverList(
-                      delegate: SliverChildListDelegate(<Widget>[
-                        AppText(
-                          text: 'Create Account',
-                          textSize: 20,
-                          isBold: true,
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        AppText(
-                          text: 'Welcome',
-                          textSize: 25,
-                          isBold: true,
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        AppText(
-                          text: 'its easier to sign up',
-                          textSize: 18,
-                        ),
-                      ]),
-                    ),
-                  ];
+        body: ListView(
+          shrinkWrap: true,
+          children: [
+            AppText(
+              text: 'Create Account',
+              textSize: 20,
+              isBold: true,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            AppText(
+              text: 'Welcome',
+              textSize: 25,
+              isBold: true,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            AppText(
+              text: 'its easier to sign up',
+              textSize: 18,
+            ),
+            Obx(() => Stepper(
+                physics: const NeverScrollableScrollPhysics(),
+                currentStep: controller.currentStep.value,
+                onStepTapped: (index) {
+                  if (index == 0) {
+                    controller.currentStep.value = 0;
+                  } else if (index == 1) {
+                    var isComplete =
+                        controller.formKeys[0].currentState!.validate();
+                    if (isComplete) {
+                      controller.currentStep.value = 1;
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'please complete the first form');
+                    }
+                  } else if (index == 2) {
+                    var isFirstComplete =
+                        controller.formKeys[0].currentState!.validate();
+                    var isSecondComplete =
+                        controller.formKeys[1].currentState!.validate();
+                    if (isFirstComplete && isSecondComplete) {
+                      controller.currentStep.value = 2;
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'please complete the both forms');
+                    }
+                  } else {
+                    controller.currentStep.value = 0;
+                  }
+                  /* if (index == 1 &&
+                      !controller.formKeys[0].currentState!.validate()) {
+                    
+                  } else if (index == 2 &&
+                      (!controller.formKeys[0].currentState!.validate() ||
+                          !controller.formKeys[1].currentState!.validate())) {
+                    print('Please complete both forms');
+                  } else {
+                    controller.currentStep.value = index;
+                  } */
                 },
-                body: Obx(() => Stepper(
-                    currentStep: controller.currentStep.value,
-                    onStepTapped: (index) {
-                      controller.currentStep.value = index;
-                    },
-                    steps: accountRegisterFormSteps(),
-                    type: StepperType.vertical,
-                    controlsBuilder: (context, _) {
-                      return Container(
-                        margin: const EdgeInsets.only(top: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            (controller.currentStep.value != 0)
-                                ? SizedBox(
-                                    width: 100,
-                                    height: 50,
-                                    child: TextButton(
-                                      onPressed: () {
-                                        controller.currentStep.value == 0
-                                            ? null
-                                            : controller.currentStep.value--;
-                                      },
-                                      style: TextButton.styleFrom(
-                                          // padding: const EdgeInsets.symmetric(horizontal: 30),
-                                          backgroundColor:
-                                              Constants.buttonBackgroundColor,
-                                          elevation: 2,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(25))),
-                                      child: AppText(
-                                        text: 'Back',
-                                        isBold: true,
-                                        textSize: 15,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox(),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: SizedBox(
+                steps: accountRegisterFormSteps(),
+                type: StepperType.vertical,
+                controlsBuilder: (context, _) {
+                  return Container(
+                    margin: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        (controller.currentStep.value != 0)
+                            ? SizedBox(
                                 width: 100,
                                 height: 50,
                                 child: TextButton(
                                   onPressed: () {
-                                    if (controller.currentStep.value < 2) {
-                                      if (controller
-                                          .formKeys[
-                                              controller.currentStep.value]
-                                          .currentState!
-                                          .validate()) {
-                                        controller.currentStep.value++;
-                                      }
-                                      // print(controller.currentStep.value);
-                                    } else {
-                                      controller.userSignUpMethod();
-                                      /*  if (controller.formKeys[0].currentState!
-                                              .validate() &&
-                                          controller.formKeys[1].currentState!
-                                              .validate()) {
-                                        controller.userSignUpMethod();
-                                        print(controller.currentStep.value);
-                                      } */
-                                      /* Get.to(
-                                          () => const ForgotPasswordActivity()); */
-                                    }
+                                    controller.currentStep.value == 0
+                                        ? null
+                                        : controller.currentStep.value--;
                                   },
                                   style: TextButton.styleFrom(
                                       // padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -141,50 +124,95 @@ class SignUpActivity extends StatelessWidget  {
                                           borderRadius:
                                               BorderRadius.circular(25))),
                                   child: AppText(
-                                    text: (controller.currentStep.value == 2)
-                                        ? 'Sign Up'
-                                        : 'Next',
+                                    text: 'Back',
                                     isBold: true,
-                                    textSize: 18,
+                                    textSize: 15,
                                   ),
                                 ),
+                              )
+                            : const SizedBox(),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 100,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {
+                                if (controller.currentStep.value < 2) {
+                                  if (controller
+                                      .formKeys[controller.currentStep.value]
+                                      .currentState!
+                                      .validate()) {
+                                    controller.currentStep.value++;
+                                  }
+                                  // print(controller.currentStep.value);
+                                } else {
+                                  controller.userSignUpMethod();
+                                  /*  if (controller.formKeys[0].currentState!
+                                            .validate() &&
+                                        controller.formKeys[1].currentState!
+                                            .validate()) {
+                                      controller.userSignUpMethod();
+                                      print(controller.currentStep.value);
+                                    } */
+                                  /* Get.to(
+                                        () => const ForgotPasswordActivity()); */
+                                }
+                              },
+                              style: TextButton.styleFrom(
+                                  // padding: const EdgeInsets.symmetric(horizontal: 30),
+                                  backgroundColor:
+                                      Constants.buttonBackgroundColor,
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25))),
+                              child: AppText(
+                                text: (controller.currentStep.value == 2)
+                                    ? 'Sign Up'
+                                    : 'Next',
+                                isBold: true,
+                                textSize: 18,
                               ),
-                            )
-                          ],
-                        ),
-                      );
-                    })))));
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }))
+          ],
+        ));
   }
 
-  List<Step> accountRegisterFormSteps(){
+  List<Step> accountRegisterFormSteps() {
     return [
-                      Step(
-                          isActive: controller.currentStep.value >= 0,
-                          title: AppText(
-                            text: 'Account',
-                            textSize: 20,
-                            isBold: true,
-                          ),
-                          content: getAccountDetails()),
-                      Step(
-                        title: AppText(
-                          text: 'Address',
-                          textSize: 20,
-                          isBold: true,
-                        ),
-                        content: getAddressForm(),
-                        isActive: controller.currentStep.value >= 1,
-                      ),
-                      Step(
-                        title: AppText(
-                          text: 'Add a Branch',
-                          textSize: 20,
-                          isBold: true,
-                        ),
-                        content: getBranches(),
-                        isActive: controller.currentStep.value >= 2,
-                      ),
-                    ];
+      Step(
+          isActive: controller.currentStep.value >= 0,
+          title: AppText(
+            text: 'Account',
+            textSize: 20,
+            isBold: true,
+          ),
+          content: getAccountDetails()),
+      Step(
+        title: AppText(
+          text: 'Address',
+          textSize: 20,
+          isBold: true,
+        ),
+        content: getAddressForm(),
+        isActive: controller.currentStep.value >= 1,
+      ),
+      Step(
+        title: AppText(
+          text: 'Add a Branch',
+          textSize: 20,
+          isBold: true,
+        ),
+        content: getBranches(),
+        isActive: controller.currentStep.value >= 2,
+      ),
+    ];
   }
 
 // Account Details Form
@@ -377,7 +405,7 @@ class SignUpActivity extends StatelessWidget  {
                         child: Text(
                           'I have read the',
                           style: TextStyle(
-                              color: Constants.primaryColor, fontSize: 17),
+                              color: Constants.primaryColor, fontSize: 15),
                         ),
                       ),
                       Padding(
@@ -388,7 +416,7 @@ class SignUpActivity extends StatelessWidget  {
                             'privacy policy',
                             style: TextStyle(
                               color: Constants.secondaryColor,
-                              fontSize: 17,
+                              fontSize: 15,
                               decoration: TextDecoration.underline,
                             ),
                           ),

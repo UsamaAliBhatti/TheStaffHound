@@ -6,7 +6,7 @@ class DialogHelper {
       {String title = 'Error',
       String description = 'Something went wrong. Please try again later.'}) {
     Get.dialog(Dialog(
-      child: Column(children: [
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(
           title,
           style: Get.textTheme.headline4,
@@ -15,12 +15,14 @@ class DialogHelper {
           description,
           style: Get.textTheme.headline4,
         ),
-        ElevatedButton(onPressed: () {}, child: const Text('Okay'))
+        ElevatedButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('Okay'))
       ]),
     ));
   }
 
-  static void showDialog() {
-    
-  }
+  static void showDialog() {}
 }

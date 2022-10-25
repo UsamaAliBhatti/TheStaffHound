@@ -6,7 +6,6 @@ import 'package:the_staff_hound/custom_widgets/app_button.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/routes/app_pages.dart';
 
-
 class LoginActivity extends StatelessWidget {
   LoginActivity({Key? key}) : super(key: key);
   final controller = Get.put(LoginController());
@@ -62,31 +61,44 @@ class LoginActivity extends StatelessWidget {
                         color: Constants.primaryColor, fontSize: 18),
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
-                    controller: controller.passwordController,
-                    onSaved: (value) {
-                      controller.password.value = value!;
-                    },
-                    validator: (value) {
-                      return controller.validatePassword(value);
-                    },
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          borderSide: const BorderSide(
-                              color: Constants.primaryColor, width: 2.0),
-                        ),
-                        labelText: "Password",
-                        labelStyle: const TextStyle(
-                            color: Constants.primaryColor, fontSize: 17),
-                        prefixIcon: Image.asset(Constants.passwordIcon)),
-                    keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(
-                      color: Constants.primaryColor,
-                      fontSize: 18,
-                    ),
-                  ),
+                  Obx(() {
+                    return TextFormField(
+                      controller: controller.passwordController,
+                      onSaved: (value) {
+                        controller.password.value = value!;
+                      },
+                      validator: (value) {
+                        return controller.validatePassword(value);
+                      },
+                      obscureText: controller.showPassword.value,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            borderSide: const BorderSide(
+                                color: Constants.primaryColor, width: 2.0),
+                          ),
+                          labelText: "Password",
+                          suffixIcon: InkWell(
+                              onTap: () {
+                                controller.showPassword.value =
+                                    !controller.showPassword.value;
+                              },
+                              child: Icon(
+                                controller.showPassword.value
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Constants.primaryColor,
+                              )),
+                          labelStyle: const TextStyle(
+                              color: Constants.primaryColor, fontSize: 17),
+                          prefixIcon: Image.asset(Constants.passwordIcon)),
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(
+                        color: Constants.primaryColor,
+                        fontSize: 18,
+                      ),
+                    );
+                  }),
                   const SizedBox(
                     height: 10,
                   ),
@@ -114,7 +126,6 @@ class LoginActivity extends StatelessWidget {
                       buttonWidth: 250,
                     ),
                     onTap: () {
-                    
                       controller.checkLogin();
                     },
                   ),
@@ -171,7 +182,6 @@ class LoginActivity extends StatelessWidget {
                       const SizedBox(width: 5),
                       TextButton(
                           onPressed: () {
-
                             Get.toNamed(Routes.SIGN_UP);
                           },
                           child: AppText(

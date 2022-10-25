@@ -55,7 +55,7 @@ class AuthApis {
   // User Sign up  Method
   static Future<SignUpResponse?> registerUser(
       Map<String, dynamic> userData) async {
-    var url = Uri.parse('${Constants.baseUrl}login');
+    var url = Uri.parse('${Constants.baseUrl}register');
     var isConnected = await _networkManager.checkInternetConnection();
 
     if (isConnected) {
@@ -91,6 +91,7 @@ class AuthApis {
     }
   }
 
+//get Branches api
   static Future<BranchesResponse?> getAllBranches() async {
     var url = Uri.parse('${Constants.baseUrl}getBranches');
     var isConnected = await _networkManager.checkInternetConnection();
@@ -107,7 +108,6 @@ class AuthApis {
             throw BadRequestException(utf8.decode(response.bodyBytes),
                 response.request!.url.toString());
           default:
-            print(response.statusCode);
             throw FetchDataException(
                 'Error occured with code : ${response.statusCode}',
                 response.request!.url.toString());
