@@ -4,6 +4,9 @@ import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/notification_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 
+import '../routes/app_pages.dart';
+import '../shared_prefs/shared_prefs.dart';
+
 class NotificationsActivity extends StatelessWidget {
   final controller = Get.put(NotificationController());
   NotificationsActivity({Key? key}) : super(key: key);
@@ -141,78 +144,128 @@ class NotificationsActivity extends StatelessWidget {
   }
 
   announcementsScreen() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /*  AppText(
-            text: 'New Announcements',
-            textColor: Colors.black,
-            textSize: 18,
-            isBold: true,
-          ),
-          const SizedBox(
-            height: 10,
-          ), */
-          ListView(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            children: [
-              announcementItemView(true),
+    return Obx(() {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /*  AppText(
+                text: 'New Announcements',
+                textColor: Colors.black,
+                textSize: 18,
+                isBold: true,
+              ),
+              const SizedBox(
+                height: 10,
+              ), */
+            ListView.builder(
+              // physics: const NeverScrollableScrollPhysics(),
+              reverse: true,
+              shrinkWrap: true,
+              itemCount: controller.announcementsList.length,
+              itemBuilder: (context, index) {
+                if (controller.announcementsList[index].status == 'pending') {
+                  return announcementItemView(
+                      true,
+                      controller.announcementsList[index].message,
+                      controller.announcementsList[index].createdAt,
+                      controller.announcementsList[index].id);
+                } else {
+                  return announcementItemView(
+                      false,
+                      controller.announcementsList[index].message,
+                      controller.announcementsList[index].createdAt,
+                      controller.announcementsList[index].id);
+                }
+              },
+            ),
+            /* const SizedBox(
+                height: 10,
+              ),
+              AppText(
+                text: 'Announcement History',
+                textColor: Colors.black,
+                textSize: 18,
+                isBold: true,
+              ),
               const SizedBox(
                 height: 10,
               ),
-              announcementItemView(true),
-              const SizedBox(
-                height: 10,
-              ),
-              announcementItemView(false),
-              const SizedBox(
-                height: 10,
-              ),
-              announcementItemView(false),
-            ],
-          ),
-          /* const SizedBox(
-            height: 10,
-          ),
-          AppText(
-            text: 'Announcement History',
-            textColor: Colors.black,
-            textSize: 18,
-            isBold: true,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          ListView(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            children: [
-            
-            ],
-          ), */
-        ],
-      ),
-    );
+              ListView(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                children: [
+                
+                ],
+              ), */
+          ],
+        ),
+      );
+    });
   }
 
   assignmentsScreen(Size size) {
-    return ListView(
-      padding: const EdgeInsets.only(top: 10),
-      children: [
-        notificationItemView('You have received 1 new job assignment request',
-            '8 minutes ago', true),
-        notificationItemView('You have received 1 new job assignment request',
-            '8 minutes ago', true),
-        notificationItemView('You have received 1 new job assignment request',
-            '8 minutes ago', false),
-        notificationItemView('You have received 1 new job assignment request',
-            '8 minutes ago', false),
-      ],
-    ); /* SingleChildScrollView(
+    return Obx(() {
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 10),
+        itemCount: controller.notificationsList.length,
+        itemBuilder: (context, index) {
+          if (controller.notificationsList[index].confirmation == '0') {
+            if (controller.notificationsList[index].isSeen == '0') {
+              return notificationItemView(
+                  'You have received 1 new job assignment request  ${controller.notificationsList[index].title}',
+                  controller.notificationsList[index].createdAt,
+                  false,
+                  controller.notificationsList[index].projectId,
+                  controller.notificationsList[index].confirmation,
+                  controller.notificationsList[index].table,
+                  controller.notificationsList[index].id);
+            } else {
+              return notificationItemView(
+                  'You have received 1 new job assignment request  ${controller.notificationsList[index].title}',
+                  controller.notificationsList[index].createdAt,
+                  true,
+                  controller.notificationsList[index].projectId,
+                  controller.notificationsList[index].confirmation,
+                  controller.notificationsList[index].table,
+                  controller.notificationsList[index].id);
+            }
+          } else {
+            if (controller.notificationsList[index].isSeen == '0') {
+              return notificationItemView(
+                  'Congratulations! You have been approved for this  ${controller.notificationsList[index].title} job',
+                  controller.notificationsList[index].createdAt,
+                  false,
+                  controller.notificationsList[index].projectId,
+                  controller.notificationsList[index].confirmation,
+                  controller.notificationsList[index].table,
+                  controller.notificationsList[index].id);
+            } else {
+              return notificationItemView(
+                  'Congratulations! You have been approved for this ${controller.notificationsList[index].title} job',
+                  controller.notificationsList[index].createdAt,
+                  true,
+                  controller.notificationsList[index].projectId,
+                  controller.notificationsList[index].confirmation,
+                  controller.notificationsList[index].table,
+                  controller.notificationsList[index].id);
+            }
+          }
+        },
+        /* children: [
+            notificationItemView('You have received 1 new job assignment request',
+                '8 minutes ago', true),
+            notificationItemView('You have received 1 new job assignment request',
+                '8 minutes ago', true),
+            notificationItemView('You have received 1 new job assignment request',
+                '8 minutes ago', false),
+            notificationItemView('You have received 1 new job assignment request',
+                '8 minutes ago', false),
+          ], */
+      );
+    }); /* SingleChildScrollView(
       padding: const EdgeInsets.all(10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -260,19 +313,20 @@ class NotificationsActivity extends StatelessWidget {
     ); */
   }
 
-  notificationItemView(String text, String time, bool isRead) {
+  notificationItemView(String text, DateTime time, bool isRead, String id,
+      String confirmation, String table, int offerID) {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       decoration: BoxDecoration(
-          color: isRead
+          color: !isRead
               ? Constants.primaryColor.withOpacity(0.2)
               : Colors.grey.shade200,
           border: Border(
               left: BorderSide(
                   width: 5,
-                  color: isRead ? Constants.primaryColor : Colors.grey))),
+                  color: !isRead ? Constants.primaryColor : Colors.grey))),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         CircleAvatar(
           radius: 25,
@@ -301,7 +355,19 @@ class NotificationsActivity extends StatelessWidget {
                 height: 5,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  controller.updateAssignmentsStatus(
+                      SharedPrefsManager.getUserToken, table, offerID);
+                  if (confirmation == "0") {
+                    Get.toNamed(Routes.NOTIFICATION_DETAILS, arguments: [
+                      {'offerID': int.parse(id), 'type': 'new'}
+                    ]);
+                  } else {
+                    Get.toNamed(Routes.SECOND_NOTIFICATION, arguments: [
+                      {'offerID': int.parse(id), 'type': table, 'id': offerID}
+                    ]);
+                  }
+                },
                 child: AppText(
                   text: 'click to view',
                   isBold: true,
@@ -311,7 +377,7 @@ class NotificationsActivity extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: AppText(
-                  text: time,
+                  text: Constants.timeAgo(time),
                   textColor: Colors.grey,
                 ),
               )
@@ -322,71 +388,77 @@ class NotificationsActivity extends StatelessWidget {
     );
   }
 
-  announcementItemView(bool isNew) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      width: double.infinity,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-              left: BorderSide(
-                  color: isNew ? Constants.primaryColor : Colors.grey,
-                  width: 5))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.grey.shade300,
-                child: Image.asset(
-                  Constants.splashLogo,
-                  width: 23,
-                  height: 23,
+  announcementItemView(bool isNew, String message, DateTime time, int id) {
+    return InkWell(
+      onTap: () {
+        controller.updateAnnouncementsStatus(
+            SharedPrefsManager.getUserToken, id);
+        controller.showDetailsDialog(message, id);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(bottom: 10),
+        width: double.infinity,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+                left: BorderSide(
+                    color: isNew ? Constants.primaryColor : Colors.grey,
+                    width: 5))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.grey.shade300,
+                  child: Image.asset(
+                    Constants.splashLogo,
+                    width: 23,
+                    height: 23,
+                  ),
                 ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppText(
-                    text: 'West Ridge Branch',
-                    textColor: Colors.black,
-                    textSize: 18,
-                    isBold: true,
-                    isStart: true,
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    width: 240,
-                    child: AppText(
-                      text:
-                          'Please pay a visit to branch for biometric verification',
-                      textColor: Colors.grey,
-                      textSize: 16,
+                const SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText(
+                      text: 'Branch',
+                      textColor: Colors.black,
+                      textSize: 18,
+                      isBold: true,
                       isStart: true,
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          isNew
-              ? AppText(
-                  text: 'Today',
-                  textColor: Colors.black,
-                )
-              : const SizedBox()
-        ],
+                    const SizedBox(
+                      height: 2,
+                    ),
+                    SizedBox(
+                      width: 150,
+                      child: AppText(
+                        text: message,
+                        textColor: Colors.grey,
+                        textSize: 16,
+                        isStart: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            AppText(
+              text: Constants.timeAgo(time),
+              textColor: Colors.black,
+              textSize: 12,
+            )
+          ],
+        ),
       ),
     );
   }

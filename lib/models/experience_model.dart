@@ -13,20 +13,20 @@ class UserExperienceModel {
   set id(value) => _id = value; */
 
   Map toJson() => {
-        'startDate': _startDate,
-        'endDate': _endDate,
-        'companyName': _companyName,
-        'userDesignation': _userDesignation
+        'start_date': _startDate,
+        'end_date': _endDate,
+        'company': _companyName,
+        'designation': _userDesignation
       };
 
   factory UserExperienceModel.fromJson(Map<String, dynamic> json) =>
-      UserExperienceModel(json['userDesignation'], json['companyName'],
-          json['startDate'], json['endDate']);
+      UserExperienceModel(json['designation'], json['company'],
+          json['start_date'], json['endDate']);
   get startDate => _startDate;
 
   set startDate(value) => _startDate = value;
 
-  get endDate => _endDate;
+  String? get endDate => _endDate;
 
   set endDate(value) => _endDate = value;
 

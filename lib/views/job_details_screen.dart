@@ -51,40 +51,31 @@ class JobDetailsActivity extends StatelessWidget {
                   Icons.share_sharp,
                   color: Constants.primaryColor,
                 )),
-            IconButton(
-                onPressed: () {
-                  jobDetailController
-                      .addToArchive(jobDetailController.jobId.value);
-                },
-                icon: const Icon(
-                  Icons.favorite_border_sharp,
-                  color: Constants.primaryColor,
-                )),
+            Obx(() {
+              return IconButton(
+                  onPressed: () {
+                    if (jobDetailController.status.value == '1') {
+                      jobDetailController.saveProject(
+                          jobDetailController.jobId.value, 0);
+                    } else {
+                      jobDetailController.saveProject(
+                          jobDetailController.jobId.value, 1);
+                    }
+                  },
+                  icon: Icon(
+                    jobDetailController.status.value == '0'
+                        ? Icons.favorite_border_sharp
+                        : Icons.favorite_sharp,
+                    color: Constants.primaryColor,
+                  ));
+            })
           ],
         ),
         body: Obx(() {
           return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: size.width,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  color: Constants.secondaryColor,
-                  child: AppText(
-                    text: 'Congratulation! You have been offered this job',
-                    textColor: Colors.white,
-                    isBold: true,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: AppText(
-                    text: 'NEW',
-                    textColor: Colors.grey.shade400,
-                    textSize: 12,
-                    isStart: true,
-                  ),
-                ),
+              
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.only(
@@ -95,8 +86,12 @@ class JobDetailsActivity extends StatelessWidget {
                         height: 10,
                       ),
                       AppText(
-                        text: 'Packaging Associate',
-                        textColor: Colors.black,
+                        text: jobDetailController.offerDetail.value.success !=
+                                null
+                            ? jobDetailController
+                                .offerDetail.value.success!.title
+                            : 'N/A',
+                        textColor: Constants.primaryColor,
                         isBold: true,
                         textSize: 20,
                         isStart: true,
@@ -105,7 +100,12 @@ class JobDetailsActivity extends StatelessWidget {
                         height: 5,
                       ),
                       AppText(
-                        text: 'Ashland Company',
+                        text: jobDetailController.offerDetail.value.success !=
+                                null
+                            ? jobDetailController.offerDetail.value.success!
+                                    .client!.companyName ??
+                                'N/A'
+                            : 'N/A',
                         textColor: Colors.black,
                         textSize: 15,
                         isStart: true,
@@ -114,7 +114,12 @@ class JobDetailsActivity extends StatelessWidget {
                         height: 5,
                       ),
                       AppText(
-                        text: 'Contract / Temporary',
+                        text: jobDetailController.offerDetail.value.success !=
+                                null
+                            ? jobDetailController
+                                    .offerDetail.value.success!.hiringType ??
+                                'N/A'
+                            : 'N/A',
                         textColor: Colors.grey.shade600,
                         textSize: 12,
                         isStart: true,
@@ -134,7 +139,12 @@ class JobDetailsActivity extends StatelessWidget {
                                   width: 5,
                                 ),
                                 AppText(
-                                  text: 'Hotel - Hospitality',
+                                  text: jobDetailController
+                                              .offerDetail.value.success !=
+                                          null
+                                      ? jobDetailController.offerDetail.value
+                                          .success!.client!.businessCategory
+                                      : 'N/A',
                                   textSize: 13,
                                   textColor: Colors.black,
                                 )
@@ -153,7 +163,12 @@ class JobDetailsActivity extends StatelessWidget {
                                   width: 5,
                                 ),
                                 AppText(
-                                  text: 'Los Angeles, CA 90036',
+                                  text: jobDetailController
+                                              .offerDetail.value.success !=
+                                          null
+                                      ? jobDetailController.offerDetail.value
+                                          .success!.client!.companyAddress
+                                      : 'N/A',
                                   textSize: 13,
                                   textColor: Colors.black,
                                 )
@@ -172,7 +187,11 @@ class JobDetailsActivity extends StatelessWidget {
                                   width: 5,
                                 ),
                                 AppText(
-                                  text: '\$13 - \$15 per hour',
+                                  text: jobDetailController
+                                              .offerDetail.value.success !=
+                                          null
+                                      ? '\$${jobDetailController.offerDetail.value.success!.rateHour} per hour'
+                                      : 'N/A',
                                   textSize: 13,
                                   textColor: Colors.black,
                                 )
@@ -191,7 +210,15 @@ class JobDetailsActivity extends StatelessWidget {
                                   width: 5,
                                 ),
                                 AppText(
-                                  text: 'Sep 24 - 23 Oct',
+                                  text: jobDetailController
+                                              .offerDetail.value.success !=
+                                          null
+                                      ? jobDetailController.offerDetail.value
+                                                  .success!.requiredAt ==
+                                              null
+                                          ? 'N/A'
+                                          : 'Apply before  ${Constants.convertDate(jobDetailController.offerDetail.value.success!.requiredAt!)}'
+                                      : 'N/A',
                                   textSize: 13,
                                   textColor: Colors.black,
                                 )
@@ -237,9 +264,14 @@ class JobDetailsActivity extends StatelessWidget {
                         ],
                       ),
                       jobDetailController.isDescriptionPressed.isFalse
-                          ? const Text(
-                              'This is Packaging Associate Job Dscription fdsadfvsjlkgmnsb gnb flwdshldsa nvdsqng/z dfhbvqs godg lg ge kxgb ',
-                              style: TextStyle(
+                          ? Text(
+                              jobDetailController.offerDetail.value.success !=
+                                      null
+                                  ? jobDetailController.offerDetail.value
+                                          .success!.description ??
+                                      'N/A'
+                                  : 'N/A',
+                              style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black,
                                   height: 1.5,
@@ -282,39 +314,18 @@ class JobDetailsActivity extends StatelessWidget {
                                       height: 10,
                                     ), */
                       jobDetailController.isDutiesPressed.isFalse
-                          ? ListView.builder(
-                              itemCount: 3,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (_, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 5.0),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 5,
-                                        height: 5,
-                                        color: Colors.black,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: AppText(
-                                          text: index == 0
-                                              ? 'responsibility of package detailing'
-                                              : index == 2
-                                                  ? 'responsibility of package in and out'
-                                                  : 'responsibility of handling packages accounts',
-                                          textColor: Colors.black,
-                                          textSize: 12,
-                                          isStart: true,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              })
+                          ? AppText(
+                              text: jobDetailController
+                                          .offerDetail.value.success !=
+                                      null
+                                  ? jobDetailController.offerDetail.value
+                                          .success!.responsibilities ??
+                                      'N/A'
+                                  : 'N/A',
+                              textColor: Colors.black,
+                              textSize: 15,
+                              isStart: true,
+                            )
                           : const SizedBox(),
                       const SizedBox(
                         height: 10,
@@ -329,10 +340,14 @@ class JobDetailsActivity extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      const Text(
-                        'Our shift starts from 9 : 00 AM and ends at 5 : 00 PM including break time from 1 : 00 PM to 2 : 00 PM',
-                        style: TextStyle(
-                            fontSize: 14,
+                      Text(
+                        jobDetailController.offerDetail.value.success != null
+                            ? jobDetailController
+                                    .offerDetail.value.success!.workingHours ??
+                                'N/A'
+                            : 'N/A',
+                        style: const TextStyle(
+                            fontSize: 15,
                             color: Colors.black,
                             height: 1.5,
                             wordSpacing: 1.5),
@@ -364,7 +379,7 @@ class JobDetailsActivity extends StatelessWidget {
                         )),
                   ),
                 ), */
-                Padding(
+                /*  Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
@@ -411,6 +426,30 @@ class JobDetailsActivity extends StatelessWidget {
                       ),
                     ],
                   ),
+                ), */
+
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  width: size.width,
+                  child: TextButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Constants.secondaryColor),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)))),
+                      onPressed: () {
+                        jobDetailController.applyForJob();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: AppText(
+                          text: 'Apply',
+                          textColor: Colors.white,
+                          textSize: 24,
+                          isBold: true,
+                        ),
+                      )),
                 ),
                 const SizedBox(
                   height: 10,
@@ -444,7 +483,7 @@ class JobDetailsActivity extends StatelessWidget {
         }));
   }
 
-  appliedJobDetailFunction(size, context) {
+/*   appliedJobDetailFunction(size, context) {
     return Obx(() {
       return SizedBox(
         width: size.width,
@@ -1254,9 +1293,9 @@ class JobDetailsActivity extends StatelessWidget {
                     child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                             color: Constants.backgroundColor,
-                            boxShadow: [
+                            boxShadow: const [
                               BoxShadow(
                                   color: Colors.grey,
                                   offset: Offset(0, -2),
@@ -1357,8 +1396,8 @@ class JobDetailsActivity extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(20),
           width: size.width,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
             ),
@@ -1468,6 +1507,8 @@ class JobDetailsActivity extends StatelessWidget {
         exitBottomSheetDuration: const Duration(milliseconds: 500));
   }
 
+
+ */
   Row createDetailsRow(String title, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,

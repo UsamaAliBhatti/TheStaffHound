@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 
+import '../controllers/recent_job_controller.dart';
+import '../routes/app_pages.dart';
+
 // ignore: must_be_immutable
 class JobItemView extends StatelessWidget {
-  VoidCallback? callback;
+  var contoller = Get.put(RecentJobController());
+
   bool? isSaved;
-  String? companyLogo;
+  int? offerID;
+  // Offer? data;
+  // String? companyLogo;
   String? jobTitle;
   String? address;
   String? salaryRange;
   String? jobDuration;
   String? jobType;
-  String? jobPostTime;
+  DateTime? jobPostTime;
   String? shiftType;
   bool? isNew;
   bool? showBorder;
 
   JobItemView(
       {Key? key,
-      this.callback,
+      this.offerID,
       this.isSaved = false,
-      this.companyLogo,
+      // this.companyLogo,
       this.address,
       this.jobDuration,
       this.jobTitle,
@@ -74,18 +81,28 @@ class JobItemView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText(
-                        text: 'Manual Operator',
-                        textColor: Colors.black,
-                        textSize: 18,
-                        isBold: true,
-                        isStart: true,
+                      InkWell(
+                        onTap: () {
+                          Get.toNamed(Routes.JOB_DETAILS, arguments: [
+                            {'offerID': offerID, 'type': 'job'}
+                          ]);
+                        },
+                        child: SizedBox(
+                          width: size.width / 1.7,
+                          child: AppText(
+                            text: jobTitle!,
+                            textColor: Colors.black,
+                            textSize: 18,
+                            isBold: true,
+                            isStart: true,
+                          ),
+                        ),
                       ),
                       const SizedBox(
                         height: 2,
                       ),
                       AppText(
-                        text: 'Lake City ,FL',
+                        text: address!,
                         textColor: Colors.grey,
                         textSize: 16,
                         isStart: true,
@@ -94,7 +111,7 @@ class JobItemView extends StatelessWidget {
                         height: 2,
                       ),
                       AppText(
-                        text: '\$13 - \$15 / h',
+                        text: '\$$salaryRange / h',
                         textColor: Constants.secondaryColor,
                         textSize: 16,
                         isStart: true,
@@ -113,7 +130,9 @@ class JobItemView extends StatelessWidget {
                       splashRadius: 10,
                       splashColor: Colors.transparent,
                       padding: EdgeInsets.zero,
-                      onPressed: () {},
+                      onPressed: () async {
+                        contoller.saveProject(offerID!, 1);
+                      },
                       icon: Icon(
                         isSaved! ? Icons.favorite : Icons.favorite_outline,
                         color: Constants.primaryColor,
@@ -133,7 +152,10 @@ class JobItemView extends StatelessWidget {
             children: [
               buildBottomRowItem('24 Dec - 4 Jan', icon: Icons.calendar_month),
               buildBottomRowItem('Temp', icon: Icons.shopping_bag_rounded),
-              buildBottomRowItem('6 days ago', textColor: Colors.grey),
+              buildBottomRowItem(
+                  Constants.timeAgo(
+                      DateTime.parse(jobPostTime!.toIso8601String())),
+                  textColor: Colors.grey),
             ],
           )
         ],

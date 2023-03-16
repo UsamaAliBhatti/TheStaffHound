@@ -405,37 +405,40 @@ class CreateResumeActivity extends StatelessWidget {
                 ],
               )),
               Container(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 10.0),
-                /* width: 120, */
-                height: 60,
-                child: TextButton(
-                    onPressed: () {
-                      // resumeController.createResume();
-                    },
-                    style: TextButton.styleFrom(
-                        backgroundColor: Constants.secondaryColor,
-                        elevation: 5,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40))),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.save,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          AppText(
-                            text: 'Save',
-                            textSize: 20,
-                            isBold: true,
-                            textColor: Colors.white,
-                          )
-                        ])),
+                color: Colors.white,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10.0),
+                  /* width: 120, */
+                  height: 60,
+                  child: TextButton(
+                      onPressed: () {
+                        resumeController.createResume();
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: Constants.secondaryColor,
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40))),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.save,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            AppText(
+                              text: 'Save',
+                              textSize: 20,
+                              isBold: true,
+                              textColor: Colors.white,
+                            )
+                          ])),
+                ),
               ),
             ],
           ),
@@ -705,8 +708,9 @@ class CreateResumeActivity extends StatelessWidget {
           textSize: 25,
           isBold: true,
         ),
+        insetPadding: const EdgeInsets.all(10),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(12.0),
@@ -785,7 +789,7 @@ class CreateResumeActivity extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 150, mainAxisExtent: 40),
+                            maxCrossAxisExtent: 160, mainAxisExtent: 40),
                     shrinkWrap: true,
                     itemCount: resumeController.tempSkillsList.length,
                     itemBuilder: ((context, index) {
@@ -1208,9 +1212,10 @@ class CreateResumeActivity extends StatelessWidget {
 // Method For Creating Chips
   Widget createChip(String text) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
+          margin: const EdgeInsets.only(top: 5),
           width: 10,
           height: 10,
           decoration: BoxDecoration(
@@ -1221,14 +1226,17 @@ class CreateResumeActivity extends StatelessWidget {
         const SizedBox(
           width: 5,
         ),
-        Text(
-          text,
-          style: TextStyle(
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.normal,
-              fontSize: 16),
-          textAlign: TextAlign.start,
-          overflow: TextOverflow.ellipsis,
+        SizedBox(
+          width: 100,
+          child: Text(
+            text,
+            style: TextStyle(
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.normal,
+                fontSize: 16),
+            textAlign: TextAlign.start,
+            overflow: TextOverflow.visible,
+          ),
         )
       ],
     );
@@ -1317,12 +1325,26 @@ class CreateResumeActivity extends StatelessWidget {
                     const SizedBox(
                       height: 5,
                     ),
-                    AppText(
+                    RichText(
+                      text: TextSpan(
+                          text:
+                              '${resumeController.userExperienceList[index].startDate} - ',
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
+                          children: [
+                            TextSpan(
+                              text: resumeController
+                                      .userExperienceList[index].endDate ??
+                                  'present',
+                            )
+                          ]),
+                    )
+                    /* AppText(
                       text:
-                          '${resumeController.userExperienceList[index].startDate} - ${resumeController.userExperienceList[index].endDate}',
+                          '${resumeController.userExperienceList[index].startDate} - $}',
                       textColor: Colors.grey,
                       textSize: 12,
-                    ),
+                    ), */
                   ],
                 ))
               ],
@@ -1416,34 +1438,20 @@ class CreateResumeActivity extends StatelessWidget {
                     ),
                     RichText(
                       text: TextSpan(
-                          text: 'Start Date: ',
-                          style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold),
+                          text:
+                              '${resumeController.userEducationsList[index].startDate} - ',
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
                           children: [
                             TextSpan(
-                                text:
-                                    '${resumeController.userEducationsList[index].startDate}  ',
-                                style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.normal)),
-                            TextSpan(
-                                text: 'End Date: ',
-                                style: TextStyle(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold)),
-                            TextSpan(
-                                text:
-                                    '${resumeController.userEducationsList[index].endDate}',
-                                style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.normal))
+                              text: (resumeController.userEducationsList[index]
+                                      .endDate!.isNotEmpty)
+                                  ? resumeController
+                                      .userEducationsList[index].endDate
+                                  : 'present',
+                            )
                           ]),
-                    ),
+                    )
                   ],
                 ))
               ],

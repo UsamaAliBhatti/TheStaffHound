@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
+import 'package:the_staff_hound/helper/dialog_helper.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
 class ProfileController extends GetxController {
@@ -56,19 +57,21 @@ class ProfileController extends GetxController {
   }
 
   void getMyProfile(String token) async {
-    var response = await RestApiServices.getMyProfile(token);
+    var response = await AuthApis.getUserProfile(token);
     if (response != null) {
       isLoaded.value = true;
-      nameText.value = response.profile!.name!;
-      emailText.value = response.profile!.email!;
+      var address =
+          '${response.data!.street}, ${response.data!.city}, ${response.data!.zipCode}, ${response.data!.state}, ${response.data!.country}';
+      nameText.value = response.data!.name!;
+      emailText.value = response.data!.email!;
 
-      phoneNumberText.value = response.profile!.phone!;
-      addressText.value = response.address!;
-      streetText.value = response.profile!.street1!;
-      zipcodeText.value = response.profile!.zipCode!;
-      stateText.value = response.profile!.state!;
-      countryText.value = response.profile!.country!;
-      cityText.value = response.profile!.city ?? '';
+      phoneNumberText.value = response.data!.phone!;
+      addressText.value = address;
+      streetText.value = response.data!.street!;
+      zipcodeText.value = response.data!.zipCode!;
+      stateText.value = response.data!.state!;
+      countryText.value = response.data!.country!;
+      cityText.value = response.data!.city ?? '';
       nameTextController.text = nameText.value;
       emailTextController.text = emailText.value;
       phoneNumberTextController.text = phoneNumberText.value;
@@ -179,26 +182,28 @@ class ProfileController extends GetxController {
 
       Map<String, String> data = {
         'name': nameText.value,
-        'phone': phoneNumberText.value,
-        'street1': streetText.value,
+        // 'phone': phoneNumberText.value,
+        'street': streetText.value,
         'state': stateText.value,
         'zip_code': zipcodeText.value,
         'country': countryText.value,
-        'city': cityText.value
+        'city': cityText.value,
+        'type': '5'
       };
-      var response = await RestApiServices.updateMyProfile(token.value, data);
+      var response = await AuthApis.updateUserProfile(token.value, data);
       if (response != null) {
         isLoaded.value = true;
 
-        nameText.value = response.profile!.name!;
-        emailText.value = response.profile!.email!;
-        phoneNumberText.value = response.profile!.phone!;
-        addressText.value = response.address!;
-        streetText.value = response.profile!.street1!;
-        zipcodeText.value = response.profile!.zipCode!;
-        stateText.value = response.profile!.state!;
-        countryText.value = response.profile!.country!;
-        cityText.value = response.profile!.city!;
+        nameText.value = response.name!;
+        // emailText.value = response.profile!.email!;
+        // phoneNumberText.value = response.profile!.phone!;
+        addressText.value =
+            '${response.street}, ${response.city}, ${response.zipCode}, ${response.state}, ${response.country}';
+        streetText.value = response.street!;
+        zipcodeText.value = response.zipCode!;
+        stateText.value = response.state!;
+        countryText.value = response.country!;
+        cityText.value = response.city!;
         var isSaved = await SharedPrefsManager.update(
             nameText.value, phoneNumberText.value, addressText.value);
         if (isSaved) {
@@ -239,18 +244,15 @@ class ProfileController extends GetxController {
   updatePasswordMethod() async {
     if (resetPasswordFormKey.currentState!.validate()) {
       var data = {
-        'current_password': oldPasswordController.text,
-        'new_password': newPasswordController.text,
+        'old_password': oldPasswordController.text,
+        'password': newPasswordController.text,
         'confirm_password': reenterPasswordTextController.text
       };
 
-      bool? isChanged = await RestApiServices.changePassword(token.value, data);
-      if (isChanged!) {
-        Get.back();
-        oldPasswordController.clear();
+      DialogHelper.showConfirmationDialog(data);
+      /*  oldPasswordController.clear();
         newPasswordController.clear();
-        reenterPasswordTextController.clear();
-      }
+        reenterPasswordTextController.clear(); */
     }
   }
 

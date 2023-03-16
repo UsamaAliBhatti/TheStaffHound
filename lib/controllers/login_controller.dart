@@ -39,6 +39,7 @@ class LoginController extends GetxController with BaseController {
     super.onClose();
     emailController.dispose();
     passwordController.dispose();
+    // loginFormKey.currentState!.deactivate();
   }
 
   String? validateEmail(String? email) {
@@ -66,7 +67,6 @@ class LoginController extends GetxController with BaseController {
           .catchError(handleError);
       if (userData != null) {
         saveUserMethod(userData, 'Logged in successfully...');
-        loginFormKey.currentState!.reset();
 
         email.value = '';
         password.value = '';
@@ -101,13 +101,13 @@ class LoginController extends GetxController with BaseController {
           Get.off(() => DashboardActivity());
         }
       }
-    } else {
+    } else { 
       Get.snackbar('Connection Error', 'Please Check Your Internet Connection');
     }
   } */
   }
 
-  void saveUserMethod(User userModel, String message) async {
+  void saveUserMethod(UserModel userModel, String message) async {
     var isDataSaved = await SharedPrefsManager.saveUserData(
         userModel.token!,
         userModel.data!.id!,
@@ -115,7 +115,8 @@ class LoginController extends GetxController with BaseController {
         userModel.data!.email!,
         userModel.data!.type!,
         userModel.phone!,
-        userModel.address!);
+        userModel.address!,
+        userModel.data!.unavailability!);
     if (isDataSaved) {
       Fluttertoast.showToast(
           msg: message,

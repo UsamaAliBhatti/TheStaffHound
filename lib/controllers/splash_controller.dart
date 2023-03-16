@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:the_staff_hound/helper/dialog_helper.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 import 'package:the_staff_hound/views/dashboard_screen.dart';
 
@@ -23,9 +23,9 @@ class SplashController extends GetxController {
         }
       });
     } else {
-      // Fluttertoast.showToast(
-      //     msg: 'Seems like you aren\'t connected to internet');
-      DialogHelper.showDialog();
+      Fluttertoast.showToast(
+          msg: 'Seems like you aren\'t connected to internet');
+
       /* showDialog(
           context: Get.context!,
           builder: (_) {

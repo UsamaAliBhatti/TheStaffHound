@@ -1,51 +1,103 @@
 import 'package:get/get.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:the_staff_hound/api_services/main_api_services.dart';
+import 'package:the_staff_hound/api_services/response_models/categories_response.dart';
+import 'package:the_staff_hound/api_services/response_models/dashboard_offers_response.dart';
 import 'package:the_staff_hound/api_services/response_models/dashboard_response.dart';
-import 'package:the_staff_hound/api_services/rest_api_services.dart';
 import 'package:the_staff_hound/constants.dart';
-import 'package:the_staff_hound/models/general_jobs_model.dart';
 import 'package:the_staff_hound/models/nav_model.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
 class DashBoardController extends GetxController {
-  var jobCategoryList = <Category>[].obs;
+  var jobCategoryList = <Success>[].obs;
   // var featuredJobsList = <Job>[].obs;
-  var recentJobsList = <Job>[].obs;
+  var jobsList = <Offer>[].obs;
   var navModelList = <NavModel>[].obs;
-  var testJobsList = <GeneralJobModel>[].obs;
+  // var testJobsList = <GeneralJobModel>[].obs;
 
   var selectedIndex = 0.obs;
   var isAvailable = false.obs;
 
   var savedJobs = 0.obs;
   var approvedJobs = 0.obs;
-  DashboardResponse dashboardModel = DashboardResponse();
+  // DashboardResponse dashboardModel = DashboardResponse();
 
   var userName = ''.obs;
   var userEmail = ''.obs;
-  var token = ''.obs;
+  // var token = ''.obs;
 
   var isLoaded = false.obs;
+  var userAvailailityStatus = 0.obs;
 
-  var focusedDay = DateTime.now().obs;
-  var selectedDay = Rxn<DateTime>();
-  var rangeStart = Rxn<DateTime>();
-  var rangeEnd = Rxn<DateTime>();
-  final rangeSelectionMode = RangeSelectionMode.toggledOn.obs;
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-
-    token.value = SharedPrefsManager.getUserToken;
-
+    getUserData();
+    // token.value = SharedPrefsManager.getUserToken;
+    // print(await FirebaseMessaging.instance.getToken());
     // fetchFeaturedJobs();
     fetchDrawerMenu();
-    fetchDashboardData(SharedPrefsManager.getUserToken.toString());
+    fetchAllData();
+  }
+
+  fetchAllData() {
+    fetchCategories(SharedPrefsManager.getUserToken);
+    fetchDashboardData(SharedPrefsManager.getUserToken);
+    fetchSavedJobsData(SharedPrefsManager.getUserToken);
+  }
+
+  getUserData() {
+    // userAvailailityStatus.value = SharedPrefsManager.getUserAvailabilityStatus;
+    userName.value = SharedPrefsManager.getUserName;
+    userEmail.value = SharedPrefsManager.getUserEmail;
+    if (userAvailailityStatus.value == 0) {
+      isAvailable.value = true;
+    } else {
+      isAvailable.value = false;
+    }
+  }
+
+  saveProject(int id, int status) async {
+    var response = await ApiServices.saveProject(
+        SharedPrefsManager.getUserToken, id, status);
+    if (response!.statusCode == 200) {
+      // print('Error Not Given');
+      fetchDashboardData(SharedPrefsManager.getUserToken);
+    } else {
+      print(response.body);
+    }
+  }
+
+  fetchSavedJobsData(String token) async {
+    var response = await ApiServices.getDashboardData(token);
+    if (response != null && response.statusCode == 200) {
+      var data = dashboardResponseFromJson(response.body);
+      savedJobs.value = data.savedJobCounter;
+      approvedJobs.value = data.assignedJobCounter;
+    } else {
+      Constants.showToast('Error Occurred. Please try again later');
+    }
+  }
+
+  fetchCategories(String token) async {
+    var response = await ApiServices.getCategories(token);
+    if (response != null && response.statusCode == 200) {
+      var data = categoriesResponseFromJson(response.body);
+      jobCategoryList.value = data.success;
+    } else {
+      Constants.showToast('Error Occurred. Please try again later');
+    }
   }
 
   fetchDashboardData(String token) async {
-    userName.value = SharedPrefsManager.getUserName;
-    userEmail.value = SharedPrefsManager.getUserEmail;
+    var response = await ApiServices.getJobOffers(token);
+    if (response!.statusCode == 200) {
+      var data = dashboardOffersResponseFromJson(response.body);
+      jobsList.value = data.offers;
+      print(jobsList.toJson());
+    } else {
+      Constants.showToast('Error');
+      print(response.body.toString());
+    }
     /* var json = await RestApiServices.getDashboardData(token);
     if (json != null) {
       isLoaded.value = true;
@@ -76,11 +128,11 @@ class DashBoardController extends GetxController {
         navIcon: Constants.navSearchJobIcon,
         isNavSelected: false.obs));
 
-    navModelList.add(NavModel(
+    /*  navModelList.add(NavModel(
         navName: 'Saved Jobs',
         navIcon: Constants.icFavorite,
         isNavSelected: false.obs));
-
+ */
     navModelList.add(NavModel(
         navName: 'My Branches',
         navIcon: Constants.icBranch,
@@ -103,9 +155,9 @@ class DashBoardController extends GetxController {
     }
   }
 
-  addToArchive(int jobId) {
-    RestApiServices.addToArchive(token.value, jobId);
-  }
+  // addToArchive(int jobId) {
+  //   RestApiServices.addToArchive(token.value, jobId);
+  // }
 
   /*  notInterestedInJob(int jobId) {
     RestApiServices.addNotInterested(token.value, jobId);

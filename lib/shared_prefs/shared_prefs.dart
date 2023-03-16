@@ -1,4 +1,6 @@
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 
 class SharedPrefsManager {
   static var userNameKey = 'userName';
@@ -8,7 +10,8 @@ class SharedPrefsManager {
   static var userTypeKey = 'userType';
   static var userPhoneNumberKey = 'userPhoneNumber';
   static var userAddresskey = 'userAddressKey';
-  
+  static var userAvailabilitykey = 'userAvailabilityKey';
+
   static late SharedPreferences prefs;
 
   static Future<SharedPreferences> init() async {
@@ -17,20 +20,21 @@ class SharedPrefsManager {
   }
 
   static Future<bool> saveUserData(
-    String userToken,
-    int userId,
-    String userName,
-    String userEmail,
-    int userType,
-     String userPhoneNumber,
-      String userAddress
-  ) async {
+      String userToken,
+      int userId,
+      String userName,
+      String userEmail,
+      int userType,
+      String userPhoneNumber,
+      String userAddress,
+      int isAvailable) async {
     prefs.setInt(userIdKey, userId);
     prefs.setString(userNameKey, userName);
     prefs.setString(userEmailKey, userEmail);
     prefs.setInt(userTypeKey, userType);
     prefs.setString(userPhoneNumberKey, userPhoneNumber);
     prefs.setString(userAddresskey, userAddress);
+    prefs.setInt(userAvailabilitykey, isAvailable);
     return prefs.setString(userTokenKey, userToken);
   }
 
@@ -38,8 +42,7 @@ class SharedPrefsManager {
       String userName, String userPhoneNumber, String userAddress) {
     prefs.setString(userNameKey, userName);
     prefs.setString(userPhoneNumberKey, userPhoneNumber);
-    
- 
+
     return prefs.setString(userAddresskey, userAddress);
   }
 
@@ -50,6 +53,7 @@ class SharedPrefsManager {
   static get getUserEmail => prefs.getString(userEmailKey);
   static get getUserPhoneNumber => prefs.getString(userPhoneNumberKey);
   static get getUserAddress => prefs.getString(userAddresskey);
+  static get getUserAvailabilityStatus => prefs.getInt(userAvailabilitykey);
 
   static void userLogout() {
     prefs.remove(userTokenKey);
@@ -59,5 +63,7 @@ class SharedPrefsManager {
     prefs.remove(userTypeKey);
     prefs.remove(userPhoneNumberKey);
     prefs.remove(userAddresskey);
+    prefs.remove(userAvailabilitykey);
+    Get.offNamedUntil(Routes.LOGIN, (route) => false);
   }
 }

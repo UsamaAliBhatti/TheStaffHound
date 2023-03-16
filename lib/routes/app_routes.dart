@@ -21,6 +21,9 @@ abstract class Routes {
   static const VIEW_RESUME = _Paths.VIEW_RESUME;
   static const PROFILE = _Paths.PROFILE;
   static const MY_JOBS = _Paths.MY_JOBS;
+  static const SECOND_NOTIFICATION = _Paths.SECOND_NOTIFICATION;
+  static const ARCHIVED_JOBS = _Paths.ARCHIVED_JOBS;
+  static const NOTIFICATION_DETAILS = _Paths.NOTIFICATION_DETAILS;
 }
 
 abstract class _Paths {
@@ -41,4 +44,7 @@ abstract class _Paths {
   static const VIEW_RESUME = '/view_resume';
   static const PROFILE = '/profile';
   static const MY_JOBS = '/my_jobs';
+  static const SECOND_NOTIFICATION = '/second_notification';
+  static const ARCHIVED_JOBS = '/archived_jobs';
+  static const NOTIFICATION_DETAILS = '/notification_details';
 }

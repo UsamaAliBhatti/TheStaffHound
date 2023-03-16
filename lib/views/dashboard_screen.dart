@@ -1,68 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/dasboard_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
+import 'package:the_staff_hound/helper/dialog_helper.dart';
 import 'package:the_staff_hound/main.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
-import 'package:the_staff_hound/views/archived_jobs_screen.dart';
-import 'package:the_staff_hound/views/branches_screen.dart';
-import 'package:the_staff_hound/views/login_screen.dart';
-import 'package:the_staff_hound/views/my_jobs_screen.dart';
-import 'package:the_staff_hound/views/notification_screen.dart';
-import 'package:the_staff_hound/views/profile_screen.dart';
-import 'package:the_staff_hound/views/recent_jobs_screen.dart';
-import 'package:the_staff_hound/views/resume_view.dart';
-
-import '../custom_widgets/job_item_view.dart';
-import 'job_details_screen.dart';
 
 class DashboardActivity extends StatelessWidget {
   final dashboardController = Get.put(DashBoardController());
+
   DashboardActivity({Key? key}) : super(key: key);
   final _globalKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      key: _globalKey,
-      drawer: navDrawer(),
-      appBar: AppBar(
+        key: _globalKey,
         backgroundColor: Constants.backgroundColor,
-        elevation: 1,
-        titleSpacing: 0,
-        shape:
-            const Border(bottom: BorderSide(color: Colors.black26, width: 0.2)),
-        shadowColor: Colors.black38,
-        toolbarHeight: 70,
-        leading: Container(
-          margin: const EdgeInsets.only(left: 10),
-          width: 25,
-          height: 25,
-          child: IconButton(
-              onPressed: () {
-                _globalKey.currentState!.openDrawer();
-              },
-              icon: const Icon(
-                Icons.menu,
-                color: Colors.black,
-              )),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Stack(children: <Widget>[
-              IconButton(
-                  onPressed: () {
-                    Get.to(() => NotificationsActivity());
-                  },
-                  icon: const Icon(
-                    Icons.notifications,
-                    color: Constants.primaryColor,
-                    size: 30,
-                  )),
-              /* Positioned(
+        drawer: navDrawer(),
+        appBar: AppBar(
+          backgroundColor: Constants.backgroundColor,
+          elevation: 1,
+          titleSpacing: 0,
+          shape: const Border(
+              bottom: BorderSide(color: Colors.black26, width: 0.2)),
+          shadowColor: Colors.black38,
+          toolbarHeight: 70,
+          leading: Container(
+            margin: const EdgeInsets.only(left: 10),
+            width: 25,
+            height: 25,
+            child: IconButton(
+                onPressed: () {
+                  _globalKey.currentState!.openDrawer();
+                },
+                icon: const Icon(
+                  Icons.menu,
+                  color: Colors.black,
+                )),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Stack(children: <Widget>[
+                IconButton(
+                    onPressed: () {
+                      Get.toNamed(Routes.NOTIFICATIONS);
+                    },
+                    icon: const Icon(
+                      Icons.notifications,
+                      color: Constants.primaryColor,
+                      size: 30,
+                    )),
+                /* Positioned(
                   // draw a red marble
                   top: 1,
                   right: 1,
@@ -82,568 +75,612 @@ class DashboardActivity extends StatelessWidget {
                     ),
                   ),
                 ) */
-            ]),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0, left: 20, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      AppText(
-                        text: "Hello",
-                        textSize: 15,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Obx(() {
-                        return AppText(
-                          text: dashboardController
-                              .userName.value.capitalizeFirstofEach,
-                          isBold: true,
-                          textSize: 20,
-                        );
-                      })
-                    ],
-                  ),
-                  Container(
-                      padding: const EdgeInsets.all(8),
-                      width: 50,
-                      height: 50, // Border width
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: NetworkImage(
-                                "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8bWVufGVufDB8fDB8fA%3D%3D&w=1000&q=80"),
-                            fit: BoxFit.cover),
-                      )),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            /*  InkWell(
-                        onTap: () {},
-                        child: Container(
-                            width: size.width,
-                            height: 50,
-                            margin:
-                                const EdgeInsets.symmetric(horizontal: 20),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  AppText(
-                                    text: 'search job here...',
-                                    textSize: 18,
-                                    textColor: Colors.grey,
-                                  ),
-                                  const Icon(
-                                    Icons.search,
-                                    size: 20,
-                                    color: Colors.grey,
-                                  )
-                                ])),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ), */
-            InkWell(
-              onTap: () {},
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.only(top: 40),
-                      width: size.width,
-                      decoration: BoxDecoration(
-                          color: Constants.secondaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          AppText(
-                            text: 'Find a nearest branch',
-                            textColor: Colors.white,
-                            isBold: true,
-                            textSize: 20,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          SizedBox(
-                            width: 230,
-                            child: AppText(
-                              text:
-                                  'See how close you are to us. \nRegister with your branch to get your desired jobs.',
-                              textColor: Colors.white,
-                              textSize: 15,
-                              isStart: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                        right: 10,
-                        child: Image.asset(
-                          Constants.jobImg,
-                          width: 110,
-                          height: 130,
-                        )),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          Get.to(() => MyJobsActivity());
-                          print('Approved Jobs Tapped');
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          // width: 170,
-                          // height: 100,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade100,
-                                  offset: const Offset(2, 3),
-                                  blurRadius: 5,
-                                )
-                              ]),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Obx(() {
-                                return AppText(
-                                  text: dashboardController.approvedJobs.value
-                                      .toString(),
-                                  isBold: true,
-                                  isStart: true,
-                                  textSize: 25,
-                                  textColor: Colors.black,
-                                );
-                              }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              AppText(
-                                text: 'Approved Jobs',
-                                isStart: true,
-                                textSize: 15,
-                                textColor: Colors.black,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          Get.to(() => ArchivedJobsActivity());
-                          // print('Saved Jobs Tapped');
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          // width: 170,
-                          // height: 100,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade100,
-                                  offset: const Offset(2, 3),
-                                  blurRadius: 5,
-                                )
-                              ]),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Obx(() {
-                                return AppText(
-                                  text: dashboardController.savedJobs.value
-                                      .toString(),
-                                  isBold: true,
-                                  isStart: true,
-                                  textSize: 25,
-                                  textColor: Colors.black,
-                                );
-                              }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              AppText(
-                                text: 'Saved Jobs',
-                                isStart: true,
-                                textSize: 15,
-                                textColor: Colors.black,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ]),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: AppText(
-                    text: 'Job Categories',
-                    textSize: 25,
-                    textColor: Colors.black,
-                    isBold: true,
-                    isStart:
-                        true), /* Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: <Widget>[
-                             
-                           /*    InkWell(
-                                onTap: () {
-                                  Get.to(() => const RecentJobs(),
-                                      arguments: {'more': true});
-                                },
-                                child: AppText(
-                                    text: 'View More',
-                                    textSize: 15,
-                                    textColor: Constants.primaryColor,
-                                    isBold: true,
-                                    isStart: true),
-                              ) */
-                            ],
-                          ), */
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: size.width,
-              height: 60,
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: 3,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        Get.to(
-                          () => const RecentJobs(),
-                          /*   arguments: {
-                                        'categoryId': controller
-                                            .jobCategoryList[index].id,
-                                        'more': false
-                                      }, */
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 5),
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
-                            color: Colors
-                                .primaries[index % Colors.primaries.length],
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Center(
-                          child: AppText(
-                            text: (index == 0)
-                                ? 'Hotel'
-                                : (index == 1)
-                                    ? 'Carpenter'
-                                    : 'Plumber',
-                            textColor: Colors.white,
-                            textSize: 17,
-                            isBold: true,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            /* Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: AppText(
-                                text: 'Featured Jobs',
-                                isStart: true,
-                                isBold: true,
-                                textColor: Colors.black,
-                                textSize: 25,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: SizedBox(
-                              width: size.width,
-                              height: 170,
-                              child: Obx(() {
-                                return ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        dashboardController.featuredJobsList.length,
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (context, index) {
-                                      return InkWell(
-                                        onTap: () {
-                                          Get.to(
-                                            () => JobDetailsActivity(),
-                                            arguments: [
-                                              {
-                                                'jobId': dashboardController
-                                                    .featuredJobsList[index].id
-                                              }
-                                            ],
-                                          );
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 10),
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          width: 260,
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey.shade100,
-                                                  offset: const Offset(2, 3),
-                                                  blurRadius: 5,
-                                                )
-                                              ]),
-                                          child: Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Row(
-                                                  children: <Widget>[
-                                                    Container(
-                                                        width: 40,
-                                                        height: 40,
-                                                        padding: EdgeInsets.zero,
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.red,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  10),
-                                                        ),
-                                                        child: Obx(() {
-                                                          return _getImage(
-                                                              dashboardController
-                                                                  .featuredJobsList[
-                                                                      index]
-                                                                  .imageUrl);
-                                                        })),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    AppText(
-                                                      text: dashboardController
-                                                          .featuredJobsList[index]
-                                                          .jobTitle!,
-                                                      isBold: true,
-                                                      isStart: true,
-                                                      textColor:
-                                                          Constants.textHintColor,
-                                                      textSize: 15,
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                AppText(
-                                                  text: dashboardController
-                                                      .featuredJobsList[index]
-                                                      .jobTitle!,
-                                                  isBold: true,
-                                                  isStart: true,
-                                                  textColor: Colors.black,
-                                                  textSize: 20,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                AppText(
-                                                  text: dashboardController
-                                                      .featuredJobsList[index]
-                                                      .location!,
-                                                  textColor:
-                                                      Constants.textHintColor,
-                                                  isStart: true,
-                                                  textSize: 13,
-                                                ),
-                                                const SizedBox(height: 15),
-                                                Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: <Widget>[
-                                                      AppText(
-                                                        text: dashboardController
-                                                                .featuredJobsList[
-                                                                    index]
-                                                                .salary ??
-                                                            'Empty',
-                                                        textSize: 20,
-                                                        isBold: true,
-                                                        isStart: true,
-                                                      ),
-                                                      const Icon(
-                                                        Icons.keyboard_arrow_right,
-                                                        color:
-                                                            Constants.textHintColor,
-                                                      )
-                                                    ])
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    });
-                              }),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ), */
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  AppText(
-                    text: 'Job Offers',
-                    textColor: Colors.black,
-                    isStart: true,
-                    isBold: true,
-                    textSize: 25,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Get.to(() => const RecentJobs(),
-                            arguments: {'more': true});
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.search),
-                          AppText(
-                            text: 'Search',
-                            textSize: 15,
-                            isBold: true,
-                          ),
-                        ],
-                      ))
-                  /* InkWell(
-                              onTap: () {
-                                
-                              },
-                              child: AppText(
-                                text: 'View More',
-                                textColor: Constants.primaryColor,
-                                textSize: 15,
-                                isBold: true,
-                              ),
-                            ), */
-                ],
-              ),
-            ),
-            /*  const SizedBox(
-                        height: 10,
-                      ), */
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: SizedBox(
-                width: size.width,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: 5,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                        onTap: () => Get.to(() => JobDetailsActivity()),
-                        child: JobItemView());
-                  },
-                ) /*  Obx(() {
-                            return ListView.separated(
-                                shrinkWrap: true,
-                                itemCount:
-                                    dashboardController.recentJobsList.length,
-                                physics: const NeverScrollableScrollPhysics(),
-                                separatorBuilder: (context, index) {
-                                  return const Divider(
-                                    height: 1,
-                                  );
-                                },
-                                itemBuilder: (context, index) {
-                                  return RecentJobsItemView(
-                                    dashboardController: dashboardController,
-                                    size: size,
-                                    index: index,
-                                  );
-                                });
-                          }) */
-                ,
-              ),
+              ]),
             ),
           ],
         ),
-      ), /*  Obx(() {
+        body: Obx(() {
+          return RefreshIndicator(
+            onRefresh: () async {
+              dashboardController.fetchAllData();
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 10.0, left: 20, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            AppText(
+                              text: "Hello",
+                              textSize: 15,
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Obx(() {
+                              return AppText(
+                                text: dashboardController
+                                    .userName.value.capitalizeFirstofEach,
+                                isBold: true,
+                                textSize: 20,
+                              );
+                            })
+                          ],
+                        ),
+                        Container(
+                            padding: const EdgeInsets.all(8),
+                            width: 50,
+                            height: 50, // Border width
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8bWVufGVufDB8fDB8fA%3D%3D&w=1000&q=80"),
+                                  fit: BoxFit.cover),
+                            )),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  /*  InkWell(
+                                onTap: () {},
+                                child: Container(
+                                    width: size.width,
+                                    height: 50,
+                                    margin:
+                                        const EdgeInsets.symmetric(horizontal: 20),
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 20),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white,
+                                    ),
+                                    child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          AppText(
+                                            text: 'search job here...',
+                                            textSize: 18,
+                                            textColor: Colors.grey,
+                                          ),
+                                          const Icon(
+                                            Icons.search,
+                                            size: 20,
+                                            color: Colors.grey,
+                                          )
+                                        ])),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ), */
+                  InkWell(
+                    onTap: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Stack(
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            margin: const EdgeInsets.only(top: 40),
+                            width: size.width,
+                            decoration: BoxDecoration(
+                                color: Constants.secondaryColor,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                AppText(
+                                  text: 'Find a nearest branch',
+                                  textColor: Colors.white,
+                                  isBold: true,
+                                  textSize: 20,
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                SizedBox(
+                                  width: 230,
+                                  child: AppText(
+                                    text:
+                                        'See how close you are to us. \nRegister with your branch to get your desired jobs.',
+                                    textColor: Colors.white,
+                                    textSize: 15,
+                                    isStart: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                              right: 10,
+                              child: Image.asset(
+                                Constants.jobImg,
+                                width: 110,
+                                height: 130,
+                              )),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed(Routes.MY_JOBS);
+                                print('Approved Jobs Tapped');
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(20),
+                                // width: 170,
+                                // height: 100,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade100,
+                                        offset: const Offset(2, 3),
+                                        blurRadius: 5,
+                                      )
+                                    ]),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Obx(() {
+                                      return AppText(
+                                        text: dashboardController
+                                            .approvedJobs.value
+                                            .toString(),
+                                        isBold: true,
+                                        isStart: true,
+                                        textSize: 25,
+                                        textColor: Colors.black,
+                                      );
+                                    }),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    AppText(
+                                      text: 'Approved Jobs',
+                                      isStart: true,
+                                      textSize: 15,
+                                      textColor: Colors.black,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed(Routes.MY_JOBS);
+                                // print('Saved Jobs Tapped');
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(20),
+                                // width: 170,
+                                // height: 100,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade100,
+                                        offset: const Offset(2, 3),
+                                        blurRadius: 5,
+                                      )
+                                    ]),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Obx(() {
+                                      return AppText(
+                                        text: dashboardController
+                                            .savedJobs.value
+                                            .toString(),
+                                        isBold: true,
+                                        isStart: true,
+                                        textSize: 25,
+                                        textColor: Colors.black,
+                                      );
+                                    }),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    AppText(
+                                      text: 'Saved Jobs',
+                                      isStart: true,
+                                      textSize: 15,
+                                      textColor: Colors.black,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ]),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: AppText(
+                          text: 'Job Categories',
+                          textSize: 25,
+                          textColor: Colors.black,
+                          isBold: true,
+                          isStart:
+                              true), /* Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                     
+                                   /*    InkWell(
+                                        onTap: () {
+                                          Get.to(() => const RecentJobs(),
+                                              arguments: {'more': true});
+                                        },
+                                        child: AppText(
+                                            text: 'View More',
+                                            textSize: 15,
+                                            textColor: Constants.primaryColor,
+                                            isBold: true,
+                                            isStart: true),
+                                      ) */
+                                    ],
+                                  ), */
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    width: size.width,
+                    height: 60,
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: dashboardController.jobCategoryList.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              Get.toNamed(
+                                Routes.RECENT_JOBS,
+                                arguments: [
+                                  {
+                                    'categoryId': dashboardController
+                                        .jobCategoryList[index].id
+                                  }
+                                ],
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
+                              decoration: BoxDecoration(
+                                  color: Colors.primaries[
+                                      index % Colors.primaries.length],
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Center(
+                                child: AppText(
+                                  text: dashboardController
+                                      .jobCategoryList[index].title,
+                                  textColor: Colors.white,
+                                  textSize: 17,
+                                  isBold: true,
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  /* Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: AppText(
+                                        text: 'Featured Jobs',
+                                        isStart: true,
+                                        isBold: true,
+                                        textColor: Colors.black,
+                                        textSize: 25,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: SizedBox(
+                                      width: size.width,
+                                      height: 170,
+                                      child: Obx(() {
+                                        return ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                dashboardController.featuredJobsList.length,
+                                            scrollDirection: Axis.horizontal,
+                                            itemBuilder: (context, index) {
+                                              return InkWell(
+                                                onTap: () {
+                                                  Get.to(
+                                                    () => JobDetailsActivity(),
+                                                    arguments: [
+                                                      {
+                                                        'jobId': dashboardController
+                                                            .featuredJobsList[index].id
+                                                      }
+                                                    ],
+                                                  );
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 20, vertical: 10),
+                                                  margin: const EdgeInsets.symmetric(
+                                                      horizontal: 5),
+                                                  width: 260,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(10),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.shade100,
+                                                          offset: const Offset(2, 3),
+                                                          blurRadius: 5,
+                                                        )
+                                                      ]),
+                                                  child: Center(
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.start,
+                                                      children: <Widget>[
+                                                        Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                                width: 40,
+                                                                height: 40,
+                                                                padding: EdgeInsets.zero,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.red,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                          10),
+                                                                ),
+                                                                child: Obx(() {
+                                                                  return _getImage(
+                                                                      dashboardController
+                                                                          .featuredJobsList[
+                                                                              index]
+                                                                          .imageUrl);
+                                                                })),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            AppText(
+                                                              text: dashboardController
+                                                                  .featuredJobsList[index]
+                                                                  .jobTitle!,
+                                                              isBold: true,
+                                                              isStart: true,
+                                                              textColor:
+                                                                  Constants.textHintColor,
+                                                              textSize: 15,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        AppText(
+                                                          text: dashboardController
+                                                              .featuredJobsList[index]
+                                                              .jobTitle!,
+                                                          isBold: true,
+                                                          isStart: true,
+                                                          textColor: Colors.black,
+                                                          textSize: 20,
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        AppText(
+                                                          text: dashboardController
+                                                              .featuredJobsList[index]
+                                                              .location!,
+                                                          textColor:
+                                                              Constants.textHintColor,
+                                                          isStart: true,
+                                                          textSize: 13,
+                                                        ),
+                                                        const SizedBox(height: 15),
+                                                        Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: <Widget>[
+                                                              AppText(
+                                                                text: dashboardController
+                                                                        .featuredJobsList[
+                                                                            index]
+                                                                        .salary ??
+                                                                    'Empty',
+                                                                textSize: 20,
+                                                                isBold: true,
+                                                                isStart: true,
+                                                              ),
+                                                              const Icon(
+                                                                Icons.keyboard_arrow_right,
+                                                                color:
+                                                                    Constants.textHintColor,
+                                                              )
+                                                            ])
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      }),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ), */
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        AppText(
+                          text: 'Job Offers',
+                          textColor: Colors.black,
+                          isStart: true,
+                          isBold: true,
+                          textSize: 25,
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              Get.toNamed(Routes.RECENT_JOBS, arguments: [
+                                {'categoryId': 0}
+                              ]);
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.search),
+                                AppText(
+                                  text: 'Search',
+                                  textSize: 15,
+                                  isBold: true,
+                                ),
+                              ],
+                            ))
+                        /* InkWell(
+                                      onTap: () {
+                                        
+                                      },
+                                      child: AppText(
+                                        text: 'View More',
+                                        textColor: Constants.primaryColor,
+                                        textSize: 15,
+                                        isBold: true,
+                                      ),
+                                    ), */
+                      ],
+                    ),
+                  ),
+                  /*  const SizedBox(
+                                height: 10,
+                              ), */
+                  if (dashboardController.jobsList.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: SizedBox(
+                        width: size.width,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: dashboardController.jobsList.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return /*  InkWell(
+                                onTap: () =>
+                                    Get.toNamed(Routes.JOB_DETAILS, arguments: [
+                                      {
+                                        'offerID': dashboardController
+                                            .jobsList[index].id,
+                                        'type': 'offer'
+                                      }
+                                    ]),
+                                child: */
+                                jobItemView(
+                              size: size,
+                              offerID: dashboardController.jobsList[index].id,
+                              jobTitle:
+                                  dashboardController.jobsList[index].title,
+                              address:
+                                  dashboardController.jobsList[index].branch,
+                              salaryRange:
+                                  dashboardController.jobsList[index].rateHour,
+                              jobPostTime:
+                                  dashboardController.jobsList[index].createdAt,
+                              //)
+                            );
+                          },
+                        )
+                        /*  Obx(() {
+                                    return ListView.separated(
+                                        shrinkWrap: true,
+                                        itemCount:
+                                            dashboardController.recentJobsList.length,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        separatorBuilder: (context, index) {
+                                          return const Divider(
+                                            height: 1,
+                                          );
+                                        },
+                                        itemBuilder: (context, index) {
+                                          return RecentJobsItemView(
+                                            dashboardController: dashboardController,
+                                            size: size,
+                                            index: index,
+                                          );
+                                        });
+                                  }) */
+                        ,
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Center(
+                        child: AppText(
+                          text: 'No Offers Yet',
+                          isBold: true,
+                          textSize: 25,
+                        ),
+                      ),
+                    )
+                ],
+              ),
+            ),
+          );
+        })
+        /*  Obx(() {
           return Visibility(
             visible: dashboardController.isLoaded.value,
             replacement: const Center(
@@ -1230,7 +1267,7 @@ class DashboardActivity extends StatelessWidget {
             ),
           );
         }) */
-    );
+        );
   }
 
   Widget navDrawer() {
@@ -1239,67 +1276,64 @@ class DashboardActivity extends StatelessWidget {
         backgroundColor: Constants.backgroundColor,
         child: Stack(
           children: <Widget>[
-            Obx(() {
-              return Stack(
-                children: [
-                  UserAccountsDrawerHeader(
-                    accountName: AppText(
-                      text: dashboardController
-                          .userName.value.capitalizeFirstofEach,
-                      textColor: Colors.white,
-                      textSize: 18,
+            Stack(
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: AppText(
+                    text: dashboardController
+                        .userName.value.capitalizeFirstofEach,
+                    textColor: Colors.white,
+                    textSize: 18,
+                    isBold: true,
+                  ),
+                  accountEmail: AppText(
+                    text: dashboardController.userEmail.value,
+                    textColor: Colors.white,
+                    textSize: 16,
+                  ),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: Constants.secondaryColor,
+                    child: AppText(
+                      text: dashboardController.userName.value[0].inCaps,
+                      textSize: 25,
                       isBold: true,
                     ),
-                    accountEmail: AppText(
-                      text: dashboardController.userEmail.value,
-                      textColor: Colors.white,
-                      textSize: 16,
-                    ),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundColor: Constants.secondaryColor,
-                      child: AppText(
-                        text: dashboardController.userName.value[0].inCaps,
-                        textSize: 25,
-                        isBold: true,
-                      ),
-                    ),
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 10,
-                    child: IconButton(
-                        onPressed: () async {
-                          _globalKey.currentState!.openEndDrawer();
-                          var text = await Get.to(
-                            () => ProfileActivity(),
-                          );
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 10,
+                  child: IconButton(
+                      onPressed: () async {
+                        _globalKey.currentState!.openEndDrawer();
+                        var text = await Get.toNamed(Routes.PROFILE);
 
-                          if (text == 'refresh') {
-                            dashboardController.fetchDashboardData(
-                                dashboardController.token.value);
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.edit_sharp,
-                          color: Colors.white,
-                        )),
-                  ),
-                  Positioned(
-                      top: 5,
-                      right: 5,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              AppText(
-                                text: 'Available?',
-                                textColor: Colors.white,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              /*  ToggleButtons(isSelected: const [
+                        if (text == 'refresh') {
+                          dashboardController.fetchDashboardData(
+                              SharedPrefsManager.getUserToken);
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.edit_sharp,
+                        color: Colors.white,
+                      )),
+                ),
+                Positioned(
+                    top: 5,
+                    right: 5,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            AppText(
+                              text: 'Available?',
+                              textColor: Colors.white,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            /*  ToggleButtons(isSelected: const [
                                 false,
                                 false
                               ], children: [
@@ -1313,18 +1347,28 @@ class DashboardActivity extends StatelessWidget {
                                 ),
                               ]) */
 
-                              Switch(
-                                  activeColor: Constants.secondaryColor,
-                                  value: dashboardController.isAvailable.value,
-                                  onChanged: (value) {
-                                    dashboardController.isAvailable.value =
-                                        value;
-                                    if (dashboardController
-                                        .isAvailable.isFalse) {
-                                      openDurationDialog();
-                                    }
-                                  })
-                              /*  ToggleSwitch(
+                            GetX<DashBoardController>(
+                              init: DashBoardController(),
+                              initState: (_) {},
+                              builder: (_) {
+                                return Switch(
+                                    activeColor: Constants.secondaryColor,
+                                    value:
+                                        dashboardController.isAvailable.value,
+                                    onChanged: (value) {
+                                      dashboardController.isAvailable.value =
+                                          value;
+                                      if (dashboardController
+                                          .isAvailable.isFalse) {
+                                        DialogHelper.openDurationDialog();
+                                      } else {
+                                        AuthApis.setUserAvailability(
+                                            SharedPrefsManager.getUserToken, 0);
+                                      }
+                                    });
+                              },
+                            )
+                            /*  ToggleSwitch(
                                 minWidth: 45,
                                 minHeight: 25,
                                 totalSwitches: 2,
@@ -1354,96 +1398,102 @@ class DashboardActivity extends StatelessWidget {
                                   }
                                 },
                               ), */
-                            ],
+                          ],
+                        ),
+                      ],
+                    ))
+              ],
+            ),
+            GetX<DashBoardController>(
+              init: DashBoardController(),
+              initState: (_) {},
+              builder: (_) {
+                return Center(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: dashboardController.navModelList.length,
+                    itemBuilder: ((context, index) {
+                      return ListTile(
+                          contentPadding: const EdgeInsets.only(left: 20),
+                          leading: Obx(
+                            () => Image.asset(
+                              dashboardController.navModelList[index].getIcon,
+                              color: dashboardController
+                                      .navModelList[index].getIsSelected
+                                  ? Constants.secondaryColor
+                                  : Constants.primaryColor,
+                              width: 24,
+                              height: 24,
+                            ),
                           ),
-                        ],
-                      ))
-                ],
-              );
-            }),
-            Center(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: dashboardController.navModelList.length,
-                itemBuilder: ((context, index) {
-                  return ListTile(
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      leading: Obx(
-                        () => Image.asset(
-                          dashboardController.navModelList[index].getIcon,
-                          color: dashboardController
-                                  .navModelList[index].getIsSelected
-                              ? Constants.secondaryColor
-                              : Constants.primaryColor,
-                          width: 24,
-                          height: 24,
-                        ),
-                      ),
-                      title: Obx(
-                        () => AppText(
-                          text: dashboardController
-                              .navModelList[index].getNavName,
-                          textSize: 18,
-                          isStart: true,
-                          textColor: dashboardController
-                                  .navModelList[index].getIsSelected
-                              ? Constants.secondaryColor
-                              : const Color.fromRGBO(18, 114, 127, 1),
-                        ),
-                      ),
-                      onTap: () async {
-                        // dashboardController.selectedIndex.value = index;
+                          title: Obx(
+                            () => AppText(
+                              text: dashboardController
+                                  .navModelList[index].getNavName,
+                              textSize: 18,
+                              isStart: true,
+                              textColor: dashboardController
+                                      .navModelList[index].getIsSelected
+                                  ? Constants.secondaryColor
+                                  : const Color.fromRGBO(18, 114, 127, 1),
+                            ),
+                          ),
+                          onTap: () async {
+                            // dashboardController.selectedIndex.value = index;
 
-                        // dashboardController.navModelList[index].setIsSelected =
-                        //     true;
+                            // dashboardController.navModelList[index].setIsSelected =
+                            //     true;
 
-                        for (int i = 0;
-                            i < dashboardController.navModelList.length;
-                            i++) {
-                          if (i == index) {
-                            dashboardController.navModelList[i].setIsSelected =
-                                true;
-                          } else {
-                            dashboardController.navModelList[i].setIsSelected =
-                                false;
-                          }
-                        }
+                            for (int i = 0;
+                                i < dashboardController.navModelList.length;
+                                i++) {
+                              if (i == index) {
+                                dashboardController
+                                    .navModelList[i].setIsSelected = true;
+                              } else {
+                                dashboardController
+                                    .navModelList[i].setIsSelected = false;
+                              }
+                            }
 
-                        switch (index) {
-                          case 0:
-                            _globalKey.currentState!.openEndDrawer();
-                            Get.to(() => MyJobsActivity());
-                            // dashboardController.resetNav();
-                            break;
-                          case 1:
-                            _globalKey.currentState!.openEndDrawer();
-                            Get.to(() => const RecentJobs(),
-                                arguments: {'more': true});
-                            break;
+                            switch (index) {
+                              case 0:
+                                _globalKey.currentState!.openEndDrawer();
+                                Get.toNamed(Routes.MY_JOBS);
+                                // dashboardController.resetNav();
+                                break;
+                              case 1:
+                                _globalKey.currentState!.openEndDrawer();
+                                Get.toNamed(Routes.RECENT_JOBS, arguments: [
+                                  {'categoryId': 0}
+                                ]);
+                                break;
 
-                          case 2:
-                            _globalKey.currentState!.openEndDrawer();
-                            Get.to(() => ArchivedJobsActivity());
-                            // _globalKey.currentState!.openEndDrawer();
-                            // dashboardController.resetNav();
-                            break;
-                          case 3:
-                            _globalKey.currentState!.openEndDrawer();
-                            Get.to(() => BranchesActivity());
+                              /*  case 2:
+                                _globalKey.currentState!.openEndDrawer();
+                                Get.to(() => ArchivedJobsActivity());
+                                // _globalKey.currentState!.openEndDrawer();
+                                // dashboardController.resetNav();
+                                break; */
+                              case 2:
+                                _globalKey.currentState!.openEndDrawer();
+                                Get.toNamed(Routes.BRANCHES);
 
-                            // dashboardController.resetNav();
-                            break;
-                          case 4:
-                            _globalKey.currentState!.openEndDrawer();
-                            Get.to(() => ResumeViewActivity());
-                            break;
-                          default:
-                            Get.back();
-                        }
-                      });
-                }),
-              ),
+                                // dashboardController.resetNav();
+                                break;
+                              case 3:
+                                _globalKey.currentState!.openEndDrawer();
+                                Get.toNamed(Routes.VIEW_RESUME);
+                                break;
+                              default:
+                                Get.back();
+                            }
+                          });
+                    }),
+                  ),
+                );
+              },
             ),
             Positioned(
                 left: 90,
@@ -1453,7 +1503,6 @@ class DashboardActivity extends StatelessWidget {
                 child: TextButton(
                   onPressed: () {
                     SharedPrefsManager.userLogout();
-                    Get.off(() => LoginActivity());
                   },
                   style: TextButton.styleFrom(
                       // padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -1473,119 +1522,143 @@ class DashboardActivity extends StatelessWidget {
     );
   }
 
-  openDurationDialog() {
-    showDialog(
-        context: Get.overlayContext!,
-        builder: (context) {
-          return AlertDialog(
-            title: AppText(
-              text: 'Select Duration',
-              isBold: true,
-              textSize: 18,
-            ),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            content: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Obx(() {
-                  return Column(
+  jobItemView(
+      {Size? size,
+      String? jobTitle,
+      bool? isSaved = false,
+      int? offerID,
+      String? address,
+      String? salaryRange,
+      DateTime? jobPostTime}) {
+    return Container(
+      width: size!.width,
+      decoration: const BoxDecoration(color: Colors.white, border: Border()),
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.grey.shade300,
+                    child: Image.asset(
+                      Constants.splashLogo,
+                      width: 23,
+                      height: 23,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TableCalendar(
-                          rangeStartDay: dashboardController.rangeStart.value,
-                          rangeEndDay: dashboardController.rangeEnd.value,
-                          rangeSelectionMode:
-                              dashboardController.rangeSelectionMode.value,
-                          startingDayOfWeek: StartingDayOfWeek.monday,
-                          headerStyle: const HeaderStyle(
-                              titleCentered: true, formatButtonVisible: false),
-                          focusedDay: dashboardController.focusedDay.value,
-                          firstDay: DateTime.now(),
-                          selectedDayPredicate: (day) {
-                            return isSameDay(
-                                dashboardController.focusedDay.value, day);
-                          },
-                          onDaySelected: ((selectedDay, focusedDay) {
-                            if (!isSameDay(
-                                dashboardController.selectedDay.value,
-                                selectedDay)) {
-                              dashboardController.selectedDay.value =
-                                  selectedDay;
-                              dashboardController.focusedDay.value = focusedDay;
-                              dashboardController.rangeStart.value =
-                                  null; // Important to clean those
-                              dashboardController.rangeEnd.value = null;
-                              dashboardController.rangeSelectionMode.value =
-                                  RangeSelectionMode.toggledOff;
-                            }
-                          }),
-                          onRangeSelected: ((start, end, focusedDay) {
-                            if (start != null && end != null) {
-                              dashboardController.selectedDay.value = null;
-                              dashboardController.focusedDay.value = focusedDay;
-                              dashboardController.rangeStart.value = start;
-                              dashboardController.rangeSelectionMode.value =
-                                  RangeSelectionMode.toggledOn;
-
-                              print(
-                                  'Your range start from ${dashboardController.rangeStart.value}');
-                              print(
-                                  'Your range end at ${dashboardController.rangeEnd.value}');
-                            }
-                          }),
-                          onPageChanged: (focusedDay) {
-                            dashboardController.focusedDay.value = focusedDay;
-                          },
-                          lastDay: DateTime.utc(2100, 3, 30)),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Divider(
-                        height: 1,
-                        color: Colors.grey,
+                      InkWell(
+                        onTap: () {
+                          Get.toNamed(Routes.NOTIFICATION_DETAILS, arguments: [
+                            {'offerID': offerID, 'type': 'offer'}
+                          ]);
+                        },
+                        child: SizedBox(
+                          width: size.width / 1.7,
+                          child: AppText(
+                            text: jobTitle!,
+                            textColor: Colors.black,
+                            textSize: 18,
+                            isBold: true,
+                            isStart: true,
+                          ),
+                        ),
                       ),
                       const SizedBox(
-                        height: 15,
+                        height: 2,
                       ),
-                      RichText(
-                          text: TextSpan(
-                              text: 'Note: ',
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15),
-                              children: [
-                            TextSpan(
-                                text:
-                                    'You will not receive any notification while you will be away',
-                                style: TextStyle(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.normal)),
-                          ])),
+                      AppText(
+                        text: address!,
+                        textColor: Colors.grey,
+                        textSize: 16,
+                        isStart: true,
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                      AppText(
+                        text: '\$$salaryRange / h',
+                        textColor: Constants.secondaryColor,
+                        textSize: 16,
+                        isStart: true,
+                      )
                     ],
-                  );
-                })),
-            actions: [
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                    // padding: const EdgeInsets.symmetric(horizontal: 30),
-                    backgroundColor: Constants.buttonBackgroundColor,
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25))),
-                child: AppText(
-                  text: 'Confirm',
-                  isBold: true,
-                  textSize: 15,
+                  ),
+                ],
+              ),
+              /*  IconButton(
+                splashRadius: 10,
+                splashColor: Colors.transparent,
+                padding: EdgeInsets.zero,
+                onPressed: () async {
+                  dashboardController.saveProject(offerID!, 1);
+                },
+                icon: Icon(
+                  isSaved! ? Icons.favorite : Icons.favorite_outline,
+                  color: Constants.primaryColor,
                 ),
-              )
+              ) */
             ],
-            insetPadding: const EdgeInsets.all(10),
-          );
-        });
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Divider(height: 1, color: Colors.grey),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              buildBottomRowItem('24 Dec - 4 Jan', icon: Icons.calendar_month),
+              buildBottomRowItem('Temp', icon: Icons.shopping_bag_rounded),
+              buildBottomRowItem(
+                  Constants.timeAgo(
+                      DateTime.parse(jobPostTime!.toIso8601String())),
+                  textColor: Colors.grey),
+            ],
+          )
+        ],
+      ),
+    );
   }
+}
+
+buildBottomRowItem(String data, {IconData? icon, Color? textColor}) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      icon != null
+          ? Icon(
+              icon,
+              color: Colors.black,
+            )
+          : const SizedBox(),
+      const SizedBox(
+        width: 5,
+      ),
+      AppText(
+        text: data,
+        textColor: textColor ?? Colors.black,
+        textSize: 14,
+      )
+    ],
+  );
+}
 
   /*  Widget _getImage(String? s) {
     if (s == null) {
@@ -1600,7 +1673,7 @@ class DashboardActivity extends StatelessWidget {
       );
     }
   }*/
-}
+
 
 /* class RecentJobsItemView extends StatelessWidget {
   const RecentJobsItemView(

@@ -46,9 +46,11 @@ class ProfileActivity extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
                               backgroundColor: Constants.secondaryColor,
                               radius: 70,
+                              child:
+                                  Image.asset(Constants.placeholderUserImage),
                             ),
                             const SizedBox(
                               height: 10,
@@ -182,10 +184,11 @@ class ProfileActivity extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                Center(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: RichText(
                       text: TextSpan(
-                          text: 'Do you want to change your password? ',
+                          text: 'Change password? ',
                           style: const TextStyle(
                               color: Colors.black, fontSize: 15),
                           children: [
@@ -216,8 +219,8 @@ class ProfileActivity extends StatelessWidget {
         Container(
           padding: const EdgeInsets.only(top: 5, bottom: 30),
           width: size.width,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
             ),
@@ -238,31 +241,10 @@ class ProfileActivity extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   height: 120,
-                  child: Stack(
-                    children: [
-                      const CircleAvatar(
-                        radius: 80,
-                        backgroundColor: Constants.secondaryColor,
-                      ),
-                      Positioned(
-                          bottom: 2,
-                          right: 0.5,
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(30)),
-                                  color: Colors.red),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                                size: 25,
-                              ),
-                            ),
-                          )),
-                    ],
+                  child: CircleAvatar(
+                    radius: 80,
+                    backgroundColor: Constants.secondaryColor,
+                    child: Image.asset(Constants.placeholderUserImage),
                   ),
                 ),
                 Padding(
@@ -313,6 +295,8 @@ class ProfileActivity extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
+                            enabled: false,
+                            readOnly: true,
                             controller:
                                 profileController.phoneNumberTextController,
                             keyboardType: TextInputType.phone,
@@ -323,13 +307,13 @@ class ProfileActivity extends StatelessWidget {
                               isDense: true,
                               hintText: "Phone Number",
                             ),
-                            onSaved: (value) {
+                            /*    onSaved: (value) {
                               profileController.phoneNumberText.value = value!;
                             },
                             validator: (value) {
                               return profileController
                                   .validatePhoneTextField(value!);
-                            },
+                            }, */
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
@@ -468,8 +452,8 @@ class ProfileActivity extends StatelessWidget {
       Container(
           padding: const EdgeInsets.only(top: 5, bottom: 30),
           width: size.width,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
             ),
@@ -479,10 +463,8 @@ class ProfileActivity extends StatelessWidget {
             key: profileController.resetPasswordFormKey,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Column
-              (
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
-              
                 children: [
                   Container(
                     margin: const EdgeInsets.only(top: 5, bottom: 50),

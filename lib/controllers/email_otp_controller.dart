@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 
-import '../api_services/rest_api_services.dart';
+
 
 class EmailOTPController extends GetxController {
   var otpText = ''.obs;
@@ -11,6 +13,7 @@ class EmailOTPController extends GetxController {
   var seconds = 30.obs;
   // var status = ''.obs;
   var email = ''.obs;
+  var code = ''.obs;
 
   @override
   void onInit() {
@@ -18,6 +21,7 @@ class EmailOTPController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     email.value = Get.arguments['email'];
+    code.value = Get.arguments['code'];
     timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (seconds.value != 0) {
         seconds.value--;
@@ -29,8 +33,9 @@ class EmailOTPController extends GetxController {
   }
 
   verifyOTP(String otp) async {
-    if (otp.isNotEmpty) {
-      await RestApiServices.verifyEmailOTP(email.value, otp);
+    if (otp.isNotEmpty && otp == code.value) {
+      Get.toNamed(Routes.RESET_PASSWORD,
+          arguments: {'email': email.value, 'code': code.value});
     }
   }
 
@@ -38,7 +43,7 @@ class EmailOTPController extends GetxController {
     if (enableResend.isTrue) {
       enableResend.value = false;
       seconds.value = 30;
-      await RestApiServices.sendEmailForOTP(email.value);
+      code.value = (await AuthApis.getCode(email.value))!;
     }
   }
 }

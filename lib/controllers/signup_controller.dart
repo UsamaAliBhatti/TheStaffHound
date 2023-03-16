@@ -5,11 +5,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:the_staff_hound/api_services/auth_service/auth_api.dart';
-import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
 import 'package:the_staff_hound/network_manager/network_state_manager.dart';
 
 class SignUpController extends GetxController {
-  var branches = BranchesResponse().obs;
+  var branches = <Branch>[].obs;
   var dropdownItemsList = <MultiSelectItem>[].obs;
   var selectedBranchesList = <int>[].obs;
 
@@ -61,6 +60,7 @@ class SignUpController extends GetxController {
     countryTextController = TextEditingController();
     stateTextController = TextEditingController();
     cityTextController = TextEditingController();
+    addBranches();
     getBranchesList();
 
     super.onInit();
@@ -125,11 +125,15 @@ class SignUpController extends GetxController {
     /* Address = '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}'; */
   }
 
+  addBranches() {
+    branches.add(Branch(id: 7, branchName: 'Branch1'));
+    branches.add(Branch(id: 8, branchName: 'Branch2'));
+  }
+
 //method to get branches
-  getBranchesList() async {
-    branches.value = (await AuthApis.getAllBranches())!;
-    dropdownItemsList.value = branches.value.data!.map((branch) {
-      return MultiSelectItem(branch, branch.name!);
+  getBranchesList() {
+    dropdownItemsList.value = branches.map((branch) {
+      return MultiSelectItem(branch, branch.branchName);
     }).toList();
   }
 
@@ -324,4 +328,18 @@ class SignUpController extends GetxController {
         backgroundColor: Colors.red,
         textColor: Colors.white);
   }
+}
+
+class Branch {
+  int id;
+  String branchName;
+
+  Branch({required this.id, required this.branchName});
+  get getId => id;
+
+  set setId(id) => this.id = id;
+
+  get getBranchName => branchName;
+
+  set setBranchName(branchName) => this.branchName = branchName;
 }

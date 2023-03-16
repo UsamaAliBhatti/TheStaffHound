@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:the_staff_hound/api_services/response_models/resume_response.dart';
-import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:intl/intl.dart';
+import 'package:the_staff_hound/api_services/resume_service/resume_apis.dart';
+import 'package:the_staff_hound/api_services/resume_service/resume_model.dart';
 import 'package:the_staff_hound/models/education_model.dart';
 import 'package:the_staff_hound/models/experience_model.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
@@ -33,23 +33,30 @@ class ResumeViewController extends GetxController {
     super.onInit();
   }
 
+  final DateFormat format = DateFormat('yyyy-MM-dd');
   getResume(String token) async {
     isLoaded.value = false;
-    var response = await RestApiServices.getUserResume(token);
+    var response = await ResumeApis.getMyResume(token);
     if (response != null) {
       isEmpty.value = false;
       isLoaded.value = true;
-      ResumeResponse resumeResponse = response;
-      aboutMe.value = resumeResponse.aboutMe!;
-      skillsList.value = jsonDecode(resumeResponse.skills!).cast<String>();
-      languagesList.value = jsonDecode(resumeResponse.languages!);
+      var resumeResponse = resumeModelFromJson(response);
+      aboutMe.value = resumeResponse.data[0].aboutMe;
+      skillsList.value = getStringList(resumeResponse.data[0].skills);
+      languagesList.value = getStringList(resumeResponse.data[0].languages);
 
       experienceList.value = List<UserExperienceModel>.from(
-          jsonDecode(resumeResponse.experience!)
-              .map((element) => UserExperienceModel.fromJson(element)));
+          resumeResponse.data[0].experience.map((e) => UserExperienceModel(
+              e.designation,
+              e.company,
+              format.format(e.startDate),
+              e.endDate != null ? format.format(e.endDate) : null)));
       educationList.value = List<UserEducation>.from(
-          jsonDecode(resumeResponse.education!)
-              .map((element) => UserEducation.fromJson(element)));
+          resumeResponse.data[0].education.map((e) => UserEducation(
+              e.qualification,
+              e.institute,
+              format.format(e.startDate),
+              e.endDate != null ? format.format(e.endDate) : null)));
 
       /*  print(skillsList);
       print(experienceList);
@@ -62,5 +69,10 @@ class ResumeViewController extends GetxController {
         //Get.off(() => LoginActivity());
       });
     }
+  }
+
+  List<String> getStringList(String data) {
+    final removedBrackets = data.substring(1, data.length - 1);
+    return removedBrackets.split(',');
   }
 }

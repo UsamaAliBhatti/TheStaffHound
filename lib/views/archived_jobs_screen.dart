@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/archived_jobs_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
-import 'package:the_staff_hound/views/job_details_screen.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
+import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
 class ArchivedJobsActivity extends StatelessWidget {
   final controller = Get.put(ArchivedJobsController());
@@ -49,13 +50,17 @@ class ArchivedJobsActivity extends StatelessWidget {
               itemCount: controller.archivedJobsList.length,
               itemBuilder: (context, index) {
                 return InkWell(
-                  onTap: (() {
-                    Get.to(() => JobDetailsActivity(), arguments: [
+                  onTap: (() async {
+                    var refresh =
+                        await Get.toNamed(Routes.JOB_DETAILS, arguments: [
                       {
-                        'jobId': controller.archivedJobsList[index].id,
-                        'status': 'new'
+                        'offerID': controller.archivedJobsList[index].id,
                       }
                     ]);
+                    if (refresh == 'refresh') {
+                      controller
+                          .fetchArchivedJobs(SharedPrefsManager.getUserToken);
+                    }
                   }),
                   child: Stack(
                     children: [
@@ -96,7 +101,7 @@ class ArchivedJobsActivity extends StatelessWidget {
                                   children: <Widget>[
                                     AppText(
                                       text: controller
-                                          .archivedJobsList[index].jobTitle!,
+                                          .archivedJobsList[index].title,
                                       isBold: true,
                                       isStart: true,
                                       textColor: Colors.black,
@@ -107,7 +112,7 @@ class ArchivedJobsActivity extends StatelessWidget {
                                     ),
                                     AppText(
                                       text: controller
-                                          .archivedJobsList[index].location!,
+                                          .archivedJobsList[index].branch,
                                       textColor: Constants.textHintColor,
                                       isStart: true,
                                       textSize: 13,
@@ -117,8 +122,7 @@ class ArchivedJobsActivity extends StatelessWidget {
                                     ),
                                     AppText(
                                       text: controller
-                                              .archivedJobsList[index].salary ??
-                                          'Empty',
+                                          .archivedJobsList[index].rateHour,
                                       textSize: 18,
                                       isBold: true,
                                       isStart: true,
@@ -136,17 +140,20 @@ class ArchivedJobsActivity extends StatelessWidget {
                           child: Row(
                             children: [
                               IconButton(
-                                  onPressed: () {
-                                    Get.to(
-                                      () => JobDetailsActivity(),
+                                  onPressed: () async {
+                                    var isRefresh = await Get.toNamed(
+                                      Routes.JOB_DETAILS,
                                       arguments: [
                                         {
-                                          'jobId': controller
+                                          'offerID': controller
                                               .archivedJobsList[index].id,
-                                          'status': 'new'
                                         }
                                       ],
                                     );
+                                    if (isRefresh == 'refresh') {
+                                      controller.fetchArchivedJobs(
+                                          SharedPrefsManager.getUserToken);
+                                    }
                                   },
                                   icon: const Icon(
                                     Icons.remove_red_eye_rounded,

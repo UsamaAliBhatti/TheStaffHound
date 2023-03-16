@@ -7,7 +7,6 @@ import 'package:the_staff_hound/network_manager/network_binding.dart';
 import 'package:the_staff_hound/notification_handler/notification_manager.dart';
 import 'package:the_staff_hound/routes/app_pages.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
-import 'package:the_staff_hound/views/job_details_screen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
@@ -15,11 +14,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print(message.notification!.body);
 /*     final title = message.notification!.title;
     final body = message.notification!.body; */
-    if (message.data['notify_type'] == 'new_job') {
-      Get.to(() => JobDetailsActivity(), arguments: [
-        {"jobId": int.parse(message.data['job_id'])}
-      ]);
-    }
+
+    Get.toNamed(Routes.NOTIFICATIONS);
   }
 }
 
@@ -36,8 +32,6 @@ void main() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onMessage.listen((message) {
     if (message.notification != null) {
-      print(message.notification!.title);
-      print(message.notification!.body);
       /*  final title = message.notification!.title;
       final body = message.notification!.body; */
       /*  if (message.data['notify_type'] == 'new_job') {
@@ -52,11 +46,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    if (message.data['notify_type'] == 'new_job') {
-      Get.to(() => JobDetailsActivity(), arguments: [
-        {"jobId": int.parse(message.data['job_id'])}
-      ]);
-    }
+    Get.toNamed(Routes.NOTIFICATIONS);
   });
 
   await SharedPrefsManager.init();
@@ -75,10 +65,11 @@ class MyApp extends StatelessWidget {
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
       theme: ThemeData(
-          primarySwatch: createMaterialColor(Constants.primaryColor),
           primaryColor: Constants.primaryColor,
-          backgroundColor: Constants.backgroundColor,
-          fontFamily: 'Lato'),
+          fontFamily: 'Lato',
+          colorScheme: ColorScheme.fromSwatch(
+                  primarySwatch: createMaterialColor(Constants.primaryColor))
+              .copyWith(background: Constants.backgroundColor)),
     );
   }
 }

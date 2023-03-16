@@ -4,6 +4,7 @@ import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/controllers/view_resume_controller.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/main.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 import 'package:the_staff_hound/views/create_resume_screen.dart';
 
 import '../shared_prefs/shared_prefs.dart';
@@ -20,7 +21,7 @@ class ResumeViewActivity extends StatelessWidget {
     var size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-          // backgroundColor: Constants.backgroundColor,
+          backgroundColor: Constants.backgroundColor,
           appBar: AppBar(
             title: AppText(
               text: 'My Resume',
@@ -39,9 +40,17 @@ class ResumeViewActivity extends StatelessWidget {
                     color: Colors.white, size: 25)),
           ),
           body: Obx(() {
-            return SizedBox(
-              width: size.width,
-              height: size.height,
+            return Visibility(
+              visible: resumeController.isLoaded.isTrue &&
+                  resumeController.isEmpty.isFalse,
+              replacement: (resumeController.isLoaded.isFalse &&
+                      resumeController.isEmpty.isTrue)
+                  ? emptyDataScreen(size)
+                  : const Center(
+                      child: CircularProgressIndicator(
+                        color: Constants.secondaryColor,
+                      ),
+                    ),
               child: Column(
                 children: [
                   Expanded(
@@ -259,8 +268,9 @@ class ResumeViewActivity extends StatelessWidget {
                                 height: 20,
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
                                 child: AppText(
                                   text: 'Summary',
                                   textColor: Constants.primaryColor,
@@ -268,6 +278,9 @@ class ResumeViewActivity extends StatelessWidget {
                                   isBold: true,
                                   isStart: true,
                                 ),
+                              ),
+                              const SizedBox(
+                                height: 10,
                               ),
                               resumeController.aboutMe.isNotEmpty
                                   ? Padding(
@@ -281,6 +294,9 @@ class ResumeViewActivity extends StatelessWidget {
                                       ),
                                     )
                                   : const SizedBox(),
+                              const SizedBox(
+                                height: 10,
+                              ),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
@@ -292,6 +308,9 @@ class ResumeViewActivity extends StatelessWidget {
                                   isStart: true,
                                 ),
                               ),
+                              const SizedBox(
+                                height: 10,
+                              ),
                               resumeController.skillsList.isNotEmpty
                                   ? Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -299,6 +318,9 @@ class ResumeViewActivity extends StatelessWidget {
                                       child: generateSkillsListView(),
                                     )
                                   : const SizedBox(),
+                              const SizedBox(
+                                height: 10,
+                              ),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
@@ -310,7 +332,14 @@ class ResumeViewActivity extends StatelessWidget {
                                   isStart: true,
                                 ),
                               ),
-                              generateUserExperienceListView(),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: generateUserExperienceListView(),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
@@ -322,7 +351,14 @@ class ResumeViewActivity extends StatelessWidget {
                                   isStart: true,
                                 ),
                               ),
-                              generateEducationListVIew(),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: generateEducationListVIew(),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
@@ -344,366 +380,55 @@ class ResumeViewActivity extends StatelessWidget {
                     ],
                   )),
                   Container(
-                    margin: const EdgeInsets.all(20),
-                    width: size.width,
-                    height: 60,
-                    child: TextButton(
-                        onPressed: () async {
-                          /* final data = await resumeController.createResumePdf();
-                                  resumeController.saveAndViewPdf(data);
-                                  print(Icons.home.codePoint); */
-                          // resumeController.createResume();
-                          var text = await Get.to(() => CreateResumeActivity());
-                          print(text);
-                          if (text == 'refresh') {
-                            resumeController
-                                .getResume(resumeController.userToken.value);
-                          }
-                        },
-                        style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            backgroundColor: Constants.secondaryColor,
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30))),
-                        child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              AppText(
-                                text: 'Edit',
-                                textSize: 20,
-                                isBold: true,
-                                textColor: Colors.white,
-                              )
-                            ])),
+                    color: Colors.white,
+                    child: Container(
+                      margin: const EdgeInsets.all(20),
+                      width: size.width,
+                      height: 60,
+                      color: Colors.white,
+                      child: TextButton(
+                          onPressed: () async {
+                            /* final data = await resumeController.createResumePdf();
+                                    resumeController.saveAndViewPdf(data);
+                                    print(Icons.home.codePoint); */
+                            // resumeController.createResume();
+                            var text = await Get.toNamed(Routes.CREATE_RESUME);
+                            print(text);
+                            if (text == 'refresh') {
+                              resumeController
+                                  .getResume(resumeController.userToken.value);
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              backgroundColor: Constants.secondaryColor,
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
+                          child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                AppText(
+                                  text: 'Edit',
+                                  textSize: 20,
+                                  isBold: true,
+                                  textColor: Colors.white,
+                                )
+                              ])),
+                    ),
                   )
                 ],
               ),
-
-              /* Stack(
-                children: [
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: ListView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: [
-                        Container(
-                          width: size.width,
-                          decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              boxShadow: const [
-                                BoxShadow(
-                                    color: Constants.textHintColor,
-                                    offset: Offset(0, 1),
-                                    blurRadius: 1)
-                              ]),
-                          padding: const EdgeInsets.all(10),
-                          child: Row(children: <Widget>[
-                            Container(
-                              width: 130,
-                              height: 130,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(200),
-                                color: Colors.amber,
-                                /* image: DecorationImage(
-                                              image: FileImage(
-                                                File(
-                                                  resumeController.selectedImagepath.value,
-                                                ),
-                                              ),
-                                              fit: BoxFit.fill) */
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Obx(
-                                    () => AppText(
-                                      text: resumeController.userName.value,
-                                      textColor: Constants.primaryColor,
-                                      isBold: true,
-                                      isStart: true,
-                                      textSize: 23,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      const Icon(
-                                        Icons.phone,
-                                        color: Constants.primaryColor,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Obx(() {
-                                        return AppText(
-                                          text: resumeController
-                                              .userPhone.value,
-                                          textSize: 13,
-                                          textColor: Colors.black,
-                                          isBold: true,
-                                          isStart: true,
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      const Icon(
-                                        Icons.email,
-                                        color: Constants.primaryColor,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Obx(() {
-                                        return Expanded(
-                                          child: AppText(
-                                            text: resumeController
-                                                .userEmail.value,
-                                            textSize: 13,
-                                            textColor: Colors.black,
-                                            isBold: true,
-                                            isStart: true,
-                                          ),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      const Icon(
-                                        Icons.home,
-                                        color: Constants.primaryColor,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Obx(() {
-                                        return Expanded(
-                                          child: AppText(
-                                            text: resumeController
-                                                .userAddress.value,
-                                            textSize: 13,
-                                            textColor: Colors.black,
-                                            isBold: true,
-                                            isStart: true,
-                                          ),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          ]),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 20, left: 10, right: 10, bottom: 5),
-                          child: AppText(
-                            text: 'Summary',
-                            textColor: Constants.primaryColor,
-                            textSize: 20,
-                            isBold: true,
-                            isStart: true,
-                          ),
-                        ),
-
-                        Obx(() {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20.0),
-                            child: AppText(
-                              text: resumeController.aboutMe.value,
-                              textColor: Colors.black,
-                              textSize: 16,
-                              isStart: true,
-                            ),
-                          );
-                        }),
-                        Container(
-                          width: size.width,
-                          height: 1,
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          color: Constants.textHintColor.withOpacity(0.5),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: AppText(
-                            text: 'Education',
-                            textColor: Constants.primaryColor,
-                            textSize: 20,
-                            isBold: true,
-                            isStart: true,
-                          ),
-                        ),
-                        Obx(() {
-                          return generateEducationListVIew();
-                        }),
-                        Container(
-                          width: size.width,
-                          height: 1,
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          color: Constants.textHintColor.withOpacity(0.5),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: AppText(
-                            text: 'Experience',
-                            textColor: Constants.primaryColor,
-                            textSize: 20,
-                            isBold: true,
-                            isStart: true,
-                          ),
-                        ),
-
-                        Obx(() {
-                          return generateUserExperienceListView();
-                        }), //Calling Experience Method
-                        Container(
-                          width: size.width,
-                          height: 1,
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          color: Constants.textHintColor.withOpacity(0.5),
-                        ),
-                        Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: AppText(
-                                        text: 'Skills',
-                                        textColor: Constants.primaryColor,
-                                        textSize: 20,
-                                        isBold: true,
-                                        isStart: true,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Obx(() => generateSkillsListView())
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: AppText(
-                                        text: 'Languages',
-                                        textColor: Constants.primaryColor,
-                                        textSize: 20,
-                                        isBold: true,
-                                        isStart: true,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Obx(() => generateLanguagesListView())
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                      bottom: 30,
-                      right: 1,
-                      child: Container(
-                        margin: const EdgeInsets.all(20),
-                        /* width: 120, */
-                        height: 60,
-                        child: TextButton(
-                            onPressed: () async {
-                              /* final data = await resumeController.createResumePdf();
-                                  resumeController.saveAndViewPdf(data);
-                                  print(Icons.home.codePoint); */
-                              // resumeController.createResume();
-                              var text =
-                                  await Get.to(() => CreateResumeActivity());
-                              print(text);
-                              if (text == 'refresh') {
-                                resumeController.getResume(
-                                    resumeController.userToken.value);
-                              }
-                            },
-                            style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20),
-                                backgroundColor: Constants.secondaryColor,
-                                elevation: 5,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20))),
-                            child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  AppText(
-                                    text: 'Edit',
-                                    textSize: 20,
-                                    isBold: true,
-                                    textColor: Colors.white,
-                                  )
-                                ])),
-                      ))
-                ],
-              ), */
             );
           })),
     );
@@ -717,108 +442,81 @@ class ResumeViewActivity extends StatelessWidget {
         itemCount: resumeController.experienceList.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Constants.primaryColor),
-                  ),
-                  child: Center(
-                    child: AppText(
-                      text: (index + 1).toString(),
-                      isBold: true,
-                      textColor: Constants.secondaryColor,
-                      textSize: 15,
-                    ),
-                  ),
-                ),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    RichText(
-                        text: TextSpan(
-                            text: 'Position: ',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Colors.black),
-                            children: [
-                          TextSpan(
-                            text: resumeController
-                                .experienceList[index].userDesignation,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                color: Colors.black),
-                          )
-                        ])),
-                    RichText(
-                        text: TextSpan(
-                            text: 'Company Name: ',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Colors.black),
-                            children: [
-                          TextSpan(
-                              text: resumeController
-                                  .experienceList[index].companyName,
-                              style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal)),
-                        ])),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(5)),
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        RichText(
-                            text: TextSpan(
-                                text: 'Start Date: ',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Colors.black),
-                                children: [
-                              TextSpan(
-                                  text: resumeController
-                                      .experienceList[index].startDate,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal)),
-                            ])),
-                        RichText(
-                            text: TextSpan(
-                                text: 'End Date: ',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Colors.black),
-                                children: [
-                              TextSpan(
-                                  text: resumeController
-                                      .experienceList[index].endDate,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal)),
-                            ])),
-                      ],
-                    )
+                    (index != (resumeController.experienceList.length - 1))
+                        ? Container(
+                            height: 80,
+                            width: 0.8,
+                            color: Colors.grey,
+                          )
+                        : const SizedBox(),
                   ],
                 ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText(
+                      text: resumeController
+                          .experienceList[index].userDesignation,
+                      textColor: Colors.grey.shade600,
+                      textSize: 16,
+                      isBold: true,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    AppText(
+                      text: resumeController.experienceList[index].companyName,
+                      textColor: Colors.grey.shade600,
+                      textSize: 14,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                          text:
+                              '${resumeController.experienceList[index].startDate} - ',
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
+                          children: [
+                            TextSpan(
+                              text: resumeController
+                                      .experienceList[index].endDate ??
+                                  'present',
+                            )
+                          ]),
+                    )
+                    /* AppText(
+                      text:
+                          '${resumeController.userExperienceList[index].startDate} - $}',
+                      textColor: Colors.grey,
+                      textSize: 12,
+                    ), */
+                  ],
+                ))
               ],
             ),
           );
@@ -833,108 +531,99 @@ class ResumeViewActivity extends StatelessWidget {
         itemCount: resumeController.educationList.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Constants.primaryColor),
-                  ),
-                  child: Center(
-                    child: AppText(
-                      text: (index + 1).toString(),
-                      isBold: true,
-                      textColor: Constants.secondaryColor,
-                      textSize: 15,
-                    ),
-                  ),
-                ),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    RichText(
-                        text: TextSpan(
-                            text: 'Degree: ',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Colors.black),
-                            children: [
-                          TextSpan(
-                            text: resumeController
-                                .educationList[index].qualification,
-                            style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal),
-                          )
-                        ])),
-                    RichText(
-                        text: TextSpan(
-                            text: 'Institute Name: ',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Colors.black),
-                            children: [
-                          TextSpan(
-                              text: resumeController
-                                  .educationList[index].instituteName,
-                              style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal)),
-                        ])),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 1),
+                          borderRadius: BorderRadius.circular(5)),
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        RichText(
-                            text: TextSpan(
-                                text: 'Start Date: ',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Colors.black),
-                                children: [
-                              TextSpan(
-                                  text: resumeController
-                                      .educationList[index].startDate,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal)),
-                            ])),
-                        RichText(
-                            text: TextSpan(
-                                text: 'End Date: ',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Colors.black),
-                                children: [
-                              TextSpan(
-                                  text: resumeController
-                                      .educationList[index].endDate,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal)),
-                            ])),
-                      ],
-                    )
+                    (index != (resumeController.educationList.length - 1))
+                        ? Container(
+                            height: 80,
+                            width: 0.8,
+                            color: Colors.grey,
+                          )
+                        : const SizedBox(),
                   ],
                 ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                          text: 'Degree: ',
+                          style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(
+                                text:
+                                    '${resumeController.educationList[index].qualification}',
+                                style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal))
+                          ]),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                          text: 'Institute Name: ',
+                          style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(
+                                text:
+                                    '${resumeController.educationList[index].instituteName}',
+                                style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal))
+                          ]),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                          text:
+                              '${resumeController.educationList[index].startDate} - ',
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
+                          children: [
+                            TextSpan(
+                              text: (resumeController
+                                      .educationList[index].endDate!.isNotEmpty)
+                                  ? resumeController
+                                      .educationList[index].endDate
+                                  : 'present',
+                            )
+                          ]),
+                    )
+                  ],
+                ))
               ],
             ),
           );
@@ -942,8 +631,13 @@ class ResumeViewActivity extends StatelessWidget {
   }
 
   // user skills list method
-  ListView generateSkillsListView() {
-    return ListView.builder(
+  GridView generateSkillsListView() {
+    return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            mainAxisExtent: 40,
+            maxCrossAxisExtent: 200,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 5),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: resumeController.skillsList.length,
@@ -971,31 +665,33 @@ class ResumeViewActivity extends StatelessWidget {
 
 // Method For Creating Chips
   Widget createChip(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Constants.secondaryColor),
-          ),
-          const SizedBox(
-            width: 5,
-          ),
-          Text(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 5),
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Constants.secondaryColor),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        SizedBox(
+          width: 100,
+          child: Text(
             text,
             style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.normal,
                 fontSize: 15),
             textAlign: TextAlign.start,
-            overflow: TextOverflow.ellipsis,
-          )
-        ],
-      ),
+            overflow: TextOverflow.visible,
+          ),
+        )
+      ],
     );
 
     /*  Chip(

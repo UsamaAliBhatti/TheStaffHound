@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 
@@ -663,8 +662,8 @@ class SignUpActivity extends StatelessWidget {
             onConfirm: (values) {
               controller.selectedBranchesList.value = [];
               for (int i = 0; i < values.length; i++) {
-                Datum datum = values[i] as Datum;
-                controller.selectedBranchesList.add(datum.id!);
+                Branch datum = values[i] as Branch;
+                controller.selectedBranchesList.add(datum.id);
                 print(values);
               }
               print(controller.selectedBranchesList.toJson());

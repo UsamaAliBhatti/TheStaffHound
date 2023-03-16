@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart ';
@@ -7,11 +6,13 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/api_services/resume_service/resume_model.dart';
 import 'package:the_staff_hound/main.dart';
 import 'package:the_staff_hound/models/language_model.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
+import '../api_services/resume_service/resume_apis.dart';
 import '../constants.dart';
 import '../custom_widgets/app_text.dart';
 import '../models/education_model.dart';
@@ -21,7 +22,7 @@ class ResumeController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var selectedImagepath = ''.obs;
   var selectedImageSize = ''.obs;
-
+  final DateFormat format = DateFormat('yyyy-MM-dd');
 // Skills Dialog Parameters
 /*   var skillsList = [
     'Programming',
@@ -33,7 +34,7 @@ class ResumeController extends GetxController
   // var selectedSkill = ''.obs;
   final otherSkillController = TextEditingController();
   var skillFormKey = GlobalKey<FormState>();
-  var userSelectedSkillsList = [].obs;
+  var userSelectedSkillsList = <String>[].obs;
   var tempSkillsList = <String>[].obs;
 
 // Language Dialog Parameters
@@ -51,7 +52,7 @@ class ResumeController extends GetxController
   var languagesList = <LanguageModel>[].obs;
   var tempLanguagesList = <String>[].obs;
   final otherLanguageController = TextEditingController();
-  var userSelectedLanguagesList = [].obs;
+  var userSelectedLanguagesList = <String>[].obs;
   var languageFormKey = GlobalKey<FormState>();
 
 //Experience Dialog Parameters
@@ -150,14 +151,30 @@ class ResumeController extends GetxController
   getResume(String token) async {
     address.value = SharedPrefsManager.getUserAddress ?? '';
     phoneNumber.value = SharedPrefsManager.getUserPhoneNumber ?? '';
-    var response = await RestApiServices.getUserResume(token);
+    var response = await ResumeApis.getMyResume(token);
     if (response != null) {
-      aboutMeText.value = response.aboutMe!;
+      var resume = resumeModelFromJson(response);
+
+      aboutMeText.value = resume.data[0].aboutMe;
       aboutMeTextController.text = aboutMeText.value;
 
-      userSelectedSkillsList.value =
-          jsonDecode(response.skills!).cast<String>();
-      userSelectedLanguagesList.value =
+      userSelectedSkillsList.value = getStringList(resume.data[0].skills);
+      userSelectedLanguagesList.value = getStringList(resume.data[0].languages);
+      userExperienceList.value = List<UserExperienceModel>.from(
+          resume.data[0].experience.map((e) => UserExperienceModel(
+              e.designation,
+              e.company,
+              format.format(e.startDate),
+              e.endDate != null ? format.format(e.endDate) : null)));
+      userEducationsList.value = List<UserEducation>.from(
+          resume.data[0].education.map((e) => UserEducation(
+              e.qualification,
+              e.institute,
+              format.format(e.startDate),
+              e.endDate != null ? format.format(e.endDate) : null)));
+
+      // userSelectedSkillsList.value = jsonDecode(resume.data!.skills!);
+      /*   userSelectedLanguagesList.value =
           jsonDecode(response.languages!).cast<String>();
 
       userExperienceList.value = List<UserExperienceModel>.from(
@@ -165,7 +182,7 @@ class ResumeController extends GetxController
               .map((element) => UserExperienceModel.fromJson(element)));
       userEducationsList.value = List<UserEducation>.from(
           jsonDecode(response.education!)
-              .map((element) => UserEducation.fromJson(element)));
+              .map((element) => UserEducation.fromJson(element))); */
 
       // print(skillsList);
       // print(experienceList);
@@ -198,6 +215,10 @@ class ResumeController extends GetxController
     }
   }
 
+  List<String> getStringList(String data) {
+    final removedBrackets = data.substring(1, data.length - 1);
+    return removedBrackets.split(',');
+  }
 //---------------------------------------------------------------------------------------------//
 //--------------------------------------Education Methods--------------------------------------//
 //---------------------------------------------------------------------------------------------//
@@ -381,10 +402,11 @@ class ResumeController extends GetxController
       return false;
     } else {
       educationFormKey.currentState!.save();
-      if (educationEndDate.isEmpty || educationStartDate.isEmpty) {
-        showToast('Please Enter Start Date or End Date');
+      if (educationStartDate.isEmpty) {
+        showToast('Please Enter Start Date');
         return false;
       } else {
+        print(educationEndDate.value);
         userEducationsList.add(UserEducation(
             qualificationText.value,
             instituteNameText.value,
@@ -407,7 +429,7 @@ class ResumeController extends GetxController
         lastDate: DateTime(2030));
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      educationEndDate.value = DateFormat.yMMMMd().format(pickedDate);
+      educationEndDate.value = format.format(pickedDate);
       update();
     }
   }
@@ -421,7 +443,7 @@ class ResumeController extends GetxController
         lastDate: DateTime.now());
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      educationStartDate.value = DateFormat.yMMMMd().format(pickedDate);
+      educationStartDate.value = format.format(pickedDate);
       update();
     }
   }
@@ -441,7 +463,7 @@ class ResumeController extends GetxController
   Widget educationCalenderOrText() {
     switch (_isEducationContinue.value) {
       case 'true':
-        educationEndDate.value = 'Present';
+        educationEndDate.value = '';
         return InkWell(
           onTap: () {
             chooseEducationEndDate();
@@ -709,8 +731,8 @@ class ResumeController extends GetxController
       return false;
     } else {
       experienceFormKey.currentState!.save();
-      if (experienceStartDate.isEmpty || experienceEndDate.isEmpty) {
-        showToast('Please Enter Start Date or End Date');
+      if (experienceStartDate.isEmpty) {
+        showToast('Please Enter Start Date');
         return false;
       } else {
         userExperienceList.add(UserExperienceModel(
@@ -735,7 +757,7 @@ class ResumeController extends GetxController
         lastDate: DateTime.now());
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      experienceStartDate.value = DateFormat.yMMMMd().format(pickedDate);
+      experienceStartDate.value = format.format(pickedDate);
       update();
     }
   }
@@ -749,7 +771,7 @@ class ResumeController extends GetxController
         lastDate: DateTime(2030));
 
     if (pickedDate != null /* && pickedDate != selectedStartDate.value */) {
-      experienceEndDate.value = DateFormat.yMMMMd().format(pickedDate);
+      experienceEndDate.value = format.format(pickedDate);
       update();
     }
   }
@@ -770,7 +792,7 @@ class ResumeController extends GetxController
   Widget experienceCalenderOrText() {
     switch (_isExperienceContinue.value) {
       case 'true':
-        experienceEndDate.value = 'Present';
+        experienceEndDate.value = '';
         return InkWell(
           onTap: () {
             chooseExperienceEndDate();
@@ -1288,18 +1310,26 @@ class ResumeController extends GetxController
     } else if (userSelectedSkillsList.isEmpty) {
       showToast('Please add some of your skills');
     } else {
-      print(userSelectedLanguagesList);
-      Map<String, String> data = {
+      /* Map<String, dynamic> data = {
         'about_me': aboutMeText.value,
         // 'phone': phoneNumber.value,
         'education': jsonEncode(userEducationsList),
         'skills': jsonEncode(userSelectedSkillsList),
         'experience': jsonEncode(userExperienceList),
-        'language': jsonEncode(userSelectedLanguagesList),
+        'languages': jsonEncode(userSelectedLanguagesList),
         // 'address': address.value
-      };
-      var isCreated = await RestApiServices.createResume(
-          SharedPrefsManager.getUserToken, data);
+      }; */
+
+      // print(data);
+
+      var isCreated = await ResumeApis.createMyResume(
+          SharedPrefsManager.getUserToken,
+          educationList: userEducationsList,
+          experienceList: userExperienceList,
+          aboutMe: aboutMeText.value,
+          skillsList: userSelectedSkillsList,
+          languagesList: userSelectedLanguagesList);
+      print(isCreated);
       if (isCreated!) {
         Get.back(result: 'refresh');
         print('Resume Created Successfully');

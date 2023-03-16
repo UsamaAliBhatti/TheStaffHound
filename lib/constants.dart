@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
 class Constants {
   //base url for api's
-  static const baseUrl = 'https://api.thestaffhound.com/api/';
+  static const baseUrl = 'https://pensive-fermi.157-175-231-72.plesk.page/api/';
   // Custom Colors
-  static const Color backgroundColor = Color(0xffF9F9F9);
+  static Color backgroundColor = Colors.grey.shade100;
   static const Color secondaryColor = Color(0xfff4bd05);
   static const Color primaryColor = Color(0xff12727f);
   static const Color buttonBackgroundColor = Color(0xffECF0F3);
@@ -47,4 +49,45 @@ class Constants {
   static const icBranch = "assets/images/ic_branch.png";
   static const icFavorite = "assets/images/ic_favorite.png";
   static const icFilter = "assets/images/ic_filter.png";
+  static const successImg = "assets/images/success.jpg";
+  static const failedImg = "assets/images/failed.png";
+
+  //Methods
+  static showToast(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Constants.secondaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
+  static String convertDate(String date) {
+    return DateFormat.MMMEd().format(DateTime.parse(date));
+  }
+
+  static String timeAgo(DateTime d) {
+    Duration diff = DateTime.now().difference(d);
+    if (diff.inDays > 365) {
+      return "${(diff.inDays / 365).floor()} ${(diff.inDays / 365).floor() == 1 ? "year" : "years"} ago";
+    }
+    if (diff.inDays > 30) {
+      return "${(diff.inDays / 30).floor()} ${(diff.inDays / 30).floor() == 1 ? "month" : "months"} ago";
+    }
+    if (diff.inDays > 7) {
+      return "${(diff.inDays / 7).floor()} ${(diff.inDays / 7).floor() == 1 ? "week" : "weeks"} ago";
+    }
+    if (diff.inDays > 0) {
+      return "${diff.inDays} ${diff.inDays == 1 ? "day" : "days"} ago";
+    }
+    if (diff.inHours > 0) {
+      return "${diff.inHours} ${diff.inHours == 1 ? "hour" : "hours"} ago";
+    }
+    if (diff.inMinutes > 0) {
+      return "${diff.inMinutes} ${diff.inMinutes == 1 ? "minute" : "minutes"} ago";
+    }
+    return "just now";
+  }
 }

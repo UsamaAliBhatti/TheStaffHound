@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:the_staff_hound/api_services/response_models/archive_jobs_response.dart';
 import 'package:the_staff_hound/api_services/response_models/forgot_password_email_response.dart';
 import 'package:the_staff_hound/api_services/response_models/my_jobs_response.dart';
-import 'package:the_staff_hound/api_services/auth_service/responses/branches_model.dart';
 import 'package:the_staff_hound/api_services/response_models/job_detail_response.dart';
 import 'package:the_staff_hound/api_services/response_models/jobs_response.dart';
 import 'package:the_staff_hound/api_services/response_models/notifications_response.dart';
@@ -389,7 +388,7 @@ class RestApiServices {
   //---------------------------------------------------------------------------------------------------------//
   ////-------------------------------------Method to get saved jobs----------------------------------------////
   //---------------------------------------------------------------------------------------------------------//
-  static Future<List<ArchivedJobsResponse>?> getArchivedJobs(
+/*   static Future<List<ArchivedJobsResponse>?> getArchivedJobs(
       String token) async {
     try {
       var client = http.Client();
@@ -409,11 +408,11 @@ class RestApiServices {
       return null;
     }
   }
-
+ */
   //----------------------------------------------------------------------------------------------------------------//
   ////-------------------------------------Method to get all notifications----------------------------------------////
   //---------------------------------------------------------------------------------------------------------------//
-  static Future<NotificationsResponse?> getAllNotifications(
+ /*  static Future<NotificationsResponse?> getAllNotifications(
       String token) async {
     try {
       var client = http.Client();
@@ -432,7 +431,7 @@ class RestApiServices {
       showToast('Request timeout. Please try again later.');
       return null;
     }
-  }
+  } */
 
   //------------------------------------------------------------------------------------------------------//
   ////-------------------------------------Method to apply for job--------------------------------------////
@@ -595,7 +594,7 @@ class RestApiServices {
 
       var data = forgotPasswordEmailResponseFromJson(response.body);
       if (data.status == 'True') {
-        Get.off(() => const ResetPasswordActivity(), arguments: {
+        Get.off(() =>  ResetPasswordActivity(), arguments: {
           'email': email
         });
       } else {
@@ -620,7 +619,7 @@ class RestApiServices {
 
       var data = forgotPasswordEmailResponseFromJson(response.body);
       if (data.status == 'True') {
-        Get.off(() => const ResetPasswordActivity(), arguments: {
+        Get.off(() =>  ResetPasswordActivity(), arguments: {
           'email': email
         });
       } else {

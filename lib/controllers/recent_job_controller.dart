@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:the_staff_hound/api_services/rest_api_services.dart';
+import 'package:the_staff_hound/api_services/main_api_services.dart';
+import 'package:the_staff_hound/api_services/response_models/jobs_model.dart';
 import 'package:the_staff_hound/constants.dart';
 import 'package:the_staff_hound/custom_widgets/app_text.dart';
 import 'package:the_staff_hound/shared_prefs/shared_prefs.dart';
 
-import '../api_services/response_models/jobs_response.dart';
+import '../api_services/response_models/dashboard_offers_response.dart';
+import '../api_services/response_models/general_data_class.dart';
 
 class RecentJobController extends GetxController {
   var categoryId = 0.obs;
-  var jobsList = <Job>[].obs;
+  var jobsList = <Data>[].obs;
+  var offersList = <Offer>[].obs;
+  var controller = TextEditingController();
   var isLoaded = false.obs;
   var isEmpty = false;
   var listOfCities = <String>['Miami', 'Chicago', 'Florida'];
+  var tempList = <Data>[].obs;
 
   var listOfBranches = <String>['Branch 1', 'Branch 2', 'Branch 3'];
   var skillsList = <String>[
@@ -26,34 +31,91 @@ class RecentJobController extends GetxController {
 
   var isCitySearchSelected = false.obs;
   var isSkillSearchSelected = false.obs;
-
   @override
   void onInit() {
     super.onInit();
-    print(Get.arguments['more']);
-    if (Get.arguments['more'] == true) {
-      fetchAllJobs(SharedPrefsManager.getUserToken);
+
+    // token.value = SharedPrefsManager.getUserToken;
+
+    // fetchFeaturedJobs();
+    if (Get.arguments != null) {
+      categoryId.value = Get.arguments[0]['categoryId'];
+
+      if (categoryId.value != 0) {
+        fetchJobsByCategory(SharedPrefsManager.getUserToken, categoryId.value);
+        debugPrint('Jobs By Category Called');
+      } else {
+        fetchMultipleOffers(SharedPrefsManager.getUserToken);
+        debugPrint('All Projects API Called');
+      }
     } else {
-      categoryId.value = Get.arguments['categoryId'];
+      debugPrint('Arguments are null');
+    }
 
-      fetchJobsbyCategory(categoryId.value, SharedPrefsManager.getUserToken);
+    fetchRecentOffers(SharedPrefsManager.getUserToken);
+  }
 
-      print(categoryId);
+  updateList(String value) {
+    tempList.value = jobsList
+        .where((element) =>
+            element.title.toLowerCase().contains(value.toLowerCase()))
+        .toList();
+  }
+
+  fetchMultipleOffers(String token) async {
+    var response = await ApiServices.getMulitpleProjects(token);
+    if (response!.statusCode == 200) {
+      var data = multipleProjectsResponseFromJson(response.body);
+      jobsList.value = data.success.data;
+      tempList.value = data.success.data;
+    } else {
+      Constants.showToast('Error');
+      print(response.body);
     }
   }
 
-  fetchAllJobs(String token) async {
-    var response = await RestApiServices.getAllJobs(token);
-    if (response!.recentJobs != null) {
-      jobsList.value = response.recentJobs!;
-      print(jobsList.toJson());
-      isLoaded.value = true;
+  fetchJobsByCategory(String token, int categoryId) async {
+    var response = await ApiServices.getJobsByCategory(token, categoryId);
+    if (response!.statusCode == 200) {
+      var data = multipleProjectsResponseFromJson(response.body);
+      jobsList.value = data.success.data;
+      tempList.value = data.success.data;
     } else {
-      isLoaded.value = false;
+      print(response.body);
+      Constants.showToast('Error');
     }
   }
 
-  fetchJobsbyCategory(int? id, String getUserToken) async {
+  fetchRecentOffers(String token) async {
+    var response = await ApiServices.getJobOffers(token);
+    if (response!.statusCode == 200) {
+      var data = dashboardOffersResponseFromJson(response.body);
+      offersList.value = data.offers;
+      // print(jobsList.toJson());
+    } else {
+      Constants.showToast('Error');
+      print(response.body.toString());
+    }
+  }
+
+  saveProject(int id, int status) async {
+    var response = await ApiServices.saveProject(
+        SharedPrefsManager.getUserToken, id, status);
+    if (response!.statusCode == 200) {
+      // print('Error Not Given');
+      if (categoryId.value != 0) {
+        fetchJobsByCategory(SharedPrefsManager.getUserToken, categoryId.value);
+        debugPrint('Jobs By Category Called');
+      } else {
+        fetchMultipleOffers(SharedPrefsManager.getUserToken);
+        debugPrint('All Projects API Called');
+      }
+    } else {
+      print(response.body);
+    }
+  }
+
+  /* fetchJobsbyCategory(int? id, String getUserToken) async {
     var response = await RestApiServices.getJobsByCategory(id!, getUserToken);
     if (response!.recentJobs != null) {
       jobsList.value = response.recentJobs!;
@@ -61,14 +123,15 @@ class RecentJobController extends GetxController {
     } else {
       isLoaded.value = false;
     }
-  }
+  } */
 
-  addToArchive(int jobId) {
-    RestApiServices.addToArchive(SharedPrefsManager.getUserToken, jobId);
-  }
+  // addToArchive(int jobId) {
+  //   RestApiServices.addToArchive(SharedPrefsManager.getUserToken, jobId);
+  // }
 
   openFiltersDialog(Size size) {
     showDialog(
+      barrierDismissible: false,
       context: Get.overlayContext!,
       builder: (_) => AlertDialog(
         contentPadding: const EdgeInsets.all(10),

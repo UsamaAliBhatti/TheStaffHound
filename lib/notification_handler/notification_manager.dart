@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications_plus/flutter_local_notifications_plus.dart';
 import 'package:get/get.dart';
-import 'package:the_staff_hound/views/job_details_screen.dart';
+import 'package:the_staff_hound/routes/app_pages.dart';
 
 class NotificationManager {
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -19,12 +19,7 @@ class NotificationManager {
         InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
-      if (payload != null) {
-        print(payload);
-        Get.to(() => JobDetailsActivity(), arguments: [
-          {'jobId': int.parse(payload)}
-        ]);
-      }
+      Get.toNamed(Routes.NOTIFICATIONS);
     });
   }
 
